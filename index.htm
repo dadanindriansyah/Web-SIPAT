@@ -24,17 +24,30 @@
             <div class="flex items-center gap-3">
                 <span class="text-3xl">🏫</span>
                 <div>
-                    <h1 class="text-xl font-black tracking-wider uppercase" id="navSchoolName">SIAKAD RARANGGE</h1>
+                    <h1 class="text-xl font-black tracking-wider uppercase" id="navSchoolName">SD NEGERI JASINGA 01</h1>
                     <p class="text-xs text-indigo-200" id="navSchoolNpsn">NPSN: -</p>
                 </div>
             </div>
-            <div id="userInfo" class="flex items-center gap-4 hidden">
-                <span id="txtActiveUser" class="font-bold bg-indigo-800 px-4 py-1.5 rounded-full text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-circle-user"></i> Loading...
-                </span>
-                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-4 py-1.5 rounded-full transition shadow-md">
-                    <i class="fa-solid fa-right-from-bracket"></i> Keluar
-                </button>
+            <div class="flex items-center gap-4">
+                <!-- FITUR BACKUP & RESTORE DATA -->
+                <div class="flex gap-2 bg-indigo-800/50 p-1.5 rounded-xl border border-indigo-500/30">
+                    <button onclick="backupSeluruhData()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition shadow flex items-center gap-1">
+                        <i class="fa-solid fa-cloud-arrow-down"></i> Backup Data
+                    </button>
+                    <label class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg cursor-pointer transition shadow flex items-center gap-1">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload Ulang (Restore)
+                        <input type="file" id="fileRestore" class="hidden" accept=".json" onchange="restoreSeluruhData(event)">
+                    </label>
+                </div>
+                
+                <div id="userInfo" class="flex items-center gap-4 hidden">
+                    <span id="txtActiveUser" class="font-bold bg-indigo-800 px-4 py-1.5 rounded-full text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-circle-user"></i> Loading...
+                    </span>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-4 py-1.5 rounded-full transition shadow-md">
+                        <i class="fa-solid fa-right-from-bracket"></i> Keluar
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -64,8 +77,8 @@
                     </div>
                 </div>
                 <button onclick="handleLogin()" class="w-full bg-red-600 hover:bg-red-700 text-white font-black py-3 px-6 rounded-xl transition duration-300 shadow-md hover:shadow-lg flex justify-center items-center gap-2 text-base border-b-4 border-red-800 active:border-b-0 active:mt-1">
-            <i class="fa-solid fa-right-to-bracket text-yellow-300"></i> Masuk Sistem
-        </button>
+                    <i class="fa-solid fa-right-to-bracket text-yellow-300"></i> Masuk Sistem
+                </button>
             </div>
         </section>
 
@@ -86,12 +99,12 @@
 
             <!-- TAB ADMIN: PROFIL & METADATA -->
             <div id="tabAdmProfil" class="adm-content space-y-8">
-                <!-- Profil Sekolah -->
+                <!-- Profil Sekolah & Tahun Pelajaran -->
                 <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
                     <h3 class="text-lg font-bold border-b pb-3 mb-4 text-indigo-600 flex items-center gap-2">
-                        <i class="fa-solid fa-school"></i> Profil Lembaga / Sekolah
+                        <i class="fa-solid fa-school"></i> Profil Lembaga / Sekolah & Tahun Pelajaran
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase">Nama Sekolah</label>
                             <input type="text" id="schName" class="mt-1 block w-full rounded-lg border border-slate-300 p-2.5 text-sm">
@@ -99,6 +112,10 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase">NPSN Sekolah</label>
                             <input type="text" id="schNpsn" class="mt-1 block w-full rounded-lg border border-slate-300 p-2.5 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Tahun Pelajaran Aktif</label>
+                            <input type="text" id="schTapel" class="mt-1 block w-full rounded-lg border border-slate-300 p-2.5 text-sm" placeholder="Contoh: 2025/2026">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase">Alamat Lengkap</label>
@@ -276,14 +293,23 @@
             <div class="bg-gradient-to-r from-emerald-800 to-emerald-600 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center flex-wrap gap-4">
                 <div>
                     <h2 class="text-2xl font-black" id="guruTitle">Panel Kerja Guru</h2>
-                    <p class="text-emerald-100 text-sm">Kelola kegiatan presensi, penilaian mata pelajaran, penilaian ekskul, dan tabungan murid.</p>
+                    <div class="flex items-center gap-4 mt-1">
+                        <p class="text-emerald-100 text-sm">Kelola kegiatan presensi, penilaian mata pelajaran, penilaian ekskul, dan tabungan murid.</p>
+                        <span id="txtGuruTapel" class="bg-emerald-900 px-3 py-1 rounded-full text-xs font-bold border border-emerald-400/30">TP: -</span>
+                    </div>
                 </div>
-                <!-- Navigasi Menu Guru -->
-                <div class="flex gap-2 bg-emerald-900/40 p-1.5 rounded-xl border border-emerald-400/20">
-                    <button onclick="switchGuruTab('tabAbsensi')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-white text-emerald-800 transition">📅 Absensi</button>
-                    <button onclick="switchGuruTab('tabNilai')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">📝 Nilai Mapel</button>
-                    <button onclick="switchGuruTab('tabEkskul')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">🏆 Nilai Ekskul</button>
-                    <button onclick="switchGuruTab('tabTabungan')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">💰 Tabungan</button>
+                <!-- Navigasi Menu Guru & Tombol Hapus Semua Data -->
+                <div class="flex items-center gap-4 flex-wrap">
+                    <button onclick="clearAllGuruData()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-black px-4 py-2.5 rounded-xl border-b-4 border-red-950 active:border-b-0 active:mt-1 transition-all shadow-md">
+                        <i class="fa-solid fa-dumpster-fire text-yellow-300"></i> Kosongkan Semua Input Data
+                    </button>
+                    
+                    <div class="flex gap-2 bg-emerald-900/40 p-1.5 rounded-xl border border-emerald-400/20">
+                        <button onclick="switchGuruTab('tabAbsensi')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-white text-emerald-800 transition">📅 Absensi</button>
+                        <button onclick="switchGuruTab('tabNilai')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">📝 Nilai Mapel</button>
+                        <button onclick="switchGuruTab('tabEkskul')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">🏆 Nilai Ekskul</button>
+                        <button onclick="switchGuruTab('tabTabungan')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">💰 Tabungan</button>
+                    </div>
                 </div>
             </div>
 
@@ -531,9 +557,12 @@
 
         <!-- SECTION 4: DASHBOARD SISWA -->
         <section id="secSiswa" class="hidden space-y-6">
-            <div class="bg-gradient-to-r from-violet-800 to-indigo-700 text-white p-6 rounded-2xl shadow-lg">
-                <h2 class="text-2xl font-black" id="siswaTitle">Halo, Selamat Datang!</h2>
-                <p class="text-indigo-200 text-sm">Akses cepat laporan belajar harian, penilaian mata pelajaran, laporan ekskul, dan tabungan Anda di bawah ini.</p>
+            <div class="bg-gradient-to-r from-violet-800 to-indigo-700 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center flex-wrap">
+                <div>
+                    <h2 class="text-2xl font-black" id="siswaTitle">Halo, Selamat Datang!</h2>
+                    <p class="text-indigo-200 text-sm">Akses cepat laporan belajar harian, penilaian mata pelajaran, laporan ekskul, dan tabungan Anda di bawah ini.</p>
+                </div>
+                <span id="txtSiswaTapel" class="bg-indigo-900 px-4 py-1.5 rounded-full text-xs font-black border border-indigo-400/30">TP: -</span>
             </div>
 
             <!-- Tampilan Data Komprehensif Siswa -->
@@ -593,7 +622,7 @@
             localStorage.setItem('adminPassword', 'Rarangge01');
         }
         if (!localStorage.getItem('schoolProfile')) {
-            localStorage.setItem('schoolProfile', JSON.stringify({ nama: "SIAKAD RARANGGE", npsn: "10203040", alamat: "Jl. Rarangge Raya No. 1" }));
+            localStorage.setItem('schoolProfile', JSON.stringify({ nama: "SD NEGERI JASINGA 01", npsn: "20201508", alamat: "Jl. Rarangge Raya No. 1", tapel: "2025/2026" }));
         }
         if (!localStorage.getItem('users')) {
             localStorage.setItem('users', JSON.stringify([]));
@@ -625,7 +654,7 @@
         function loadNavSchool() {
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
             document.getElementById('navSchoolName').innerText = profile.nama;
-            document.getElementById('navSchoolNpsn').innerText = "NPSN: " + profile.npsn;
+            document.getElementById('navSchoolNpsn').innerText = "NPSN: " + profile.npsn + " | TP: " + (profile.tapel || "-");
         }
         loadNavSchool();
 
@@ -667,16 +696,21 @@
             document.getElementById('userInfo').classList.remove('hidden');
             document.getElementById('txtActiveUser').innerHTML = `<i class="fa-solid fa-circle-user"></i> ${currentUser.nama || currentUser.username} (${role})`;
 
+            const profile = JSON.parse(localStorage.getItem('schoolProfile'));
+            const currentTapel = profile.tapel || "-";
+
             if (role === "Admin") {
                 document.getElementById('secAdmin').classList.remove('hidden');
                 initAdminDashboard();
             } else if (role === "Guru") {
                 document.getElementById('secGuru').classList.remove('hidden');
                 document.getElementById('guruTitle').innerText = `Panel Kerja Guru - Kelas ${currentUser.kelas}`;
+                document.getElementById('txtGuruTapel').innerText = `TP: ${currentTapel}`;
                 initGuruViews();
             } else if (role === "Siswa") {
                 document.getElementById('secSiswa').classList.remove('hidden');
                 document.getElementById('siswaTitle').innerText = `Halo, Selamat Datang ${currentUser.nama}! (Kelas ${currentUser.kelas})`;
+                document.getElementById('txtSiswaTapel').innerText = `TP: ${currentTapel}`;
                 loadSiswaDashboard();
             }
         }
@@ -687,16 +721,17 @@
                 btn.classList.remove('bg-white', 'text-indigo-700');
                 btn.classList.add('text-indigo-100', 'hover:bg-indigo-800/50');
             });
-            event.target.classList.add('bg-white', 'text-indigo-700');
-            event.target.classList.remove('text-indigo-100', 'hover:bg-indigo-800/50');
+            if (event) {
+                event.target.classList.add('bg-white', 'text-indigo-700');
+                event.target.classList.remove('text-indigo-100', 'hover:bg-indigo-800/50');
+            }
 
             document.querySelectorAll('.adm-content').forEach(content => content.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
         }
 
-        // FUNGSI BARU: DOWNLOAD TEMPLATE EXCEL UNTUK GURU/SISWA
+        // PERBAIKAN DI BAGIAN INI (Mengubah parameter 'Guru' menjadi variabel 'role')
         function downloadTemplateUsers(role) {
-            // Struktur data header kolom template sesuai dengan fungsi importUsersExcel
             const templateData = [
                 {
                     "Username": "contoh_user123",
@@ -713,29 +748,31 @@
         }
 
         function initAdminDashboard() {
-            // Load Profil Sekolah
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
             document.getElementById('schName').value = profile.nama;
             document.getElementById('schNpsn').value = profile.npsn;
+            document.getElementById('schTapel').value = profile.tapel || "";
             document.getElementById('schAddress').value = profile.alamat;
 
             loadAdminMetadata();
             loadAdminUsers();
         }
 
+        // Admin: Save Profile
         function saveSchoolProfile() {
             const nama = document.getElementById('schName').value.trim();
             const npsn = document.getElementById('schNpsn').value.trim();
+            const tapel = document.getElementById('schTapel').value.trim();
             const alamat = document.getElementById('schAddress').value.trim();
 
-            if (!nama || !npsn || !alamat) {
+            if (!nama || !npsn || !tapel || !alamat) {
                 alert("Semua kolom isian profil sekolah wajib diisi!");
                 return;
             }
 
-            localStorage.setItem('schoolProfile', JSON.stringify({ nama, npsn, alamat }));
+            localStorage.setItem('schoolProfile', JSON.stringify({ nama, npsn, alamat, tapel }));
             loadNavSchool();
-            alert("Profil sekolah berhasil disimpan!");
+            alert("Profil sekolah & Tahun Pelajaran berhasil disimpan!");
         }
 
         // Admin: Load Mapel & Ekskul
@@ -743,7 +780,6 @@
             const mapel = JSON.parse(localStorage.getItem('mapel'));
             const ekskul = JSON.parse(localStorage.getItem('ekskul'));
 
-            // Mapel Render
             const listMapel = document.getElementById('listMapel');
             listMapel.innerHTML = '';
             mapel.forEach((m, idx) => {
@@ -755,7 +791,6 @@
                 `;
             });
 
-            // Ekskul Render
             const listEkskul = document.getElementById('listEkskul');
             listEkskul.innerHTML = '';
             ekskul.forEach((e, idx) => {
@@ -768,7 +803,6 @@
             });
         }
 
-        // Tambah Mapel & Ekskul Manual
         function addMapelManual() {
             const val = document.getElementById('newMapel').value.trim();
             if(!val) return alert("Isi nama mata pelajaran!");
@@ -779,6 +813,7 @@
             loadAdminMetadata();
         }
 
+        // Admin: Ekskul & User Management
         function addEkskulManual() {
             const val = document.getElementById('newEkskul').value.trim();
             if(!val) return alert("Isi nama ekstrakurikuler!");
@@ -798,7 +833,6 @@
             }
         }
 
-        // Import Excel Untuk Metadata (Mapel / Ekskul)
         function importMetadata(event, type) {
             const file = event.target.files[0];
             if (!file) return;
@@ -828,7 +862,6 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // --- MANAJEMEN GURU & SISWA OLEH ADMIN ---
         function changeAdminPass() {
             const pass = document.getElementById('newAdminPass').value.trim();
             if(pass) {
@@ -881,7 +914,6 @@
             alert(`Sukses menambahkan akun ${role} baru!`);
             loadAdminUsers();
 
-            // Reset inputs
             document.getElementById(role === 'Guru' ? 'guruUser' : 'siswaUser').value = '';
             document.getElementById(role === 'Guru' ? 'guruPass' : 'siswaPass').value = '';
             document.getElementById(role === 'Guru' ? 'guruNama' : 'siswaNama').value = '';
@@ -938,8 +970,10 @@
                 btn.classList.remove('bg-white', 'text-emerald-800');
                 btn.classList.add('text-emerald-100', 'hover:bg-emerald-800/50');
             });
-            event.target.classList.add('bg-white', 'text-emerald-800');
-            event.target.classList.remove('text-emerald-100', 'hover:bg-emerald-800/50');
+            if (event) {
+                event.target.classList.add('bg-white', 'text-emerald-800');
+                event.target.classList.remove('text-emerald-100', 'hover:bg-emerald-800/50');
+            }
 
             document.querySelectorAll('.guru-content').forEach(content => content.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
@@ -963,7 +997,6 @@
             const mapel = JSON.parse(localStorage.getItem('mapel'));
             const ekskul = JSON.parse(localStorage.getItem('ekskul'));
 
-            // Dropdown nama siswa
             const ddSiswa = ['absensiSiswa', 'nilaiSiswa', 'ekskulSiswa', 'tabunganSiswa'];
             ddSiswa.forEach(id => {
                 const el = document.getElementById(id);
@@ -975,18 +1008,35 @@
                 }
             });
 
-            // Dropdown mapel
             const ddMapel = document.getElementById('nilaiMapel');
             ddMapel.innerHTML = '';
             mapel.forEach(m => ddMapel.innerHTML += `<option value="${m.nama}">${m.nama}</option>`);
 
-            // Dropdown ekskul
             const ddEkskul = document.getElementById('ekskulPilihan');
             ddEkskul.innerHTML = '';
             ekskul.forEach(e => ddEkskul.innerHTML += `<option value="${e.nama}">${e.nama}</option>`);
         }
 
-        // GURU: PROSES ABSENSI
+        function clearAllGuruData() {
+            if (confirm("⚠️ PERINGATAN KERAS!\nApakah Anda yakin ingin menghapus SELURUH data inputan (Absensi, Nilai Mapel, Nilai Ekskul, dan Tabungan) khusus untuk kelas Anda? Tindakan ini tidak dapat dibatalkan.")) {
+                const kelasGuru = currentUser.kelas;
+                
+                let absensi = JSON.parse(localStorage.getItem('absensi')) || [];
+                let nilai = JSON.parse(localStorage.getItem('nilai')) || [];
+                let nilaiEkskul = JSON.parse(localStorage.getItem('nilai_ekskul')) || [];
+                let tabungan = JSON.parse(localStorage.getItem('tabungan')) || [];
+                
+                localStorage.setItem('absensi', JSON.stringify(absensi.filter(a => a.kelas !== kelasGuru)));
+                localStorage.setItem('nilai', JSON.stringify(nilai.filter(n => n.kelas !== kelasGuru)));
+                localStorage.setItem('nilai_ekskul', JSON.stringify(nilaiEkskul.filter(ne => ne.kelas !== kelasGuru)));
+                localStorage.setItem('tabungan', JSON.stringify(tabungan.filter(t => t.kelas !== kelasGuru)));
+                
+                alert("Semua data inputan guru untuk Kelas " + kelasGuru + " berhasil dibersihkan secara total!");
+                initGuruViews();
+            }
+        }
+
+        // Guru: Presensi, Nilai, Ekskul & Keuangan Logic
         function submitAbsensi() {
             const date = document.getElementById('absensiDate').value;
             const userSiswa = document.getElementById('absensiSiswa').value;
@@ -996,6 +1046,7 @@
 
             let absensi = JSON.parse(localStorage.getItem('absensi'));
             const sObj = getSiswaSekelas().find(s => s.username === userSiswa);
+            const profile = JSON.parse(localStorage.getItem('schoolProfile'));
 
             absensi.push({
                 id: Date.now(),
@@ -1003,7 +1054,8 @@
                 username: userSiswa,
                 nama: sObj.nama,
                 kelas: currentUser.kelas,
-                status
+                status,
+                tapel: profile.tapel || "-"
             });
 
             localStorage.setItem('absensi', JSON.stringify(absensi));
@@ -1038,7 +1090,6 @@
                 `;
             });
 
-            // Pie Chart update
             if (chartInstanceAbsen) chartInstanceAbsen.destroy();
             const ctx = document.getElementById('chartAbsensi').getContext('2d');
             chartInstanceAbsen = new Chart(ctx, {
@@ -1054,7 +1105,6 @@
             });
         }
 
-        // GURU: PROSES NILAI MAPEL
         function submitNilai() {
             const username = document.getElementById('nilaiSiswa').value;
             const mapel = document.getElementById('nilaiMapel').value;
@@ -1067,6 +1117,7 @@
 
             let nilai = JSON.parse(localStorage.getItem('nilai'));
             const sObj = getSiswaSekelas().find(s => s.username === username);
+            const profile = JSON.parse(localStorage.getItem('schoolProfile'));
 
             nilai.push({
                 id: Date.now(),
@@ -1077,7 +1128,8 @@
                 semester,
                 jenis,
                 date,
-                angka
+                angka,
+                tapel: profile.tapel || "-"
             });
 
             localStorage.setItem('nilai', JSON.stringify(nilai));
@@ -1117,7 +1169,6 @@
                 `;
             });
 
-            // Update Bar Chart
             if (chartInstanceNilai) chartInstanceNilai.destroy();
             const ctx = document.getElementById('chartNilai').getContext('2d');
             
@@ -1143,7 +1194,6 @@
             });
         }
 
-        // GURU: PROSES NILAI EKSTRAKURIKULER (NEW FEATURE)
         function submitNilaiEkskul() {
             const username = document.getElementById('ekskulSiswa').value;
             const ekskul = document.getElementById('ekskulPilihan').value;
@@ -1155,6 +1205,7 @@
 
             let nilaiEkskul = JSON.parse(localStorage.getItem('nilai_ekskul'));
             const sObj = getSiswaSekelas().find(s => s.username === username);
+            const profile = JSON.parse(localStorage.getItem('schoolProfile'));
 
             nilaiEkskul.push({
                 id: Date.now(),
@@ -1164,7 +1215,8 @@
                 ekskul,
                 semester,
                 predikat,
-                desc
+                desc,
+                tapel: profile.tapel || "-"
             });
 
             localStorage.setItem('nilai_ekskul', JSON.stringify(nilaiEkskul));
@@ -1199,7 +1251,6 @@
             });
         }
 
-        // GURU: PROSES TABUNGAN
         function toggleWarningTabungan() {
             const jns = document.getElementById('tabunganJenis').value;
             const warn = document.getElementById('warnPotongan');
@@ -1219,6 +1270,7 @@
 
             let tabungan = JSON.parse(localStorage.getItem('tabungan'));
             const sObj = getSiswaSekelas().find(s => s.username === username);
+            const profile = JSON.parse(localStorage.getItem('schoolProfile'));
 
             let nominalBersih = nominalKotor;
             let potongan = 0;
@@ -1227,7 +1279,6 @@
                 potongan = nominalKotor * 0.10;
                 nominalBersih = nominalKotor - potongan;
 
-                // Cek Saldo Sebelum Tarik
                 const saldoSekarang = getSiswaSaldo(username);
                 if (saldoSekarang < nominalKotor) {
                     alert(`Saldo tidak mencukupi untuk ditarik! Saldo Anda saat ini: Rp ${saldoSekarang.toLocaleString()}`);
@@ -1244,7 +1295,8 @@
                 nominalAsli: nominalKotor,
                 nominalBersih,
                 potongan,
-                date
+                date,
+                tapel: profile.tapel || "-"
             });
 
             localStorage.setItem('tabungan', JSON.stringify(tabungan));
@@ -1298,12 +1350,13 @@
         // --- SUB-DASHBOARD: PORTAL SISWA ---
         function loadSiswaDashboard() {
             const username = currentUser.username;
+            const profile = JSON.parse(localStorage.getItem('schoolProfile'));
+            const currentTapel = profile.tapel || "-";
 
-            // 1. Absensi Siswa
-            const absensi = JSON.parse(localStorage.getItem('absensi')).filter(a => a.username === username);
+            const absensi = JSON.parse(localStorage.getItem('absensi')).filter(a => a.username === username && (a.tapel === currentTapel || !a.tapel));
             const listAbsen = document.getElementById('siswaAbsenList');
             listAbsen.innerHTML = '';
-            if(absensi.length === 0) listAbsen.innerHTML = `<li class="p-3 text-slate-400 text-center">Tidak ada riwayat kehadiran</li>`;
+            if(absensi.length === 0) listAbsen.innerHTML = `<li class="p-3 text-slate-400 text-center">Tidak ada riwayat kehadiran di TP ini</li>`;
             absensi.forEach(a => {
                 listAbsen.innerHTML += `
                     <li class="py-2.5 flex justify-between items-center text-xs">
@@ -1313,11 +1366,10 @@
                 `;
             });
 
-            // 2. Nilai Pelajaran Akademik
-            const nilai = JSON.parse(localStorage.getItem('nilai')).filter(n => n.username === username);
+            const nilai = JSON.parse(localStorage.getItem('nilai')).filter(n => n.username === username && (n.tapel === currentTapel || !n.tapel));
             const listNilai = document.getElementById('siswaNilaiList');
             listNilai.innerHTML = '';
-            if(nilai.length === 0) listNilai.innerHTML = `<li class="p-3 text-slate-400 text-center">Belum ada input nilai akademik</li>`;
+            if(nilai.length === 0) listNilai.innerHTML = `<li class="p-3 text-slate-400 text-center">Belum ada input nilai akademik di TP ini</li>`;
             nilai.forEach(n => {
                 listNilai.innerHTML += `
                     <li class="py-2.5 flex justify-between items-center text-xs">
@@ -1330,11 +1382,10 @@
                 `;
             });
 
-            // 3. Nilai Ekstrakurikuler Siswa (NEW)
-            const ekskuls = JSON.parse(localStorage.getItem('nilai_ekskul')).filter(ne => ne.username === username);
+            const ekskuls = JSON.parse(localStorage.getItem('nilai_ekskul')).filter(ne => ne.username === username && (ne.tapel === currentTapel || !ne.tapel));
             const listEkskul = document.getElementById('siswaEkskulList');
             listEkskul.innerHTML = '';
-            if(ekskuls.length === 0) listEkskul.innerHTML = `<li class="p-3 text-slate-400 text-center">Belum ada penilaian ekskul</li>`;
+            if(ekskuls.length === 0) listEkskul.innerHTML = `<li class="p-3 text-slate-400 text-center">Belum ada penilaian ekskul di TP ini</li>`;
             ekskuls.forEach(ne => {
                 listEkskul.innerHTML += `
                     <li class="py-2 flex justify-between items-start">
@@ -1347,7 +1398,6 @@
                 `;
             });
 
-            // 4. Riwayat Tabungan Siswa
             const tabungans = JSON.parse(localStorage.getItem('tabungan')).filter(t => t.username === username);
             const listTabungan = document.getElementById('siswaTabunganList');
             listTabungan.innerHTML = '';
@@ -1374,7 +1424,7 @@
             if(tabungans.length === 0) listTabungan.innerHTML = `<li class="p-2 text-slate-400 text-center text-[10px]">Belum ada mutasi keuangan</li>`;
         }
 
-        // --- SISTEM UNDUH REKAP EXCEL (OFFLINE) ---
+        // --- EXPORT TO EXCEL SYSTEM ---
         function exportTableToExcel(tableID, filename = '') {
             const table = document.getElementById(tableID);
             const wb = XLSX.utils.table_to_book(table, { sheet: "Data Laporan" });
@@ -1390,29 +1440,75 @@
             XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
             XLSX.writeFile(workbook, `Rekap_Global_${type}_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
+
+        // --- BACKUP & RESTORE DATA ---
+        function backupSeluruhData() {
+            const backupKeys = ['adminPassword', 'schoolProfile', 'users', 'mapel', 'ekskul', 'absensi', 'nilai', 'nilai_ekskul', 'tabungan'];
+            let backupObject = {};
+            
+            backupKeys.forEach(key => {
+                const item = localStorage.getItem(key);
+                try {
+                    backupObject[key] = JSON.parse(item);
+                } catch(e) {
+                    backupObject[key] = item;
+                }
+            });
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObject, null, 2));
+            const downloadAnchor = document.createElement('a');
+            const dateStr = new Date().toISOString().slice(0,10);
+            
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `BACKUP_SIPAT_ALL_DATA_${dateStr}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function restoreSeluruhData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    const backupKeys = ['adminPassword', 'schoolProfile', 'users', 'mapel', 'ekskul', 'absensi', 'nilai', 'nilai_ekskul', 'tabungan'];
+                    
+                    let keyCount = 0;
+                    backupKeys.forEach(key => {
+                        if (importedData.hasOwnProperty(key)) {
+                            keyCount++;
+                        }
+                    });
+                    
+                    if(keyCount < 5) {
+                        alert("Gagal mengunggah! Format berkas JSON backup tidak valid.");
+                        return;
+                    }
+                    
+                    if(confirm("Apakah Anda yakin ingin melakukan Restore data? Seluruh data saat ini akan ditimpa.")) {
+                        backupKeys.forEach(key => {
+                            if (importedData.hasOwnProperty(key)) {
+                                if (typeof importedData[key] === 'object') {
+                                    localStorage.setItem(key, JSON.stringify(importedData[key]));
+                                } else {
+                                    localStorage.setItem(key, importedData[key]);
+                                }
+                            }
+                        });
+                        
+                        alert("Sistem Berhasil Direstore!");
+                        window.location.reload();
+                    }
+                } catch (err) {
+                    alert("Terjadi kesalahan saat membaca file JSON: " + err.message);
+                }
+            };
+            reader.readAsText(file);
+            document.getElementById('fileRestore').value = ''; 
+        }
     </script>
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyC9MIrdaEfMFrRMyMMYVbC2BMPKQH1Qhmw",
-    authDomain: "web-sioat.firebaseapp.com",
-    projectId: "web-sioat",
-    storageBucket: "web-sioat.firebasestorage.app",
-    messagingSenderId: "293286030379",
-    appId: "1:293286030379:web:756e6db8fd990bb4108e6e",
-    measurementId: "G-DRM47ZZ7EE"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
 </body>
 </html>
