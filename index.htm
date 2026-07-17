@@ -1391,5 +1391,28 @@
             XLSX.writeFile(workbook, `Rekap_Global_${type}_${new Date().toISOString().slice(0,10)}.xlsx`);
         }
     </script>
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyC9MIrdaEfMFrRMyMMYVbC2BMPKQH1Qhmw",
+    authDomain: "web-sioat.firebaseapp.com",
+    projectId: "web-sioat",
+    storageBucket: "web-sioat.firebasestorage.app",
+    messagingSenderId: "293286030379",
+    appId: "1:293286030379:web:756e6db8fd990bb4108e6e",
+    measurementId: "G-DRM47ZZ7EE"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 </body>
 </html>
