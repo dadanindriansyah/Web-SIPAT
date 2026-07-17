@@ -239,12 +239,20 @@
                             <input type="password" id="guruPass" placeholder="Password" class="border p-2 rounded text-xs">
                             <input type="text" id="guruNama" placeholder="Nama Lengkap" class="border p-2 rounded text-xs col-span-2">
                             <input type="text" id="guruNip" placeholder="NIP Guru" class="border p-2 rounded text-xs col-span-2">
-                            <input type="text" id="guruKelas" placeholder="Kelas Diajar (Contoh: 1, 2, 3A)" class="border p-2 rounded text-xs col-span-2">
+                            <div class="col-span-2 grid grid-cols-2 gap-2">
+                                <input type="text" id="guruKelas" placeholder="Kelas Diajar (Contoh: 1, 2, 3A)" class="border p-2 rounded text-xs">
+                                <select id="guruFase" class="border p-2 rounded text-xs bg-white text-slate-600">
+                                    <option value="">-- Pilih Fase Kelas --</option>
+                                    <option value="A">Fase A (Kelas 1-2)</option>
+                                    <option value="B">Fase B (Kelas 3-4)</option>
+                                    <option value="C">Fase C (Kelas 5-6)</option>
+                                </select>
+                            </div>
                             <button onclick="addUserManual('Guru')" class="bg-indigo-600 text-white p-2 rounded text-xs font-semibold col-span-2 hover:bg-indigo-700">Tambah Guru Manual</button>
                         </div>
                         <div class="overflow-x-auto border rounded-xl max-h-60 overflow-y-auto">
                             <table class="w-full text-left text-xs">
-                                <thead class="bg-slate-100"><tr><th class="p-2">User</th><th class="p-2">Nama</th><th class="p-2">NIP</th><th class="p-2">Kelas</th><th class="p-2 text-right">Aksi</th></tr></thead>
+                                <thead class="bg-slate-100"><tr><th class="p-2">User</th><th class="p-2">Nama</th><th class="p-2">NIP</th><th class="p-2">Kelas</th><th class="p-2">Fase</th><th class="p-2 text-right">Aksi</th></tr></thead>
                                 <tbody id="tblAdminGuru" class="divide-y"></tbody>
                             </table>
                         </div>
@@ -268,12 +276,20 @@
                             <input type="text" id="siswaUser" placeholder="Username / NISN" class="border p-2 rounded text-xs">
                             <input type="password" id="siswaPass" placeholder="Password" class="border p-2 rounded text-xs">
                             <input type="text" id="siswaNama" placeholder="Nama Lengkap" class="border p-2 rounded text-xs col-span-2">
-                            <input type="text" id="siswaKelas" placeholder="Kelas (Contoh: 1, 2)" class="border p-2 rounded text-xs col-span-2">
+                            <div class="col-span-2 grid grid-cols-2 gap-2">
+                                <input type="text" id="siswaKelas" placeholder="Kelas (Contoh: 1, 2)" class="border p-2 rounded text-xs">
+                                <select id="siswaFase" class="border p-2 rounded text-xs bg-white text-slate-600">
+                                    <option value="">-- Pilih Fase --</option>
+                                    <option value="A">Fase A</option>
+                                    <option value="B">Fase B</option>
+                                    <option value="C">Fase C</option>
+                                </select>
+                            </div>
                             <button onclick="addUserManual('Siswa')" class="bg-indigo-600 text-white p-2 rounded text-xs font-semibold col-span-2 hover:bg-indigo-700">Tambah Siswa Manual</button>
                         </div>
                         <div class="overflow-x-auto border rounded-xl max-h-60 overflow-y-auto">
                             <table class="w-full text-left text-xs">
-                                <thead class="bg-slate-100"><tr><th class="p-2">User</th><th class="p-2">Nama</th><th class="p-2">Kelas</th><th class="p-2 text-right">Aksi</th></tr></thead>
+                                <thead class="bg-slate-100"><tr><th class="p-2">User</th><th class="p-2">Nama</th><th class="p-2">Kelas</th><th class="p-2">Fase</th><th class="p-2 text-right">Aksi</th></tr></thead>
                                 <tbody id="tblAdminSiswa" class="divide-y"></tbody>
                             </table>
                         </div>
@@ -853,9 +869,9 @@
                 btn.classList.remove('bg-white', 'text-indigo-700');
                 btn.classList.add('text-indigo-100', 'hover:bg-indigo-800/50');
             });
-            if (event) {
-                event.target.classList.add('bg-white', 'text-indigo-700');
-                event.target.classList.remove('text-indigo-100', 'hover:bg-indigo-800/50');
+            if (window.event) {
+                window.event.target.classList.add('bg-white', 'text-indigo-700');
+                window.event.target.classList.remove('text-indigo-100', 'hover:bg-indigo-800/50');
             }
 
             document.querySelectorAll('.adm-content').forEach(content => content.classList.add('hidden'));
@@ -875,8 +891,8 @@
 
         function downloadTemplateUsers(role) {
             const templateData = role === 'Guru' ? 
-                [{ "Username": "guru123", "Password": "password123", "Nama": "Nama Lengkap Guru", "NIP": "199012122020012001", "Kelas": "1" }] :
-                [{ "Username": "232401001", "Password": "password123", "Nama": "Nama Lengkap Siswa", "Kelas": "1" }];
+                [{ "Username": "guru123", "Password": "password123", "Nama": "Nama Lengkap Guru", "NIP": "199012122020012001", "Kelas": "1", "Fase": "A" }] :
+                [{ "Username": "232401001", "Password": "password123", "Nama": "Nama Lengkap Siswa", "Kelas": "1", "Fase": "A" }];
             
             const worksheet = XLSX.utils.json_to_sheet(templateData);
             const workbook = XLSX.utils.book_new();
@@ -1018,9 +1034,9 @@
 
             users.forEach((u, index) => {
                 if(u.role === "Guru") {
-                    tblGuru.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.nip || '-'}</td><td class="p-2">${u.kelas}</td><td class="p-2 text-right"><button onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                    tblGuru.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.nip || '-'}</td><td class="p-2">${u.kelas}</td><td class="p-2 font-bold text-indigo-600">${u.fase || '-'}</td><td class="p-2 text-right"><button onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
                 } else {
-                    tblSiswa.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.kelas}</td><td class="p-2 text-right"><button onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                    tblSiswa.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.kelas}</td><td class="p-2 font-bold text-indigo-600">${u.fase || '-'}</td><td class="p-2 text-right"><button onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
                 }
             });
         }
@@ -1030,14 +1046,15 @@
             const pass = document.getElementById(role === 'Guru' ? 'guruPass' : 'siswaPass').value.trim();
             const nama = document.getElementById(role === 'Guru' ? 'guruNama' : 'siswaNama').value.trim();
             const kelas = document.getElementById(role === 'Guru' ? 'guruKelas' : 'siswaKelas').value.trim().toUpperCase();
+            const fase = document.getElementById(role === 'Guru' ? 'guruFase' : 'siswaFase').value;
             const nip = role === 'Guru' ? document.getElementById('guruNip').value.trim() : "";
 
-            if(!user || !pass || !nama || !kelas) return alert("Isi seluruh kolom!");
+            if(!user || !pass || !nama || !kelas) return alert("Isi seluruh kolom utama!");
 
             let users = JSON.parse(localStorage.getItem('users')) || [];
             if(users.find(u => u.username === user)) return alert("Username sudah terdaftar!");
 
-            users.push({ username: user, password: pass, nama, kelas, role, nip });
+            users.push({ username: user, password: pass, nama, kelas, role, nip, fase });
             localStorage.setItem('users', JSON.stringify(users));
             alert("Berhasil ditambahkan!");
             loadAdminUsers();
@@ -1046,6 +1063,7 @@
             document.getElementById(role === 'Guru' ? 'guruPass' : 'siswaPass').value = '';
             document.getElementById(role === 'Guru' ? 'guruNama' : 'siswaNama').value = '';
             document.getElementById(role === 'Guru' ? 'guruKelas' : 'siswaKelas').value = '';
+            document.getElementById(role === 'Guru' ? 'guruFase' : 'siswaFase').value = '';
             if(role === 'Guru') document.getElementById('guruNip').value = '';
         }
 
@@ -1074,11 +1092,12 @@
                     const password = String(row.Password || '').trim();
                     const nama = String(row.Nama || '').trim();
                     const kelas = String(row.Kelas || '').trim().toUpperCase();
+                    const fase = row.Fase ? String(row.Fase).trim().toUpperCase() : '';
                     const nip = row.NIP ? String(row.NIP).trim() : '';
 
                     if(username && password && nama && kelas) {
                         if(!users.find(u => u.username === username)) {
-                            users.push({ username, password, nama, kelas, role, nip });
+                            users.push({ username, password, nama, kelas, role, nip, fase });
                             count++;
                         }
                     }
@@ -1096,9 +1115,9 @@
                 btn.classList.remove('bg-white', 'text-emerald-800');
                 btn.classList.add('text-emerald-100', 'hover:bg-emerald-800/50');
             });
-            if (event) {
-                event.target.classList.add('bg-white', 'text-emerald-800');
-                event.target.classList.remove('text-emerald-100', 'hover:bg-emerald-800/50');
+            if (window.event) {
+                window.event.target.classList.add('bg-white', 'text-emerald-800');
+                window.event.target.classList.remove('text-emerald-100', 'hover:bg-emerald-800/50');
             }
             document.querySelectorAll('.guru-content').forEach(content => content.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
@@ -1173,6 +1192,7 @@
             renderAbsensiGuru();
         }
 
+        // PERBAIKAN: Definisi fungsi hapus absensi
         function deleteAbsen(id) {
             if(confirm("Hapus?")) {
                 localStorage.setItem('absensi', JSON.stringify((JSON.parse(localStorage.getItem('absensi'))).filter(a => a.id !== id)));
@@ -1421,6 +1441,9 @@
 
             if (type === 'raport') {
                 // RAPORT KURIKULUM MERDEKA
+                // Menentukan Fase berdasarkan metadata siswa
+                const faseSiswa = siswaObj.fase || "-";
+
                 htmlDoc = `
                     <div class="p-4 text-slate-900">
                         <div class="text-center mb-6 border-b-2 border-slate-800 pb-4">
@@ -1431,7 +1454,7 @@
                         
                         <table class="w-full text-xs mb-6">
                             <tr><td class="w-24 font-bold py-1">Nama Peserta Didik</td><td>: ${siswaObj.nama}</td><td class="w-24 font-bold">Kelas</td><td>: ${currentUser.kelas}</td></tr>
-                            <tr><td class="font-bold py-1">NISN / Username</td><td>: ${siswaObj.username}</td><td class="font-bold">Fase</td><td>: -</td></tr>
+                            <tr><td class="font-bold py-1">NISN / Username</td><td>: ${siswaObj.username}</td><td class="font-bold">Fase</td><td>: ${faseSiswa}</td></tr>
                             <tr><td class="font-bold py-1">Tahun Pelajaran</td><td>: ${school.tapel || '-'}</td><td class="font-bold">Semester</td><td>: ${sem}</td></tr>
                         </table>
 
@@ -1466,11 +1489,32 @@
                 htmlDoc += `</tbody></table>
 
                         <h4 class="text-sm font-bold bg-slate-100 p-1.5 mb-2 border border-slate-300">C. Data Ketidakhadiran (Absensi)</h4>
-                        <table class="w-32 text-xs border-collapse border border-slate-300 mb-12">
+                        <table class="w-32 text-xs border-collapse border border-slate-300 mb-6">
                             <tr><td class="p-2 border border-slate-300">Sakit / Izin</td><td class="p-2 border border-slate-300 font-bold text-center">${i} Hari</td></tr>
                             <tr><td class="p-2 border border-slate-300">Tanpa Keterangan</td><td class="p-2 border border-slate-300 font-bold text-center">${a} Hari</td></tr>
-                        </table>
+                        </table>`;
 
+                // PERMINTAAN: Tambahkan Tulisan Naik Ke Kelas hanya di Semester 2
+                if (sem === "2") {
+                    htmlDoc += `
+                        <div class="border border-slate-400 p-4 rounded-lg my-6 text-xs bg-slate-50">
+                            <p class="font-extrabold text-slate-800 uppercase tracking-wide mb-2 flex items-center gap-2">
+                                📢 Keputusan Kenaikan Kelas:
+                            </p>
+                            <div class="flex items-center gap-6">
+                                <label class="flex items-center gap-2 font-semibold text-slate-700 cursor-pointer">
+                                    <input type="radio" name="statusKenaikan" class="accent-indigo-600" checked>
+                                    <span>Naik ke Kelas: _________</span>
+                                </label>
+                                <label class="flex items-center gap-2 font-semibold text-slate-700 cursor-pointer">
+                                    <input type="radio" name="statusKenaikan" class="accent-indigo-600">
+                                    <span>Tinggal di Kelas: _________</span>
+                                </label>
+                            </div>
+                        </div>`;
+                }
+
+                htmlDoc += `
                         <!-- SIGNATURE AREA -->
                         <div class="grid grid-cols-2 text-xs mt-12 pt-6 text-center">
                             <div>
@@ -1491,7 +1535,9 @@
                         <button onclick="window.print()" class="no-print mt-6 bg-red-600 text-white font-bold px-6 py-2 rounded shadow-md hover:bg-red-700 w-full"><i class="fa-solid fa-print"></i> Cetak Dokumen Raport</button>
                     </div>`;
             } else {
-                // BUKU INDUK SIMPEL
+                // BUKU INDUK SIMPEL (Saldo Tabungan DIHAPUS)
+                const faseSiswa = siswaObj.fase || "-";
+
                 htmlDoc = `
                     <div class="p-4 text-slate-900">
                         <div class="text-center mb-6 border-b-2 border-slate-800 pb-4">
@@ -1504,8 +1550,8 @@
                             <tr><td class="p-2 border font-bold w-40 bg-slate-50">Nama Lengkap Murid</td><td class="p-2 border font-bold text-indigo-800 text-sm">: ${siswaObj.nama}</td></tr>
                             <tr><td class="p-2 border font-bold bg-slate-50">NISN / Nomor Induk</td><td class="p-2 border">: ${siswaObj.username}</td></tr>
                             <tr><td class="p-2 border font-bold bg-slate-50">Rombongan Belajar / Kelas</td><td class="p-2 border">: Rombel Kelas ${currentUser.kelas}</td></tr>
+                            <tr><td class="p-2 border font-bold bg-slate-50">Fase Kelas</td><td class="p-2 border">: ${faseSiswa}</td></tr>
                             <tr><td class="p-2 border font-bold bg-slate-50">Tahun Pelajaran Terdaftar</td><td class="p-2 border">: ${school.tapel || '-'}</td></tr>
-                            <tr><td class="p-2 border font-bold bg-slate-50">Total Saldo Tabungan Sekarang</td><td class="p-2 border text-emerald-700 font-bold">: Rp ${getSiswaSaldo(username).toLocaleString()}</td></tr>
                         </table>
 
                         <h4 class="text-sm font-bold bg-slate-700 text-white p-1.5 mb-3">REKAPITULASI CAPAIAN NILAI AKADEMIK (Sem ${sem})</h4>
