@@ -1,0 +1,151 @@
+/* ==========================================================================
+   STYLE UTAMA - TEMA SEKOLAH DASAR (SD)
+   ========================================================================== */
+
+/* Google Fonts - Menggunakan font yang ramah anak tapi tetap rapi */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;900&display=swap');
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background-color: #f0f7ff; /* Biru muda cerah khas dunia anak */
+    color: #2c3e50;
+}
+
+/* Custom Palette Khas SD (Merah Hatian & Kuning Emas Cerah) */
+.bg-sd-red {
+    background-color: #b91c1c;
+}
+.bg-sd-red-light {
+    background-color: #fee2e2;
+}
+.text-sd-red {
+    color: #b91c1c;
+}
+
+/* Kustomisasi Header / Navbar */
+header {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important;
+    border-bottom: 5px solid #facc15; /* Aksen Kuning SD */
+    box-shadow: 0 4px 15px rgba(185, 28, 28, 0.15) !important;
+}
+
+header #txtActiveUser {
+    background-color: #991b1b !important;
+    border: 1px solid #facc15;
+}
+
+/* Kustomisasi Tombol Utama & Navigasi */
+button, 
+.guru-tab-btn, 
+.adm-tab-btn {
+    border-radius: 12px !important; /* Sudut lebih melengkung ramah anak */
+    font-weight: 700 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Form Login */
+#secLogin {
+    border-radius: 24px !important;
+    border: 3px solid #e2e8f0;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+}
+
+#secLogin button {
+    background-color: #b91c1c !important;
+}
+#secLogin button:hover {
+    background-color: #991b1b !important;
+    transform: translateY(-1px);
+}
+
+/* Card / Box Dashboard */
+.bg-white {
+    border-radius: 20px !important;
+    border: 2px solid #e0f2fe !important; /* Border biru super muda */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01) !important;
+    overflow: hidden;
+}
+
+/* Banner Dashboard Admin */
+#secAdmin > div.bg-gradient-to-r {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%) !important; /* Biru Seragam Pramuka/Formal */
+    border-radius: 20px !important;
+    border-bottom: 4px solid #facc15;
+}
+
+/* Banner Dashboard Guru */
+#secGuru > div.bg-gradient-to-r {
+    background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%) !important; /* Hijau Toska Edukatif */
+    border-radius: 20px !important;
+    border-bottom: 4px solid #facc15;
+}
+
+/* Banner Dashboard Siswa */
+#secSiswa > div.bg-gradient-to-r {
+    background: linear-gradient(135deg, #6d28d9 0%, #8b5cf6 100%) !important; /* Ungu Kreatif */
+    border-radius: 20px !important;
+    border-bottom: 4px solid #facc15;
+}
+
+/* Input Fields */
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+select {
+    border-radius: 10px !important;
+    border: 2px solid #cbd5e1 !important;
+    padding: 0.6rem 0.8rem !important;
+    transition: all 0.2s ease;
+}
+
+input:focus, select:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    outline: none;
+}
+
+/* Tabel Custom */
+table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+thead th {
+    background-color: #f8fafc !important;
+    color: #475569 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 12px !important;
+}
+
+tbody td {
+    padding: 12px !important;
+}
+
+/* Custom Scrollbar agar terlihat rapi */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Penyesuaian list di Portal Siswa */
+#siswaAbsenList li, #siswaNilaiList li, #siswaEkskulList li, #siswaTabunganList li {
+    padding: 12px !important;
+    background-color: #f8fafc;
+    border: 1px solid #f1f5f9;
+    border-radius: 10px;
+    margin-bottom: 8px;
+}
