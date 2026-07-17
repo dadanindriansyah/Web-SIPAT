@@ -646,7 +646,7 @@
             <!-- GURU: TAB CETAK DOKUMEN -->
             <div id="tabCetakDoc" class="guru-content space-y-6 hidden">
                 <div class="bg-white p-6 rounded-2xl shadow border border-slate-200 no-print">
-                    <h3 class="text-lg font-bold mb-4 text-emerald-700"><i class="fa-solid fa-print"></i> Fitur Cetak Raport Kurikulum Merdeka & Buku Induk Simpel</h3>
+                    <h3 class="text-lg font-bold mb-4 text-emerald-700"><i class="fa-solid fa-print"></i> Fitur Cetak Raport Kurikulum Merdeka & Buku Induk </h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase">Pilih Murid</label>
@@ -1415,7 +1415,7 @@
             });
         }
 
-        // --- CORE FITUR BARU: GENERATE RAPORT & BUKU INDUK SIMPEL ---
+        // --- CORE FITUR BARU: GENERATE RAPORT & BUKU INDUK ---
         function prosesGenerateCetak(type) {
             const username = document.getElementById('cetakSiswaSelect').value;
             const sem = document.getElementById('cetakSemesterSelect').value;
@@ -1541,7 +1541,7 @@
                 htmlDoc = `
                     <div class="p-4 text-slate-900">
                         <div class="text-center mb-6 border-b-2 border-slate-800 pb-4">
-                            <h2 class="text-xl font-bold uppercase">BUKU INDUK PESERTA DIDIK (SIMPEL)</h2>
+                            <h2 class="text-xl font-bold uppercase">BUKU INDUK PESERTA DIDIK</h2>
                             <h3 class="text-lg font-bold uppercase">${school.nama || 'SEKOLAH DASAR'}</h3>
                         </div>
 
