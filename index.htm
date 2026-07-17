@@ -89,11 +89,16 @@
                     <h2 class="text-2xl font-black">Panel Utama Administrator</h2>
                     <p class="text-indigo-100 text-sm">Kelola data sekolah, guru, siswa, mapel, ekskul, dan lihat rekapan global.</p>
                 </div>
-                <!-- Navigasi Tab Admin -->
-                <div class="flex gap-2 bg-indigo-900/40 p-1.5 rounded-xl border border-indigo-400/20">
-                    <button onclick="switchAdminTab('tabAdmProfil')" class="adm-tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-white text-indigo-700 transition">🏫 Profil & Metadata</button>
-                    <button onclick="switchAdminTab('tabAdmGuruSiswa')" class="adm-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-indigo-100 hover:bg-indigo-800/50 transition">👥 Akun & Pengguna</button>
-                    <button onclick="switchAdminTab('tabAdmRekap')" class="adm-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-indigo-100 hover:bg-indigo-800/50 transition">📊 Rekap & Unduh</button>
+                <!-- Navigasi Tab Admin & Tombol Kosongkan Semua Data -->
+                <div class="flex items-center gap-3 flex-wrap">
+                    <button onclick="clearAllSystemData()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-black px-4 py-2 rounded-xl border-b-4 border-red-950 active:border-b-0 active:mt-0.5 transition-all shadow-md">
+                        <i class="fa-solid fa-triangle-exclamation text-yellow-300"></i> Kosongkan Semua Data Sistem
+                    </button>
+                    <div class="flex gap-2 bg-indigo-900/40 p-1.5 rounded-xl border border-indigo-400/20">
+                        <button onclick="switchAdminTab('tabAdmProfil')" class="adm-tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-white text-indigo-700 transition">🏫 Profil & Metadata</button>
+                        <button onclick="switchAdminTab('tabAdmGuruSiswa')" class="adm-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-indigo-100 hover:bg-indigo-800/50 transition">👥 Akun & Pengguna</button>
+                        <button onclick="switchAdminTab('tabAdmRekap')" class="adm-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-indigo-100 hover:bg-indigo-800/50 transition">📊 Rekap & Unduh</button>
+                    </div>
                 </div>
             </div>
 
@@ -130,12 +135,17 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <!-- Manajemen Mata Pelajaran -->
                     <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
-                        <h3 class="text-lg font-bold border-b pb-3 mb-4 text-indigo-600 flex justify-between items-center">
+                        <h3 class="text-lg font-bold border-b pb-3 mb-4 text-indigo-600 flex justify-between items-center gap-2 flex-wrap">
                             <span><i class="fa-solid fa-book-bookmark"></i> Daftar Mata Pelajaran</span>
-                            <label class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer flex items-center gap-1">
-                                <i class="fa-solid fa-file-excel"></i> Import Excel
-                                <input type="file" class="hidden" accept=".xlsx, .xls" onchange="importMetadata(event, 'mapel')">
-                            </label>
+                            <div class="flex gap-2">
+                                <button onclick="downloadTemplateMetadata('mapel')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 font-semibold transition">
+                                    <i class="fa-solid fa-download"></i> Template
+                                </button>
+                                <label class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer flex items-center gap-1">
+                                    <i class="fa-solid fa-file-excel"></i> Import Excel
+                                    <input type="file" class="hidden" accept=".xlsx, .xls" onchange="importMetadata(event, 'mapel')">
+                                </label>
+                            </div>
                         </h3>
                         <!-- Form Tambah Mapel -->
                         <div class="flex gap-2 mb-4">
@@ -153,12 +163,17 @@
 
                     <!-- Manajemen Ekstrakurikuler -->
                     <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
-                        <h3 class="text-lg font-bold border-b pb-3 mb-4 text-indigo-600 flex justify-between items-center">
+                        <h3 class="text-lg font-bold border-b pb-3 mb-4 text-indigo-600 flex justify-between items-center gap-2 flex-wrap">
                             <span><i class="fa-solid fa-medal"></i> Daftar Ekstrakurikuler</span>
-                            <label class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer flex items-center gap-1">
-                                <i class="fa-solid fa-file-excel"></i> Import Excel
-                                <input type="file" class="hidden" accept=".xlsx, .xls" onchange="importMetadata(event, 'ekskul')">
-                            </label>
+                            <div class="flex gap-2">
+                                <button onclick="downloadTemplateMetadata('ekskul')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 font-semibold transition">
+                                    <i class="fa-solid fa-download"></i> Template
+                                </button>
+                                <label class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer flex items-center gap-1">
+                                    <i class="fa-solid fa-file-excel"></i> Import Excel
+                                    <input type="file" class="hidden" accept=".xlsx, .xls" onchange="importMetadata(event, 'ekskul')">
+                                </label>
+                            </div>
                         </h3>
                         <!-- Form Tambah Ekskul -->
                         <div class="flex gap-2 mb-4">
@@ -431,7 +446,7 @@
                 </div>
             </div>
 
-            <!-- GURU: TAB LEGGER NILAI & RANKING (FITUR BARU) -->
+            <!-- GURU: TAB LEGGER NILAI & RANKING -->
             <div id="tabLegger" class="guru-content space-y-6 hidden">
                 <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
                     <div class="flex justify-between items-center mb-6 pb-3 border-b flex-wrap gap-4">
@@ -468,7 +483,7 @@
                 </div>
             </div>
 
-            <!-- GURU: TAB NILAI EKSKUL (FITUR TERPISAH) -->
+            <!-- GURU: TAB NILAI EKSKUL -->
             <div id="tabEkskul" class="guru-content space-y-6 hidden">
                 <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
                     <h3 class="text-lg font-bold mb-4 text-emerald-700"><i class="fa-solid fa-medal"></i> Input Nilai Ekstrakurikuler Siswa (Terpisah)</h3>
@@ -768,6 +783,23 @@
             document.getElementById(tabId).classList.remove('hidden');
         }
 
+        // BARU: Download Template Mata Pelajaran / Ekstrakurikuler
+        function downloadTemplateMetadata(type) {
+            const headerName = type === 'mapel' ? 'Nama Mata Pelajaran' : 'Nama Ekstrakurikuler';
+            const exampleName = type === 'mapel' ? 'Pendidikan Pancasila' : 'Pramuka';
+            
+            const templateData = [
+                {
+                    [headerName]: exampleName
+                }
+            ];
+            
+            const worksheet = XLSX.utils.json_to_sheet(templateData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Template " + type);
+            XLSX.writeFile(workbook, `Template_Import_${type}.xlsx`);
+        }
+
         function downloadTemplateUsers(role) {
             const templateData = [
                 {
@@ -795,6 +827,24 @@
             loadAdminUsers();
         }
 
+        // BARU: Kosongkan Seluruh Data Sistem di Bagian Admin
+        function clearAllSystemData() {
+            if (confirm("🚨 PERINGATAN SANGAT PENTING!\n\nApakah Anda yakin ingin MENGHAPUS SELESAI DAN BERSIH seluruh data di dalam sistem?\nTindakan ini akan mengosongkan:\n- Data Akun Pengguna (Guru & Siswa)\n- Master Mata Pelajaran & Ekstrakurikuler\n- Seluruh Log Absensi, Nilai Mapel, Nilai Ekskul, dan Tabungan Keuangan.\n\nData Profil Sekolah dan Password Admin tidak akan dihapus. Tindakan tidak dapat dibatalkan!")) {
+                if (confirm("Konfirmasi terakhir: Anda benar-benar yakin ingin menghapus semuanya?")) {
+                    localStorage.setItem('users', JSON.stringify([]));
+                    localStorage.setItem('mapel', JSON.stringify([]));
+                    localStorage.setItem('ekskul', JSON.stringify([]));
+                    localStorage.setItem('absensi', JSON.stringify([]));
+                    localStorage.setItem('nilai', JSON.stringify([]));
+                    localStorage.setItem('nilai_ekskul', JSON.stringify([]));
+                    localStorage.setItem('tabungan', JSON.stringify([]));
+                    
+                    alert("Seluruh database transaksi, pengguna, mapel, dan ekskul berhasil dibersihkan!");
+                    initAdminDashboard();
+                }
+            }
+        }
+
         // Admin: Save Profile
         function saveSchoolProfile() {
             const nama = document.getElementById('schName').value.trim();
@@ -814,8 +864,8 @@
 
         // Admin: Load Mapel & Ekskul
         function loadAdminMetadata() {
-            const mapel = JSON.parse(localStorage.getItem('mapel'));
-            const ekskul = JSON.parse(localStorage.getItem('ekskul'));
+            const mapel = JSON.parse(localStorage.getItem('mapel')) || [];
+            const ekskul = JSON.parse(localStorage.getItem('ekskul')) || [];
 
             const listMapel = document.getElementById('listMapel');
             listMapel.innerHTML = '';
@@ -843,7 +893,7 @@
         function addMapelManual() {
             const val = document.getElementById('newMapel').value.trim();
             if(!val) return alert("Isi nama mata pelajaran!");
-            let mapel = JSON.parse(localStorage.getItem('mapel'));
+            let mapel = JSON.parse(localStorage.getItem('mapel')) || [];
             mapel.push({ id: Date.now(), nama: val });
             localStorage.setItem('mapel', JSON.stringify(mapel));
             document.getElementById('newMapel').value = '';
@@ -854,7 +904,7 @@
         function addEkskulManual() {
             const val = document.getElementById('newEkskul').value.trim();
             if(!val) return alert("Isi nama ekstrakurikuler!");
-            let ekskul = JSON.parse(localStorage.getItem('ekskul'));
+            let ekskul = JSON.parse(localStorage.getItem('ekskul')) || [];
             ekskul.push({ id: Date.now(), nama: val });
             localStorage.setItem('ekskul', JSON.stringify(ekskul));
             document.getElementById('newEkskul').value = '';
@@ -881,11 +931,12 @@
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 const sheetData = XLSX.utils.sheet_to_json(sheet);
 
-                let storedData = JSON.parse(localStorage.getItem(type));
+                let storedData = JSON.parse(localStorage.getItem(type)) || [];
                 let count = 0;
 
                 sheetData.forEach(row => {
-                    const namaVal = String(row.Nama || row['Nama ' + type] || '').trim();
+                    const keyName = type === 'mapel' ? 'Nama Mata Pelajaran' : 'Nama Ekstrakurikuler';
+                    const namaVal = String(row[keyName] || row.Nama || row['Nama ' + type] || '').trim();
                     if(namaVal && !storedData.find(x => x.nama.toLowerCase() === namaVal.toLowerCase())) {
                         storedData.push({ id: Date.now() + count, nama: namaVal });
                         count++;
@@ -909,7 +960,7 @@
         }
 
         function loadAdminUsers() {
-            const users = JSON.parse(localStorage.getItem('users'));
+            const users = JSON.parse(localStorage.getItem('users')) || [];
             const tblGuru = document.getElementById('tblAdminGuru');
             const tblSiswa = document.getElementById('tblAdminSiswa');
 
@@ -943,7 +994,7 @@
                 return;
             }
 
-            let users = JSON.parse(localStorage.getItem('users'));
+            let users = JSON.parse(localStorage.getItem('users')) || [];
             if(users.find(u => u.username === user)) return alert("Username sudah terdaftar sebelumnya!");
 
             users.push({ username: user, password: pass, nama, kelas, role });
@@ -977,7 +1028,7 @@
                 const sheet = workbook.Sheets[workbook.SheetNames[0]];
                 const sheetData = XLSX.utils.sheet_to_json(sheet);
 
-                let users = JSON.parse(localStorage.getItem('users'));
+                let users = JSON.parse(localStorage.getItem('users')) || [];
                 let count = 0;
 
                 sheetData.forEach(row => {
@@ -1030,14 +1081,14 @@
         }
 
         function getSiswaSekelas() {
-            const users = JSON.parse(localStorage.getItem('users'));
+            const users = JSON.parse(localStorage.getItem('users')) || [];
             return users.filter(u => u.role === 'Siswa' && u.kelas === currentUser.kelas);
         }
 
         function populateGuruDropdowns() {
             const siswa = getSiswaSekelas();
-            const mapel = JSON.parse(localStorage.getItem('mapel'));
-            const ekskul = JSON.parse(localStorage.getItem('ekskul'));
+            const mapel = JSON.parse(localStorage.getItem('mapel')) || [];
+            const ekskul = JSON.parse(localStorage.getItem('ekskul')) || [];
 
             const ddSiswa = ['absensiSiswa', 'nilaiSiswa', 'ekskulSiswa', 'tabunganSiswa'];
             ddSiswa.forEach(id => {
@@ -1086,7 +1137,7 @@
 
             if(!date || !userSiswa) return alert("Pilih tanggal dan nama siswa!");
 
-            let absensi = JSON.parse(localStorage.getItem('absensi'));
+            let absensi = JSON.parse(localStorage.getItem('absensi')) || [];
             const sObj = getSiswaSekelas().find(s => s.username === userSiswa);
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
 
@@ -1114,7 +1165,7 @@
         }
 
         function renderAbsensiGuru() {
-            const absensi = JSON.parse(localStorage.getItem('absensi')).filter(a => a.kelas === currentUser.kelas);
+            const absensi = (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.kelas === currentUser.kelas);
             const tbody = document.getElementById('bodyLogAbsen');
             tbody.innerHTML = '';
 
@@ -1157,7 +1208,7 @@
 
             if(!username || !mapel || !date || isNaN(angka)) return alert("Lengkapi formulir penilaian!");
 
-            let nilai = JSON.parse(localStorage.getItem('nilai'));
+            let nilai = JSON.parse(localStorage.getItem('nilai')) || [];
             const sObj = getSiswaSekelas().find(s => s.username === username);
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
 
@@ -1190,7 +1241,7 @@
         }
 
         function renderNilaiGuru() {
-            const nilai = JSON.parse(localStorage.getItem('nilai')).filter(n => n.kelas === currentUser.kelas);
+            const nilai = (JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.kelas === currentUser.kelas);
             const tbody = document.getElementById('bodyLogNilai');
             tbody.innerHTML = '';
 
@@ -1238,12 +1289,12 @@
             });
         }
 
-        // --- SISTEM GENERATE LEGGER NILAI & RANKING (LOGIC BARU) ---
+        // --- SISTEM GENERATE LEGGER NILAI & RANKING ---
         function renderLegger() {
             const semAktif = document.getElementById('leggerSemester').value;
             const siswaList = getSiswaSekelas();
-            const mapelList = JSON.parse(localStorage.getItem('mapel'));
-            const semuaNilai = JSON.parse(localStorage.getItem('nilai')).filter(n => n.kelas === currentUser.kelas && n.semester === semAktif);
+            const mapelList = JSON.parse(localStorage.getItem('mapel')) || [];
+            const semuaNilai = (JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.kelas === currentUser.kelas && n.semester === semAktif);
 
             const thead = document.getElementById('headerLegger');
             const tbody = document.getElementById('bodyLegger');
@@ -1287,19 +1338,16 @@
                 let mapelTerhitungCount = 0;
 
                 mapelList.forEach(m => {
-                    // Filter nilai per mapel dan kategori
                     const nilaiSiswaMapel = semuaNilai.filter(n => n.username === siswa.username && n.mapel === m.nama);
                     
                     const tugasArray = nilaiSiswaMapel.filter(n => n.jenis === 'Tugas').map(n => n.angka);
                     const stsArray = nilaiSiswaMapel.filter(n => n.jenis === 'STS').map(n => n.angka);
                     const sasArray = nilaiSiswaMapel.filter(n => n.jenis === 'SAS').map(n => n.angka);
 
-                    // Ambil rata-rata per-kategori
                     const avgTugas = tugasArray.length > 0 ? (tugasArray.reduce((a,b)=>a+b, 0) / tugasArray.length) : null;
                     const avgSTS = stsArray.length > 0 ? (stsArray.reduce((a,b)=>a+b, 0) / stsArray.length) : null;
                     const avgSAS = sasArray.length > 0 ? (sasArray.reduce((a,b)=>a+b, 0) / sasArray.length) : null;
 
-                    // Hitung Rata-rata akhir mapel bersangkutan
                     let elemenNilai = [];
                     if(avgTugas !== null) elemenNilai.push(avgTugas);
                     if(avgSTS !== null) elemenNilai.push(avgSTS);
@@ -1320,7 +1368,6 @@
                     }
                 });
 
-                // Hitung Rerata Akhir Seluruh Mapel
                 const rataSiswaGlobal = mapelTerhitungCount > 0 ? (totalRerataSemuaMapel / mapelTerhitungCount) : 0;
 
                 listHasilSiswa.push({
@@ -1331,14 +1378,11 @@
                 });
             });
 
-            // 3. PROSES CALCULATE RANKING (Siswa dengan Rata-rata Terbesar mendapat Ranking 1)
+            // 3. PROSES CALCULATE RANKING
             listHasilSiswa.sort((a, b) => b.rataGlobal - a.rataGlobal);
             listHasilSiswa.forEach((siswa, index) => {
                 siswa.ranking = siswa.rataGlobal > 0 ? (index + 1) : '-';
             });
-
-            // Urutkan kembali berdasarkan nama agar rapi dalam legger alfabetis, jika diinginkan (opsional). 
-            // Kita biarkan terurut ranking/peringkat tertinggi agar lebih intuitif di dashboard guru.
             
             // 4. INJECT DATA KE ELEMEN HTML TABEL
             listHasilSiswa.forEach((siswa, idx) => {
@@ -1369,9 +1413,9 @@
             const predikat = document.getElementById('ekskulPredikat').value;
             const desc = document.getElementById('ekskulDesc').value.trim();
 
-            if(!username || !ekskul || !desc) return alert("Pilih siswa, ekstrakurikuler, dan isi keterangan!");
+            if(!username || !ekskul || !desc) return alert("Pilih siswa, ekstrakurikuler, and isi keterangan!");
 
-            let nilaiEkskul = JSON.parse(localStorage.getItem('nilai_ekskul'));
+            let nilaiEkskul = JSON.parse(localStorage.getItem('nilai_ekskul')) || [];
             const sObj = getSiswaSekelas().find(s => s.username === username);
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
 
@@ -1401,7 +1445,7 @@
         }
 
         function renderNilaiEkskulGuru() {
-            const dataEkskul = JSON.parse(localStorage.getItem('nilai_ekskul')).filter(ne => ne.kelas === currentUser.kelas);
+            const dataEkskul = (JSON.parse(localStorage.getItem('nilai_ekskul')) || []).filter(ne => ne.kelas === currentUser.kelas);
             const tbody = document.getElementById('bodyLogEkskul');
             tbody.innerHTML = '';
 
@@ -1436,7 +1480,7 @@
                 return alert("Isi lengkap data transaksi tabungan!");
             }
 
-            let tabungan = JSON.parse(localStorage.getItem('tabungan'));
+            let tabungan = JSON.parse(localStorage.getItem('tabungan')) || [];
             const sObj = getSiswaSekelas().find(s => s.username === username);
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
 
@@ -1472,7 +1516,7 @@
         }
 
         function getSiswaSaldo(username) {
-            const tabungan = JSON.parse(localStorage.getItem('tabungan'));
+            const tabungan = JSON.parse(localStorage.getItem('tabungan')) || [];
             let saldo = 0;
             tabungan.forEach(t => {
                 if (t.username === username) {
@@ -1496,7 +1540,7 @@
         }
 
         function renderTabunganGuru() {
-            const tabungan = JSON.parse(localStorage.getItem('tabungan')).filter(t => t.kelas === currentUser.kelas);
+            const tabungan = (JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.kelas === currentUser.kelas);
             const tbody = document.getElementById('bodyLogTabungan');
             tbody.innerHTML = '';
 
@@ -1521,7 +1565,7 @@
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
             const currentTapel = profile.tapel || "-";
 
-            const absensi = JSON.parse(localStorage.getItem('absensi')).filter(a => a.username === username && (a.tapel === currentTapel || !a.tapel));
+            const absensi = (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.username === username && (a.tapel === currentTapel || !a.tapel));
             const listAbsen = document.getElementById('siswaAbsenList');
             listAbsen.innerHTML = '';
             if(absensi.length === 0) listAbsen.innerHTML = `<li class="p-3 text-slate-400 text-center">Tidak ada riwayat kehadiran di TP ini</li>`;
@@ -1534,7 +1578,7 @@
                 `;
             });
 
-            const nilai = JSON.parse(localStorage.getItem('nilai')).filter(n => n.username === username && (n.tapel === currentTapel || !n.tapel));
+            const nilai = (JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.username === username && (n.tapel === currentTapel || !n.tapel));
             const listNilai = document.getElementById('siswaNilaiList');
             listNilai.innerHTML = '';
             if(nilai.length === 0) listNilai.innerHTML = `<li class="p-3 text-slate-400 text-center">Belum ada input nilai akademik di TP ini</li>`;
@@ -1550,7 +1594,7 @@
                 `;
             });
 
-            const ekskuls = JSON.parse(localStorage.getItem('nilai_ekskul')).filter(ne => ne.username === username && (ne.tapel === currentTapel || !ne.tapel));
+            const ekskuls = (JSON.parse(localStorage.getItem('nilai_ekskul')) || []).filter(ne => ne.username === username && (ne.tapel === currentTapel || !ne.tapel));
             const listEkskul = document.getElementById('siswaEkskulList');
             listEkskul.innerHTML = '';
             if(ekskuls.length === 0) listEkskul.innerHTML = `<li class="p-3 text-slate-400 text-center">Belum ada penilaian ekskul di TP ini</li>`;
@@ -1566,7 +1610,7 @@
                 `;
             });
 
-            const tabungans = JSON.parse(localStorage.getItem('tabungan')).filter(t => t.username === username);
+            const tabungans = (JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.username === username);
             const listTabungan = document.getElementById('siswaTabunganList');
             listTabungan.innerHTML = '';
             let totalSaldo = 0;
