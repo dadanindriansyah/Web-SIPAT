@@ -1678,30 +1678,5 @@
             document.getElementById('fileRestore').value = ''; 
         }
     </script>
-
-    <!-- INTEGRASI SDK FIREBASE UTAMA (Type Module) -->
-    <script type="module">
-        // Import Firebase SDK yang diperlukan
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-        // import { getDatabase } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"; // Jika ingin menggunakan Realtime Database nanti
-
-        // Konfigurasi Firebase Anda
-        const firebaseConfig = {
-            apiKey: "AIzaSyC9MIrdaEfMFrRMyMMYVbC2BMPKQH1Qhmw",
-            authDomain: "web-sioat.firebaseapp.com",
-            projectId: "web-sioat",
-            storageBucket: "web-sioat.firebasestorage.app",
-            messagingSenderId: "293286030379",
-            appId: "1:293286030379:web:12a24d4d9a40f2b1108e6e",
-            measurementId: "G-LJMWR62G81"
-        };
-
-        // Inisialisasi Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-
-        console.log("Firebase berhasil diinisialisasi untuk web-sioat!");
-    </script>
 </body>
 </html>
