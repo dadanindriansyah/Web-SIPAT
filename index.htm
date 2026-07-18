@@ -39,7 +39,17 @@
             </div>
             <div class="flex items-center gap-4">
                 <!-- FITUR BACKUP & RESTORE DATA -->
-                <div class="flex gap-2 bg-indigo-800/50 p-1.5 rounded-xl border border-indigo-500/30">
+<div class="flex gap-2 bg-indigo-900 p-1.5 rounded-xl">
+    <!-- Tombol Kirim ke Firebase -->
+    <button onclick="sinkronkanKeCloud()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
+        <i class="fa-solid fa-cloud-upload"></i> Sinkron ke Cloud
+    </button>
+    <!-- Tombol Ambil dari Firebase -->
+    <button onclick="ambilDariCloud()" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
+        <i class="fa-solid fa-cloud-download"></i> Ambil dari Cloud
+    </button>
+</div>                
+<div class="flex gap-2 bg-indigo-800/50 p-1.5 rounded-xl border border-indigo-500/30">
                     <button onclick="backupSeluruhData()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition shadow flex items-center gap-1">
                         <i class="fa-solid fa-cloud-arrow-down"></i> Backup Data
                     </button>
@@ -57,7 +67,7 @@
                         <i class="fa-solid fa-right-from-bracket"></i> Keluar
                     </button>
                 </div>
-            </div>
+             </div>
         </div>
     </header>
 
@@ -1794,5 +1804,60 @@
             document.getElementById('fileRestore').value = ''; 
         }
     </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+  import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC2-JHm7bTwzxpwtFkn0k5n8u2zoBu5mss",
+    authDomain: "sipatjasinga.firebaseapp.com",
+    databaseURL: "https://sipatjasinga-default-rtdb.firebaseio.com",
+    projectId: "sipatjasinga",
+    storageBucket: "sipatjasinga.firebasestorage.app",
+    messagingSenderId: "660629546375",
+    appId: "1:660629546375:web:5898bac286bba5f14c9f22"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // Fungsi Sinkronisasi (Upload)
+  window.sinkronkanKeCloud = async function() {
+    try {
+      const dataToSync = {
+        users: JSON.parse(localStorage.getItem('users')),
+        schoolProfile: JSON.parse(localStorage.getItem('schoolProfile')),
+        absensi: JSON.parse(localStorage.getItem('absensi')),
+        nilai: JSON.parse(localStorage.getItem('nilai')),
+        tabungan: JSON.parse(localStorage.getItem('tabungan'))
+      };
+      await set(ref(db, 'data_sekolah'), dataToSync);
+      alert("Data berhasil disinkronkan ke Cloud!");
+    } catch (error) {
+      alert("Gagal sinkron: " + error.message);
+    }
+  };
+
+  // Fungsi Ambil Data (Download)
+  window.ambilDariCloud = async function() {
+    try {
+      const snapshot = await get(ref(db, 'data_sekolah'));
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        localStorage.setItem('users', JSON.stringify(data.users));
+        localStorage.setItem('schoolProfile', JSON.stringify(data.schoolProfile));
+        localStorage.setItem('absensi', JSON.stringify(data.absensi));
+        localStorage.setItem('nilai', JSON.stringify(data.nilai));
+        localStorage.setItem('tabungan', JSON.stringify(data.tabungan));
+        alert("Data berhasil diambil dari Cloud! Halaman akan dimuat ulang.");
+        window.location.reload();
+      } else {
+        alert("Data tidak ditemukan di Cloud.");
+      }
+    } catch (error) {
+      alert("Gagal mengambil data: " + error.message);
+    }
+  };
+</script>
 </body>
 </html>
