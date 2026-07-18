@@ -39,7 +39,7 @@
             </div>
             <div class="flex items-center gap-4">
                 <!-- FITUR BACKUP & RESTORE DATA -->
-<div class="flex gap-2 bg-indigo-900 p-1.5 rounded-xl">
+<div id="cloudSyncContainer" class="flex gap-2 bg-indigo-900 p-1.5 rounded-xl">
     <!-- Tombol Kirim ke Firebase -->
     <button onclick="sinkronkanKeCloud()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
         <i class="fa-solid fa-cloud-upload"></i> Sinkron ke Cloud
@@ -856,29 +856,38 @@
         }
 
         function showDashboard(role) {
-            document.getElementById('secLogin').classList.add('hidden');
-            document.getElementById('userInfo').classList.remove('hidden');
-            document.getElementById('txtActiveUser').innerHTML = `<i class="fa-solid fa-circle-user"></i> ${currentUser.nama || currentUser.username} (${role})`;
+    document.getElementById('secLogin').classList.add('hidden');
+    document.getElementById('userInfo').classList.remove('hidden');
+    document.getElementById('txtActiveUser').innerHTML = `<i class="fa-solid fa-circle-user"></i> ${currentUser.nama || currentUser.username} (${role})`;
 
-            const profile = JSON.parse(localStorage.getItem('schoolProfile'));
-            const currentTapel = profile.tapel || "-";
-
-            if (role === "Admin") {
-                document.getElementById('secAdmin').classList.remove('hidden');
-                initAdminDashboard();
-            } else if (role === "Guru") {
-                document.getElementById('secGuru').classList.remove('hidden');
-                document.getElementById('guruTitle').innerText = `Panel Kerja Guru - Kelas ${currentUser.kelas}`;
-                document.getElementById('txtGuruTapel').innerText = `TP: ${currentTapel}`;
-                initGuruViews();
-            } else if (role === "Siswa") {
-                document.getElementById('secSiswa').classList.remove('hidden');
-                document.getElementById('siswaTitle').innerText = `Halo, Selamat Datang ${currentUser.nama}! (Kelas ${currentUser.kelas})`;
-                document.getElementById('txtSiswaTapel').innerText = `TP: ${currentTapel}`;
-                loadSiswaDashboard();
-            }
+    const profile = JSON.parse(localStorage.getItem('schoolProfile'));
+    const currentTapel = profile.tapel || "-";
+    
+    // Atur visibilitas tombol sinkron cloud berdasarkan role
+    const syncContainer = document.getElementById('cloudSyncContainer');
+    if (syncContainer) {
+        if (role === "Siswa") {
+            syncContainer.classList.add('hidden'); // Sembunyikan untuk siswa
+        } else {
+            syncContainer.classList.remove('hidden'); // Tampilkan untuk Admin/Guru
         }
+    }
 
+    if (role === "Admin") {
+        document.getElementById('secAdmin').classList.remove('hidden');
+        initAdminDashboard();
+    } else if (role === "Guru") {
+        document.getElementById('secGuru').classList.remove('hidden');
+        document.getElementById('guruTitle').innerText = `Panel Kerja Guru - Kelas ${currentUser.kelas}`;
+        document.getElementById('txtGuruTapel').innerText = `TP: ${currentTapel}`;
+        initGuruViews();
+    } else if (role === "Siswa") {
+        document.getElementById('secSiswa').classList.remove('hidden');
+        document.getElementById('siswaTitle').innerText = `Halo, Selamat Datang ${currentUser.nama}! (Kelas ${currentUser.kelas})`;
+        document.getElementById('txtSiswaTapel').innerText = `TP: ${currentTapel}`;
+        loadSiswaDashboard();
+    }
+}
         // --- SUB-DASHBOARD: ADMINISTRATOR ---
         function switchAdminTab(tabId) {
             document.querySelectorAll('.adm-tab-btn').forEach(btn => {
@@ -1809,51 +1818,68 @@
   import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyC2-JHm7bTwzxpwtFkn0k5n8u2zoBu5mss",
-    authDomain: "sipatjasinga.firebaseapp.com",
-    databaseURL: "https://sipatjasinga-default-rtdb.firebaseio.com",
-    projectId: "sipatjasinga",
-    storageBucket: "sipatjasinga.firebasestorage.app",
-    messagingSenderId: "660629546375",
-    appId: "1:660629546375:web:5898bac286bba5f14c9f22"
-  };
+  apiKey: "AIzaSyA0B0LYbpy_E2L_1S1SVJB74T-fbpaC0aw",
+  authDomain: "mysipat.firebaseapp.com",
+  projectId: "mysipat",
+  storageBucket: "mysipat.firebasestorage.app",
+  messagingSenderId: "149025727702",
+  appId: "1:149025727702:web:5f1613ce133b0e91f6d577",
+  measurementId: "G-EZ6860B031"
+};
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
-// Fungsi untuk mengirim data ke Firebase
-function sinkronkanKeCloud() {
-    if (!confirm("Yakin ingin mengirim semua data ke Cloud?")) return;
-    
-    const dataToSync = {
-        users: localStorage.getItem('users'),
-        mapel: localStorage.getItem('mapel'),
-        ekskul: localStorage.getItem('ekskul'),
-        absensi: localStorage.getItem('absensi'),
-        nilai: localStorage.getItem('nilai'),
-        tabungan: localStorage.getItem('tabungan'),
-        schoolProfile: localStorage.getItem('schoolProfile')
-    };
 
-    set(ref(db, 'backup_sekolah/data'), dataToSync)
-        .then(() => alert("Data berhasil disinkronkan ke Cloud!"))
-        .catch((error) => alert("Gagal sinkron: " + error.message));
-}
+  // Mendaftarkan fungsi ke window agar bisa diakses HTML Onclick
+  window.sinkronkanKeCloud = async function() {
+      if (!confirm("Yakin ingin mengirim semua data ke Cloud Firebase?")) return;
+      
+      const dataToSync = {
+          adminPassword: localStorage.getItem('adminPassword') || "",
+          schoolProfile: localStorage.getItem('schoolProfile') || "",
+          users: localStorage.getItem('users') || "[]",
+          mapel: localStorage.getItem('mapel') || "[]",
+          ekskul: localStorage.getItem('ekskul') || "[]",
+          absensi: localStorage.getItem('absensi') || "[]",
+          nilai: localStorage.getItem('nilai') || "[]",
+          nilai_ekskul: localStorage.getItem('nilai_ekskul') || "[]",
+          tabungan: localStorage.getItem('tabungan') || "[]"
+      };
 
-// Fungsi untuk menarik data dari Firebase
-function ambilDariCloud() {
-    if (!confirm("Data lokal akan ditimpa oleh data dari Cloud. Lanjutkan?")) return;
-    
-    get(ref(db, 'backup_sekolah/data')).then((snapshot) => {
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            Object.keys(data).forEach(key => localStorage.setItem(key, data[key]));
-            alert("Data berhasil diambil dari Cloud!");
-            location.reload(); // Refresh halaman untuk memuat ulang data
-        } else {
-            alert("Data di Cloud tidak ditemukan.");
-        }
-    }).catch((error) => alert("Gagal mengambil data: " + error.message));
-}
- </script>
+      try {
+          // Mengirim keseluruhan bundle localstorage ke node 'sipat_database'
+          await set(ref(db, 'sipat_database'), dataToSync);
+          alert("Data berhasil disinkronkan ke Cloud Firebase!");
+      } catch (error) {
+          alert("Gagal sinkron: " + error.message);
+      }
+  };
+
+  window.ambilDariCloud = async function() {
+      if (!confirm("Peringatan! Data lokal saat ini akan tertimpa dengan data dari Cloud. Lanjutkan?")) return;
+      
+      try {
+          const snapshot = await get(ref(db, 'sipat_database'));
+          if (snapshot.exists()) {
+              const cloudData = snapshot.val();
+              
+              // Memulihkan data ke Local Storage browser
+              const keys = ['adminPassword', 'schoolProfile', 'users', 'mapel', 'ekskul', 'absensi', 'nilai', 'nilai_ekskul', 'tabungan'];
+              keys.forEach(key => {
+                  if (cloudData[key]) {
+                      localStorage.setItem(key, cloudData[key]);
+                  }
+              });
+              
+              alert("Berhasil mengambil data dari Cloud! Sistem akan direfresh.");
+              window.location.reload();
+          } else {
+              alert("Belum ada riwayat data di Cloud Firebase.");
+          }
+      } catch (error) {
+          alert("Terjadi kesalahan saat mengambil data: " + error.message);
+      }
+  };
+</script>
 </body>
 </html>
