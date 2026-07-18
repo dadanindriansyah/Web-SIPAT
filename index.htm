@@ -1817,15 +1817,16 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
   import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
 
-  const firebaseConfig = {
-  apiKey: "AIzaSyA0B0LYbpy_E2L_1S1SVJB74T-fbpaC0aw",
-  authDomain: "mysipat.firebaseapp.com",
-  projectId: "mysipat",
-  storageBucket: "mysipat.firebasestorage.app",
-  messagingSenderId: "149025727702",
-  appId: "1:149025727702:web:5f1613ce133b0e91f6d577",
-  measurementId: "G-EZ6860B031"
-};
+ const firebaseConfig = {
+    apiKey: "AIzaSyA0B0LYbpy_E2L_1S1SVJB74T-fbpaC0aw",
+    authDomain: "mysipat.firebaseapp.com",
+    databaseURL: "https://mysipat-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "mysipat",
+    storageBucket: "mysipat.firebasestorage.app",
+    messagingSenderId: "149025727702",
+    appId: "1:149025727702:web:5f1613ce133b0e91f6d577",
+    measurementId: "G-EZ6860B031"
+  };
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
@@ -1848,7 +1849,7 @@
 
       try {
           // Mengirim keseluruhan bundle localstorage ke node 'sipat_database'
-          await set(ref(db, 'sipat_database'), dataToSync);
+          await set(ref(db, 'mysipat_database'), dataToSync);
           alert("Data berhasil disinkronkan ke Cloud Firebase!");
       } catch (error) {
           alert("Gagal sinkron: " + error.message);
@@ -1859,7 +1860,7 @@
       if (!confirm("Peringatan! Data lokal saat ini akan tertimpa dengan data dari Cloud. Lanjutkan?")) return;
       
       try {
-          const snapshot = await get(ref(db, 'sipat_database'));
+          const snapshot = await get(ref(db, 'mysipat_database'));
           if (snapshot.exists()) {
               const cloudData = snapshot.val();
               
