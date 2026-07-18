@@ -1820,44 +1820,40 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
+// Fungsi untuk mengirim data ke Firebase
+function sinkronkanKeCloud() {
+    if (!confirm("Yakin ingin mengirim semua data ke Cloud?")) return;
+    
+    const dataToSync = {
+        users: localStorage.getItem('users'),
+        mapel: localStorage.getItem('mapel'),
+        ekskul: localStorage.getItem('ekskul'),
+        absensi: localStorage.getItem('absensi'),
+        nilai: localStorage.getItem('nilai'),
+        tabungan: localStorage.getItem('tabungan'),
+        schoolProfile: localStorage.getItem('schoolProfile')
+    };
 
-  // Fungsi Sinkronisasi (Upload)
-  window.sinkronkanKeCloud = async function() {
-    try {
-      const dataToSync = {
-        users: JSON.parse(localStorage.getItem('users')),
-        schoolProfile: JSON.parse(localStorage.getItem('schoolProfile')),
-        absensi: JSON.parse(localStorage.getItem('absensi')),
-        nilai: JSON.parse(localStorage.getItem('nilai')),
-        tabungan: JSON.parse(localStorage.getItem('tabungan'))
-      };
-      await set(ref(db, 'data_sekolah'), dataToSync);
-      alert("Data berhasil disinkronkan ke Cloud!");
-    } catch (error) {
-      alert("Gagal sinkron: " + error.message);
-    }
-  };
+    set(ref(db, 'backup_sekolah/data'), dataToSync)
+        .then(() => alert("Data berhasil disinkronkan ke Cloud!"))
+        .catch((error) => alert("Gagal sinkron: " + error.message));
+}
 
-  // Fungsi Ambil Data (Download)
-  window.ambilDariCloud = async function() {
-    try {
-      const snapshot = await get(ref(db, 'data_sekolah'));
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        localStorage.setItem('users', JSON.stringify(data.users));
-        localStorage.setItem('schoolProfile', JSON.stringify(data.schoolProfile));
-        localStorage.setItem('absensi', JSON.stringify(data.absensi));
-        localStorage.setItem('nilai', JSON.stringify(data.nilai));
-        localStorage.setItem('tabungan', JSON.stringify(data.tabungan));
-        alert("Data berhasil diambil dari Cloud! Halaman akan dimuat ulang.");
-        window.location.reload();
-      } else {
-        alert("Data tidak ditemukan di Cloud.");
-      }
-    } catch (error) {
-      alert("Gagal mengambil data: " + error.message);
-    }
-  };
-</script>
+// Fungsi untuk menarik data dari Firebase
+function ambilDariCloud() {
+    if (!confirm("Data lokal akan ditimpa oleh data dari Cloud. Lanjutkan?")) return;
+    
+    get(ref(db, 'backup_sekolah/data')).then((snapshot) => {
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            Object.keys(data).forEach(key => localStorage.setItem(key, data[key]));
+            alert("Data berhasil diambil dari Cloud!");
+            location.reload(); // Refresh halaman untuk memuat ulang data
+        } else {
+            alert("Data di Cloud tidak ditemukan.");
+        }
+    }).catch((error) => alert("Gagal mengambil data: " + error.message));
+}
+ </script>
 </body>
 </html>
