@@ -39,9 +39,9 @@
             </div>
             <div class="flex items-center gap-4">
                 <!-- FITUR BACKUP & RESTORE DATA -->
-<div id="cloudSyncContainer" class="flex gap-2 bg-indigo-900 p-1.5 rounded-xl">
+<div id="cloudSyncContainer" class="hidden flex gap-2 bg-indigo-900 p-1.5 rounded-xl">
     <!-- Tombol Kirim ke Firebase -->
-    <button onclick="sinkronkanKeCloud()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
+   <button onclick="sinkronkanKeCloud()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
         <i class="fa-solid fa-cloud-upload"></i> Sinkron ke Cloud
     </button>
     <!-- Tombol Ambil dari Firebase -->
@@ -273,6 +273,14 @@
                     <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
                         <div class="flex justify-between items-center mb-4 border-b pb-3 flex-wrap gap-2">
                             <h3 class="font-extrabold text-indigo-700 text-lg" id="titleFormSiswa"><i class="fa-solid fa-graduation-cap"></i> Manajemen Siswa</h3>
+<div class="flex gap-2 mb-4 items-center bg-slate-50 p-2 rounded-lg">
+    <select id="filterKelasSiswa" onchange="loadAdminUsers()" class="border p-2 rounded text-xs flex-grow">
+        <option value="Semua">Semua Kelas</option>
+    </select>
+    <button onclick="deleteStudentsByClass()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-bold">
+        <i class="fa-solid fa-trash-alt"></i> Hapus Semua di Kelas Ini
+    </button>
+</div>
                             <div class="flex gap-2">
                                 <button onclick="downloadTemplateUsers('Siswa')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 font-semibold transition">
                                     <i class="fa-solid fa-download"></i> Template Excel
@@ -1051,21 +1059,61 @@
         }
 
         function loadAdminUsers() {
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            const tblGuru = document.getElementById('tblAdminGuru');
-            const tblSiswa = document.getElementById('tblAdminSiswa');
-            tblGuru.innerHTML = '';
-            tblSiswa.innerHTML = '';
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const filterKelas = document.getElementById('filterKelasSiswa').value;
+    
+    // Update Dropdown Filter jika belum ada isinya
+    const uniqueClasses = [...new Set(users.filter(u => u.role === 'Siswa').map(u => u.kelas))];
+    const filterSelect = document.getElementById('filterKelasSiswa');
+    
+    // Simpan nilai pilihan saat ini agar tidak tereset saat refresh
+    const currentSelection = filterSelect.value;
+    filterSelect.innerHTML = '<option value="Semua">Semua Kelas</option>';
+    uniqueClasses.forEach(c => {
+        filterSelect.innerHTML += `<option value="${c}" ${c === currentSelection ? 'selected' : ''}>Kelas ${c}</option>`;
+    });
 
-            users.forEach((u, index) => {
-                if(u.role === "Guru") {
-                    tblGuru.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.nip || '-'}</td><td class="p-2">${u.kelas}</td><td class="p-2 font-bold text-indigo-600">${u.fase || '-'}</td><td class="p-2 text-right flex justify-end gap-2"><button onclick="editUser('${u.username}', 'Guru')" class="text-amber-600 hover:text-amber-800 mr-1"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
-                } else {
-                    tblSiswa.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.kelas}</td><td class="p-2 font-bold text-indigo-600">${u.fase || '-'}</td><td class="p-2 text-right flex justify-end gap-2"><button onclick="editUser('${u.username}', 'Siswa')" class="text-amber-600 hover:text-amber-800 mr-1"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
-                }
-            });
+    const tblGuru = document.getElementById('tblAdminGuru');
+    const tblSiswa = document.getElementById('tblAdminSiswa');
+    tblGuru.innerHTML = '';
+    tblSiswa.innerHTML = '';
+
+    users.forEach((u, index) => {
+        if(u.role === "Guru") {
+            tblGuru.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.nip || '-'}</td><td class="p-2">${u.kelas}</td><td class="p-2 font-bold text-indigo-600">${u.fase || '-'}</td><td class="p-2 text-right flex justify-end gap-2"><button onclick="editUser('${u.username}', 'Guru')" class="text-amber-600 hover:text-amber-800 mr-1"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+        } else {
+            // Terapkan filter di sini
+            if (filterKelas === "Semua" || u.kelas === filterKelas) {
+                tblSiswa.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.kelas}</td><td class="p-2 font-bold text-indigo-600">${u.fase || '-'}</td><td class="p-2 text-right flex justify-end gap-2"><button onclick="editUser('${u.username}', 'Siswa')" class="text-amber-600 hover:text-amber-800 mr-1"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+            }
         }
+    });
+}
 
+function deleteStudentsByClass() {
+    const filterKelas = document.getElementById('filterKelasSiswa').value;
+
+    // Proteksi: Mencegah penghapusan jika "Semua Kelas" dipilih
+    if (filterKelas === "Semua") {
+        alert("Harap pilih kelas spesifik dari filter di atas untuk menghapus siswa.");
+        return;
+    }
+
+    if (confirm(`🚨 PERINGATAN!\n\nAnda akan menghapus SEMUA siswa dari Kelas ${filterKelas}. Tindakan ini tidak dapat dibatalkan. Lanjutkan?`)) {
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+
+        // Memfilter array untuk menyimpan hanya user yang BUKAN siswa di kelas tersebut
+        // Jika user adalah siswa dan kelasnya sama dengan filterKelas, dia akan dihapus
+        const updatedUsers = users.filter(u => !(u.role === 'Siswa' && u.kelas === filterKelas));
+
+        localStorage.setItem('users', JSON.stringify(updatedUsers));
+        
+        // Memuat ulang daftar pengguna agar tabel diperbarui
+        loadAdminUsers();
+        
+        alert(`Semua siswa di Kelas ${filterKelas} berhasil dihapus.`);
+    }
+}
         // PERBAIKAN FITUR EDIT USER (GURU & SISWA)
         function editUser(username, role) {
             const users = JSON.parse(localStorage.getItem('users')) || [];
