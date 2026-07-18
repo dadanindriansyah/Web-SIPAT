@@ -90,7 +90,18 @@
             </div>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700">Username</label>
+<div>
+    <label class="block text-sm font-semibold text-slate-700">Masuk Sebagai</label>
+    <div class="relative mt-1">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-user-tag"></i></span>
+        <select id="loginRole" class="block w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+            <option value="Siswa">Siswa</option>
+            <option value="Guru">Guru</option>
+            <option value="Admin">Admin</option>
+        </select>
+    </div>
+</div>
+                  <label class="block text-sm font-semibold text-slate-700">Username</label>
                     <div class="relative mt-1">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-user"></i></span>
                         <input type="text" id="loginUser" class="block w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm" placeholder="Masukkan Username">
@@ -839,26 +850,38 @@
         }
 
         // AUTHENTICATION LOGIN HANDLER
-        function handleLogin() {
-            const userIn = document.getElementById('loginUser').value.trim();
-            const passIn = document.getElementById('loginPass').value.trim();
+function handleLogin() {
+    const userIn = document.getElementById('loginUser').value.trim();
+    const passIn = document.getElementById('loginPass').value.trim();
+    const roleIn = document.getElementById('loginRole').value; // Mengambil pilihan role
 
-            if (userIn === "Admin" && passIn === localStorage.getItem('adminPassword')) {
-                currentUser = { username: "Admin", role: "Admin" };
-                showDashboard("Admin");
-                return;
-            }
-
-            const users = JSON.parse(localStorage.getItem('users'));
-            const foundUser = users.find(u => u.username === userIn && u.password === passIn);
-
-            if (foundUser) {
-                currentUser = foundUser;
-                showDashboard(foundUser.role);
-            } else {
-                alert("Kesalahan! Username atau Password salah.");
-            }
+    // Validasi untuk Admin
+    if (roleIn === "Admin") {
+        if (userIn === "Admin" && passIn === localStorage.getItem('adminPassword')) {
+            currentUser = { username: "Admin", role: "Admin" };
+            showDashboard("Admin");
+            return;
+        } else {
+            return alert("Username atau Password Admin salah!");
         }
+    }
+
+    // Validasi untuk Guru / Siswa
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    // Memastikan username, password, DAN role sesuai dengan data di localStorage
+    const foundUser = users.find(u => 
+        u.username === userIn && 
+        u.password === passIn && 
+        u.role === roleIn
+    );
+
+    if (foundUser) {
+        currentUser = foundUser;
+        showDashboard(foundUser.role);
+    } else {
+        alert("Kesalahan! Username, Password, atau Role tidak sesuai.");
+    }
+}
 
         function logout() {
             currentUser = null;
