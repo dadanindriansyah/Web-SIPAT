@@ -76,48 +76,56 @@
         <!-- SECTION 1: AUTENTIKASI LOGIN -->
         <section id="secLogin" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-slate-200 mt-12 transition-all no-print">
 <div class="mt-6 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
-    <p class="text-xs text-center text-slate-500 mb-3 font-semibold">Opsi Sinkronisasi:</p>
+    <p class="text-xs text-center text-slate-500 mb-3 font-semibold">Tekan Tombol Cloud Dulu Sebelum Login !!!:</p>
     <div class="flex gap-2 justify-center">
         <button onclick="ambilDariCloud()" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition">
             <i class="fa-solid fa-cloud-download"></i> Ambil dari Cloud
         </button>
     </div>
 </div>
-            <div class="text-center mb-8">
-                <span class="text-5xl">🔐</span>
-                <h2 class="text-2xl font-extrabold text-slate-800 mt-4">Selamat Datang di SIPAT</h2>
-                <p class="text-sm text-slate-500">Silakan masuk ke dalam sistem penilaian, absensi dan tabungan</p>
+          <div class="min-h-screen flex items-center justify-center bg-[#F0F9FF] p-6 font-sans">
+    
+    <div class="w-full max-w-sm bg-white p-8 rounded-[2rem] shadow-[0_10px_25px_rgba(0,0,0,0.05)] border-2 border-blue-100">
+        
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="text-6xl mb-2">🏫</div>
+            <h2 class="text-3xl font-black text-blue-600">SIPAT</h2>
+            <p class="text-blue-400 font-bold">Sistem Penilaian, Absensi & Tabungan</p>
+        </div>
+
+        <!-- Form (Tanpa Ikon di dalam input) -->
+        <div class="space-y-6">
+            
+            <!-- Role -->
+            <div>
+                <label class="block text-sm font-black text-blue-900 mb-2 ml-1">Pilih Peran</label>
+                <select id="loginRole" class="block w-full px-5 py-4 bg-white rounded-2xl border-2 border-blue-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all font-bold text-slate-700">
+                    <option value="Siswa">Siswa</option>
+                    <option value="Guru">Guru</option>
+                    <option value="Admin">Admin</option>
+                </select>
             </div>
-            <div class="space-y-4">
-                <div>
-<div>
-    <label class="block text-sm font-semibold text-slate-700">Role</label>
-    <div class="relative mt-1">
-        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-user-tag"></i></span>
-        <select id="loginRole" class="block w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
-            <option value="Siswa">Siswa</option>
-            <option value="Guru">Guru</option>
-            <option value="Admin">Admin</option>
-        </select>
+
+            <!-- Username -->
+            <div>
+                <label class="block text-sm font-black text-blue-900 mb-2 ml-1">Username</label>
+                <input type="text" id="loginUser" class="block w-full px-5 py-4 bg-white rounded-2xl border-2 border-blue-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-700 placeholder:text-slate-300 font-medium" placeholder="Masukkan username kamu...">
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label class="block text-sm font-black text-blue-900 mb-2 ml-1">Kata Sandi</label>
+                <input type="password" id="loginPass" class="block w-full px-5 py-4 bg-white rounded-2xl border-2 border-blue-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-700 placeholder:text-slate-300 font-medium" placeholder="••••••••">
+            </div>
+
+            <!-- Button -->
+            <button onclick="handleLogin()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-black py-4 rounded-2xl transition-all shadow-[0_5px_0_#D97706] active:shadow-none active:translate-y-[5px] mt-2 text-lg">
+                Masuk Aja, Biar Seru !!
+            </button>
+        </div>
     </div>
 </div>
-                  <label class="block text-sm font-semibold text-slate-700">Username</label>
-                    <div class="relative mt-1">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-user"></i></span>
-                        <input type="text" id="loginUser" class="block w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm" placeholder="Masukkan Username">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700">Password</label>
-                    <div class="relative mt-1">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><i class="fa-solid fa-lock"></i></span>
-                        <input type="password" id="loginPass" class="block w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm" placeholder="••••••••">
-                    </div>
-                </div>
-                <button onclick="handleLogin()" class="w-full bg-red-600 hover:bg-red-700 text-white font-black py-3 px-6 rounded-xl transition duration-300 shadow-md hover:shadow-lg flex justify-center items-center gap-2 text-base border-b-4 border-red-800 active:border-b-0 active:mt-1">
-                    <i class="fa-solid fa-right-to-bracket text-yellow-300"></i> Masuk Sistem
-                </button>
-            </div>
         </section>
 
         <!-- SECTION 2: DASHBOARD ADMIN -->
