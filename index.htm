@@ -726,9 +726,12 @@
                     <h2 class="text-2xl font-black" id="siswaTitle">Hallo My Little Bolu Ketan, Selamat Datang!</h2>
                     <p class="text-indigo-200 text-sm">Akses cepat laporan belajar harian, penilaian mata pelajaran, laporan ekskul, dan tabungan Anda di bawah ini.</p>
                 </div>
-                <span id="txtSiswaTapel" class="bg-indigo-900 px-4 py-1.5 rounded-full text-xs font-black border border-indigo-400/30">TP: -</span>
+              <div class="flex items-center gap-2 mt-3 sm:mt-0 flex-wrap">
+    <span id="txtSiswaTapel" class="bg-indigo-900 px-4 py-1.5 rounded-full text-xs font-black border border-indigo-400/30 shadow-md">TP: -</span>
+    <span id="txtSiswaRankSem1" class="bg-amber-500 text-white px-4 py-1.5 rounded-full text-xs font-black border border-amber-400/30 shadow-md hidden">🏆 Rank Sem 1: -</span>
+    <span id="txtSiswaRankSem2" class="bg-amber-500 text-white px-4 py-1.5 rounded-full text-xs font-black border border-amber-400/30 shadow-md hidden">🏆 Rank Sem 2: -</span>
+</div>
             </div>
-
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 <div class="bg-white p-6 rounded-2xl shadow border border-slate-200 lg:col-span-4 flex flex-col">
                     <h3 class="font-bold text-base text-slate-800 mb-3 border-b pb-2 flex items-center gap-2">
@@ -1834,7 +1837,95 @@ function deleteStudentsByClass() {
                 listTabungan.innerHTML += `<li class="py-1.5 flex justify-between text-xs"><span>${t.date} (${t.jenis})</span><span class="font-bold">Rp ${t.nominalBersih.toLocaleString()}</span></li>`;
             });
             document.getElementById('siswaTotalSaldo').innerText = `Rp ${totalSaldo.toLocaleString()}`;
-            if(tabungans.length === 0) listTabungan.innerHTML = `<li class="p-2 text-slate-400 text-center text-[10px]">Belum ada mutasi</li>`;
+            
+            // Penutup kode tabungan yang terpotong
+            if(tabungans.length === 0) {
+                listTabungan.innerHTML = `<li class="p-3 text-slate-400 text-center">Belum ada riwayat transaksi tabungan</li>`;
+            }
+
+            // === AWAL PENAMBAHAN KODE RANKING SISWA ===
+            const rankSem1 = hitungRankingSiswa(username, currentUser.kelas, currentTapel, "1");
+            const rankSem2 = hitungRankingSiswa(username, currentUser.kelas, currentTapel, "2");
+
+            const badgeSem1 = document.getElementById('txtSiswaRankSem1');
+            const badgeSem2 = document.getElementById('txtSiswaRankSem2');
+
+            // Tampilkan badge Sem 1 jika ranking tersedia
+            if(rankSem1 !== '-') {
+                badgeSem1.innerText = `🏆 Rank Sem 1: Ke-${rankSem1}`;
+                badgeSem1.classList.remove('hidden');
+            } else {
+                badgeSem1.classList.add('hidden');
+            }
+
+            // Tampilkan badge Sem 2 jika ranking tersedia
+            if(rankSem2 !== '-') {
+                badgeSem2.innerText = `🏆 Rank Sem 2: Ke-${rankSem2}`;
+                badgeSem2.classList.remove('hidden');
+            } else {
+                badgeSem2.classList.add('hidden');
+            }
+            // === AKHIR PENAMBAHAN KODE RANKING SISWA ===
+        }
+// FUNGSI BARU UNTUK MENGHITUNG RANKING SISWA
+        function hitungRankingSiswa(targetUsername, kelas, tapel, semester) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const siswaSekelas = users.filter(u => u.role === 'Siswa' && u.kelas === kelas);
+            const mapelList = JSON.parse(localStorage.getItem('mapel')) || [];
+            const semuaNilai = (JSON.parse(localStorage.getItem('nilai')) || [])
+                .filter(n => n.kelas === kelas && n.semester === semester); 
+
+            // Jika kelas kosong atau belum ada nilai yang diinput guru, return strip (-)
+            if (siswaSekelas.length === 0 || semuaNilai.length === 0) return '-';
+
+            let listHasilSiswa = [];
+            
+            // Kalkulasi rata-rata setiap siswa di kelas tersebut (Sama seperti algoritma Legger Guru)
+            siswaSekelas.forEach(siswa => {
+                let totalRerata = 0; 
+                let mapelCount = 0;
+                
+                mapelList.forEach(m => {
+                    const filterNilai = semuaNilai.filter(n => n.username === siswa.username && n.mapel === m.nama);
+                    const tgs = filterNilai.filter(n => n.jenis === 'Tugas').map(n => n.angka);
+                    const sts = filterNilai.filter(n => n.jenis === 'STS').map(n => n.angka);
+                    const sas = filterNilai.filter(n => n.jenis === 'SAS').map(n => n.angka);
+
+                    const aTgs = tgs.length ? (tgs.reduce((a,b)=>a+b)/tgs.length) : null;
+                    const aSts = sts.length ? (sts.reduce((a,b)=>a+b)/sts.length) : null;
+                    const aSas = sas.length ? (sas.reduce((a,b)=>a+b)/sas.length) : null;
+
+                    let valid = [];
+                    if(aTgs!==null) valid.push(aTgs); 
+                    if(aSts!==null) valid.push(aSts); 
+                    if(aSas!==null) valid.push(aSas);
+                    
+                    const rMapel = valid.length ? (valid.reduce((a,b)=>a+b)/valid.length) : 0;
+                    if(rMapel > 0) { totalRerata += rMapel; mapelCount++; }
+                });
+                
+                listHasilSiswa.push({ 
+                    username: siswa.username, 
+                    rataGlobal: mapelCount > 0 ? (totalRerata/mapelCount) : 0 
+                });
+            });
+
+            // Urutkan siswa berdasarkan Rata-Rata Global tertinggi
+            listHasilSiswa.sort((a, b) => b.rataGlobal - a.rataGlobal);
+
+            // Cari ranking spesifik untuk user yang sedang aktif
+            let rank = '-';
+            for (let i = 0; i < listHasilSiswa.length; i++) {
+                if (listHasilSiswa[i].username === targetUsername) {
+                    // Hanya berikan ranking jika nilainya lebih dari 0
+                    if (listHasilSiswa[i].rataGlobal > 0) {
+                        rank = i + 1;
+                    }
+                    break;
+                }
+            }
+            
+            return rank;
         }
 
         // --- EXPORT TO EXCEL SYSTEM ---
