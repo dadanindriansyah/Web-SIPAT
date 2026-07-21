@@ -1729,39 +1729,91 @@
         }
 
         function renderTabunganGuru() {
-    const tabungan = (JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.kelas === currentUser.kelas);
-    const tbody = document.getElementById('bodyLogTabungan');
-    tbody.innerHTML = '';
-    tabungan.forEach(t => {
-        tbody.innerHTML += `<tr><td class="p-3">${t.date}</td><td class="p-3 font-semibold">${t.nama}</td><td class="font-bold">${t.jenis}</td><td>Rp ${t.nominalAsli.toLocaleString()}</td><td class="text-rose-500">Rp ${t.potongan.toLocaleString()}</td><td class="text-emerald-600 font-bold">Rp ${t.nominalBersih.toLocaleString()}</td><td class="text-right"><button onclick="deleteTabungan(${t.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
-    });
-    
-    // Panggil fungsi render rekap saldo siswa otomatis
-    renderRekapSaldoGuru();
-}
-
-// Fungsi Baru: Menghitung & Menampilkan Total Saldo Per Siswa di Bagian Guru
-function renderRekapSaldoGuru() {
+    const tabunganList = (JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.kelas === currentUser.kelas);
     const siswaList = getSiswaSekelas();
-    const tbodySaldo = document.getElementById('bodyRekapSaldoGuru');
-    if (!tbodySaldo) return;
     
-    tbodySaldo.innerHTML = '';
-    if (siswaList.length === 0) {
-        tbodySaldo.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Tidak ada data siswa.</td></tr>`;
-        return;
+    const tbodyMutasi = document.getElementById('bodyLogTabungan');
+    if (tbodyMutasi) {
+        tbodyMutasi.innerHTML = '';
+        tabunganList.forEach(t => {
+            const badgeColor = t.jenis === 'Masuk' ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
+            tbodyMutasi.innerHTML += `
+                <tr>
+                    <td class="p-3.5">${t.date}</td>
+                    <td class="p-3.5 font-semibold">${t.nama}</td>
+                    <td class="p-3.5"><span class="${badgeColor}">${t.jenis}</span></td>
+                    <td class="p-3.5">Rp ${t.nominalAsli.toLocaleString('id-ID')}</td>
+                    <td class="p-3.5 text-rose-600 font-semibold">Rp ${t.potongan.toLocaleString('id-ID')}</td>
+                    <td class="p-3.5 text-emerald-600 font-bold">Rp ${t.nominalBersih.toLocaleString('id-ID')}</td>
+                    <td class="p-3.5 text-right">
+                        <button onclick="deleteTabungan(${t.id})" class="text-rose-500 hover:text-rose-700">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>`;
+        });
     }
 
-    siswaList.forEach((siswa, index) => {
-        const saldoSiswa = getSiswaSaldo(siswa.username);
+    // Render Rekap Saldo Per Siswa dan Hitung Total Keseluruhan
+    const tbodySaldo = document.getElementById('bodyRekapSaldoGuru');
+    if (tbodySaldo) {
+        tbodySaldo.innerHTML = '';
+        let grandTotalSaldo = 0; // Inisialisasi total keseluruhan saldo tabungan
+
+        siswaList.forEach((s, index) => {
+            const mutasiSiswa = tabunganList.filter(t => t.username === s.username);
+            let saldoAkhir = 0;
+            mutasiSiswa.forEach(t => {
+                if (t.jenis === 'Masuk') saldoAkhir += t.nominalBersih;
+                else saldoAkhir -= t.nominalAsli;
+            });
+
+            grandTotalSaldo += saldoAkhir; // Akumulasi ke total keseluruhan
+
+            tbodySaldo.innerHTML += `
+                <tr class="hover:bg-slate-50/50">
+                    <td class="p-3.5 text-center font-medium text-slate-400">${index + 1}</td>
+                    <td class="p-3.5 font-mono text-slate-600">${s.username}</td>
+                    <td class="p-3.5 font-bold text-slate-800">${s.nama}</td>
+                    <td class="p-3.5 text-right font-black text-emerald-600">Rp ${saldoAkhir.toLocaleString('id-ID')}</td>
+                </tr>`;
+        });
+
+        // Tambahkan baris Grand Total di bagian bawah tabel rekap saldo
         tbodySaldo.innerHTML += `
-            <tr>
-                <td class="p-3">${index + 1}</td>
-                <td class="p-3 font-medium">${siswa.username}</td>
-                <td class="p-3 font-bold text-slate-800">${siswa.nama}</td>
-                <td class="p-3 text-right font-extrabold text-emerald-600 text-sm">Rp ${saldoSiswa.toLocaleString()}</td>
-            </tr>
-        `;
+            <tr class="bg-emerald-50/60 font-black border-t-2 border-emerald-100 text-slate-800">
+                <td colspan="3" class="p-4 text-right uppercase tracking-wider text-xs text-emerald-900">Total Keseluruhan Saldo Tabungan Kelas:</td>
+                <td class="p-4 text-right text-sm text-emerald-700">Rp ${grandTotalSaldo.toLocaleString('id-ID')}</td>
+            </tr>`;
+    }
+}
+
+function getSiswaSaldo(username) {
+    const tabungan = (JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.username === username);
+    let saldo = 0;
+    tabungan.forEach(t => {
+        if(t.jenis === 'Masuk') saldo += t.nominalBersih;
+        else saldo -= t.nominalAsli;
+    });
+    return saldo;
+}
+
+function deleteTabungan(id) {
+    if(confirm("Hapus transaksi ini?")) {
+        let tabungan = JSON.parse(localStorage.getItem('tabungan')) || [];
+        tabungan = tabungan.filter(t => t.id !== id);
+        localStorage.setItem('tabungan', JSON.stringify(tabungan));
+        renderTabunganGuru();
+    }
+}
+
+function filterRekapSaldo() {
+    const keyword = document.getElementById('searchRekapSaldo').value.toLowerCase();
+    const rows = document.querySelectorAll('#tblRekapSaldoGuru tbody tr');
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        if (row.classList.contains('bg-emerald-50/60')) return; // Lewatkan baris grand total agar tetap tampil
+        row.style.display = text.includes(keyword) ? '' : 'none';
     });
 }
 
