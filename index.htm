@@ -24,6 +24,9 @@
             .no-print { display: none !important; }
         }
     </style>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 </head>
 <body class="bg-slate-100 font-sans min-h-screen text-slate-800">
 
@@ -1878,6 +1881,88 @@
         function ambilDariCloud() {
             alert("Data berhasil dimuat ulang dari penyimpanan lokal/cloud.");
         }
+
+
+// --- INISIALISASI FIREBASE REALTIME DATABASE ---
+const firebaseConfig = {
+    apiKey: "AIzaSyA0B0LYbpy_E2L_1S1SVJB74T-fbpaC0aw",
+    authDomain: "mysipat.firebaseapp.com",
+    databaseURL: "https://mysipat-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "mysipat",
+    storageBucket: "mysipat.firebasestorage.app",
+    messagingSenderId: "149025727702",
+    appId: "1:149025727702:web:5f1613ce133b0e91f6d577",
+    measurementId: "G-EZ6860B031"
+  };
+
+    // Inisialisasi Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const dbRef = firebase.database().ref('sipat_data');
+
+    // --- FUNGSI SINKRONISASI CLOUD (REALTIME FIREBASE) ---
+
+    // 1. Sinkronkan / Kirim seluruh data LocalStorage ke Firebase Cloud
+    function sinkronkanKeCloud() {
+        if (!confirm("Sinkronkan seluruh data aplikasi ke Firebase Cloud Realtime?")) return;
+        
+        const payloadData = {
+            schoolProfile: JSON.parse(localStorage.getItem('schoolProfile') || '{}'),
+            adminPassword: localStorage.getItem('adminPassword') || 'Rarangge01',
+            users: JSON.parse(localStorage.getItem('users') || '[]'),
+            mapel: JSON.parse(localStorage.getItem('mapel') || '[]'),
+            ekskul: JSON.parse(localStorage.getItem('ekskul') || '[]'),
+            absensi: JSON.parse(localStorage.getItem('absensi') || '[]'),
+            nilai: JSON.parse(localStorage.getItem('nilai') || '[]'),
+            nilai_ekskul: JSON.parse(localStorage.getItem('nilai_ekskul') || '[]'),
+            tabungan: JSON.parse(localStorage.getItem('tabungan') || '[]'),
+            bintang: JSON.parse(localStorage.getItem('bintang') || '[]'),
+            lastUpdated: new Date().toISOString()
+        };
+
+        dbRef.set(payloadData)
+            .then(() => {
+                alert("✅ Berhasil! Data berhasil disinkronkan ke Firebase Cloud secara Realtime.");
+            })
+            .catch((error) => {
+                console.error("Gagal sinkronisasi:", error);
+                alert("❌ Gagal menyinkronkan data ke Cloud: " + error.message);
+            });
+    }
+
+    // 2. Ambil / Tarik data terbaru dari Firebase Cloud ke LocalStorage browser
+    function ambilDariCloud() {
+        if (!confirm("Ambil data terbaru dari Firebase Cloud? Data lokal yang belum disinkronkan mungkin akan tertimpa.")) return;
+
+        dbRef.once('value')
+            .then((snapshot) => {
+                const cloudData = snapshot.val();
+                if (!cloudData) {
+                    alert("⚠️ Tidak ada data ditemukan di Firebase Cloud.");
+                    return;
+                }
+
+                // Simpan kembali ke LocalStorage browser
+                if (cloudData.schoolProfile) localStorage.setItem('schoolProfile', JSON.stringify(cloudData.schoolProfile));
+                if (cloudData.adminPassword) localStorage.setItem('adminPassword', cloudData.adminPassword);
+                if (cloudData.users) localStorage.setItem('users', JSON.stringify(cloudData.users));
+                if (cloudData.mapel) localStorage.setItem('mapel', JSON.stringify(cloudData.mapel));
+                if (cloudData.ekskul) localStorage.setItem('ekskul', JSON.stringify(cloudData.ekskul));
+                if (cloudData.absensi) localStorage.setItem('absensi', JSON.stringify(cloudData.absensi));
+                if (cloudData.nilai) localStorage.setItem('nilai', JSON.stringify(cloudData.nilai));
+                if (cloudData.nilai_ekskul) localStorage.setItem('nilai_ekskul', JSON.stringify(cloudData.nilai_ekskul));
+                if (cloudData.tabungan) localStorage.setItem('tabungan', JSON.stringify(cloudData.tabungan));
+                if (cloudData.bintang) localStorage.setItem('bintang', JSON.stringify(cloudData.bintang));
+
+                alert("✅ Sukses! Data berhasil ditarik dari Cloud. Halaman akan dimuat ulang.");
+                location.reload();
+            })
+            .catch((error) => {
+                console.error("Gagal mengambil data:", error);
+                alert("❌ Gagal mengambil data dari Cloud: " + error.message);
+            });
+    }
     </script>
 </body>
 </html>
