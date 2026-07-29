@@ -430,7 +430,42 @@
                         <i class="fa-solid fa-circle-check"></i> Simpan Kehadiran
                     </button>
                 </div>
-
+<!-- GURU: TAB REKAPITULASI ABSEN PERSISWA -->
+            <div class="bg-white p-6 rounded-2xl shadow border border-slate-200 mt-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4 pb-3 border-b">
+                    <div>
+                        <h3 class="font-extrabold text-slate-800 text-base flex items-center gap-2">
+                            <span class="p-2 bg-emerald-50 text-emerald-600 rounded-xl"><i class="fa-solid fa-clipboard-user"></i></span>
+                            Rekapitulasi Total Absen (Sakit, Izin, Alfa) Per Siswa
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Akumulasi jumlah ketidakhadiran masing-masing siswa di kelas Anda.</p>
+                    </div>
+                    <div class="flex items-center gap-2 w-full md:w-auto">
+                        <input type="text" id="searchRekapAbsenSiswa" onkeyup="renderRekapAbsenSiswa()" placeholder="Cari nama siswa..." class="w-full md:w-56 px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-500">
+                        <button onclick="exportTableToExcel('tblRekapAbsenSiswa', 'Rekap_Absen_Sakit_Izin_Alfa')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm flex items-center gap-2 whitespace-nowrap">
+                            <i class="fa-solid fa-download"></i> Download Rekap Absen
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto border border-slate-100 rounded-xl max-h-80">
+                    <table id="tblRekapAbsenSiswa" class="w-full text-left text-xs">
+                        <thead class="bg-slate-50 text-slate-600 uppercase font-semibold tracking-wider">
+                            <tr>
+                                <th class="p-3.5 w-12 text-center">No</th>
+                                <th class="p-3.5">NISN / Username</th>
+                                <th class="p-3.5">Nama Siswa</th>
+                                <th class="p-3.5 text-center text-blue-600">Sakit (S)</th>
+                                <th class="p-3.5 text-center text-amber-600">Izin (I)</th>
+                                <th class="p-3.5 text-center text-rose-600">Alfa (A)</th>
+                                <th class="p-3.5 text-center font-bold">Total Absen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyRekapAbsenSiswa" class="divide-y divide-slate-100 text-slate-700">
+                            <!-- Data dirender otomatis via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
                         <div class="flex justify-between items-center mb-4">
@@ -1471,25 +1506,28 @@
         }
 
         function submitAbsensi() {
-            const date = document.getElementById('absensiDate').value;
-            const userSiswa = document.getElementById('absensiSiswa').value;
-            const status = document.getElementById('absensiStatus').value;
-            if(!date || !userSiswa) return alert("Lengkapi data!");
+    const date = document.getElementById('absensiDate').value;
+    const userSiswa = document.getElementById('absensiSiswa').value;
+    const status = document.getElementById('absensiStatus').value;
+    if(!date || !userSiswa) return alert("Lengkapi data!");
 
-            let absensi = JSON.parse(localStorage.getItem('absensi')) || [];
-            const sObj = getSiswaSekelas().find(s => s.username === userSiswa);
-            const profile = JSON.parse(localStorage.getItem('schoolProfile'));
+    let absensi = JSON.parse(localStorage.getItem('absensi')) || [];
+    const sObj = getSiswaSekelas().find(s => s.username === userSiswa);
+    const profile = JSON.parse(localStorage.getItem('schoolProfile'));
 
-            absensi.push({ id: Date.now(), date, username: userSiswa, nama: sObj ? sObj.nama : userSiswa, kelas: currentUser.kelas, status, tapel: profile.tapel || "-" });
-            localStorage.setItem('absensi', JSON.stringify(absensi));
-            renderAbsensiGuru();
-            alert("Absensi berhasil disimpan!");
-        }
+    absensi.push({ id: Date.now(), date, username: userSiswa, nama: sObj ? sObj.nama : userSiswa, kelas: currentUser.kelas, status, tapel: profile.tapel || "-" });
+    localStorage.setItem('absensi', JSON.stringify(absensi));
+
+    renderAbsensiGuru();
+    renderRekapAbsenSiswa(); // <-- Pastikan terpanggil di sini
+    alert("Absensi berhasil disimpan!");
+}
 
         function deleteAbsen(id) {
             if(confirm("Hapus?")) {
                 localStorage.setItem('absensi', JSON.stringify((JSON.parse(localStorage.getItem('absensi'))).filter(a => a.id !== id)));
                 renderAbsensiGuru();
+renderRekapAbsenSiswa();
             }
         }
 
@@ -2258,7 +2296,59 @@ function filterRekapSaldo() {
         }
     }
 }
+function renderRekapAbsenSiswa() {
+    const siswaList = getSiswaSekelas();
+    const absensiList = (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.kelas === currentUser.kelas);
+    const searchKeyword = document.getElementById('searchRekapAbsenSiswa') ? document.getElementById('searchRekapAbsenSiswa').value.toLowerCase().trim() : '';
+    const tbody = document.getElementById('bodyRekapAbsenSiswa');
+    if (!tbody) return;
+    tbody.innerHTML = '';
 
+    let filteredSiswa = siswaList.filter(s => 
+        s.nama.toLowerCase().includes(searchKeyword) || s.username.toLowerCase().includes(searchKeyword)
+    );
+
+    if (filteredSiswa.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Tidak ada data siswa yang ditemukan.</td></tr>`;
+        return;
+    }
+
+    filteredSiswa.forEach((siswa, index) => {
+        // Akumulasi jumlah Sakit, Izin, dan Alfa per siswa dari data absensi kelas
+        const sAbsen = absensiList.filter(a => a.username === siswa.username);
+        let sakit = 0, izin = 0, alfa = 0;
+        
+        sAbsen.forEach(a => {
+            if (a.status === 'Sakit') sakit++;
+            else if (a.status === 'Izin') izin++;
+            else if (a.status === 'Alfa') alfa++;
+        });
+        
+        const totalAbsen = sakit + izin + alfa;
+
+        tbody.innerHTML += `
+            <tr>
+                <td class="p-3.5 text-center font-medium">${index + 1}</td>
+                <td class="p-3.5 font-semibold text-slate-600">${siswa.username}</td>
+                <td class="p-3.5 font-bold text-slate-800">${siswa.nama}</td>
+                <td class="p-3.5 text-center font-semibold text-blue-600">${sakit}</td>
+                <td class="p-3.5 text-center font-semibold text-amber-600">${izin}</td>
+                <td class="p-3.5 text-center font-semibold text-rose-600">${alfa}</td>
+                <td class="p-3.5 text-center font-extrabold">${totalAbsen}</td>
+            </tr>
+        `;
+    });
+}
+function initGuruViews() {
+    populateGuruDropdowns();
+    renderAbsensiGuru();
+    renderRekapAbsenSiswa(); // <-- Tambahkan di sini
+    renderNilaiGuru();
+    renderLegger();
+    renderNilaiEkskulGuru();
+    renderBintangGuru();
+    renderTabunganGuru();
+}
     </script>
 </body>
 </html>
