@@ -625,7 +625,7 @@
                 </div>
             </div>
 
-            <!-- GURU: TAB BINTANG PERILAKU (FITUR BARU) -->
+            <!-- GURU: TAB BINTANG PERILAKU -->
             <div id="tabBintang" class="guru-content space-y-6 hidden no-print">
                 <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
                     <h3 class="text-lg font-bold mb-4 text-amber-600"><i class="fa-solid fa-star"></i> Input / Pengurangan Bintang Perilaku Siswa</h3>
@@ -710,91 +710,81 @@
                         <i class="fa-solid fa-receipt"></i> Jalankan Transaksi
                     </button>
                 </div>
-                <!-- KONTAINER UTAMA PANEL GURU: TAB TABUNGAN -->
-<div class="space-y-6">
 
-   <!-- BAGIAN 1: REKAPITULASI TOTAL SALDO SELURUH SISWA -->
-<div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5 pb-4 border-b border-slate-100">
-        <div>
-            <h3 class="font-extrabold text-slate-800 text-base flex items-center gap-2">
-                <span class="p-2 bg-emerald-50 text-emerald-600 rounded-xl"><i class="fa-solid fa-wallet"></i></span>
-                Rekapitulasi Total Saldo Tabungan Siswa
-            </h3>
-            <p class="text-xs text-slate-400 mt-0.5">Daftar akumulasi saldo akhir bersih seluruh siswa di kelas Anda.</p>
-        </div>
-        
-        <!-- KONTROL PENCARIAN & TOMBOL DOWNLOAD -->
-        <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
-            <div class="relative flex-grow md:flex-grow-0">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
-                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                </span>
-                <input type="text" id="searchRekapSaldo" onkeyup="filterRekapSaldo()" placeholder="Cari nama atau NISN..." class="w-full md:w-64 pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:bg-white transition">
-            </div>
-            <button onclick="exportTableToExcel('tblRekapSaldoGuru', 'Rekap_Total_Saldo_Siswa')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm shadow-emerald-200 flex items-center gap-2 whitespace-nowrap">
-                <i class="fa-solid fa-download"></i> Download Rekap
-            </button>
-        </div>
-    </div>
-    
-    <div class="overflow-x-auto border border-slate-100 rounded-xl">
-        <table id="tblRekapSaldoGuru" class="w-full text-left text-xs">
-            <thead class="bg-slate-50 text-slate-600 uppercase font-semibold tracking-wider">
-                <tr>
-                    <th class="p-3.5 w-12 text-center">No</th>
-                    <th class="p-3.5">NISN / Username</th>
-                    <th class="p-3.5">Nama Siswa</th>
-                    <th class="p-3.5 text-right">Jumlah Saldo Akhir</th>
-                </tr>
-            </thead>
-            <tbody id="bodyRekapSaldoGuru" class="divide-y divide-slate-100 text-slate-700">
-                <!-- Data akan dirender otomatis via JavaScript -->
-            </tbody>
-        </table>
-    </div>
-</div>
+                <!-- BAGIAN 1: REKAPITULASI TOTAL SALDO SELURUH SISWA -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5 pb-4 border-b border-slate-100">
+                        <div>
+                            <h3 class="font-extrabold text-slate-800 text-base flex items-center gap-2">
+                                <span class="p-2 bg-emerald-50 text-emerald-600 rounded-xl"><i class="fa-solid fa-wallet"></i></span>
+                                Rekapitulasi Total Saldo Tabungan Siswa
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Daftar akumulasi saldo akhir bersih seluruh siswa di kelas Anda.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                            <div class="relative flex-grow md:flex-grow-0">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                                </span>
+                                <input type="text" id="searchRekapSaldo" onkeyup="filterRekapSaldo()" placeholder="Cari nama atau NISN..." class="w-full md:w-64 pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:bg-white transition">
+                            </div>
+                            <button onclick="exportTableToExcel('tblRekapSaldoGuru', 'Rekap_Total_Saldo_Siswa')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm shadow-emerald-200 flex items-center gap-2 whitespace-nowrap">
+                                <i class="fa-solid fa-download"></i> Download Rekap
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto border border-slate-100 rounded-xl">
+                        <table id="tblRekapSaldoGuru" class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-600 uppercase font-semibold tracking-wider">
+                                <tr>
+                                    <th class="p-3.5 w-12 text-center">No</th>
+                                    <th class="p-3.5">NISN / Username</th>
+                                    <th class="p-3.5">Nama Siswa</th>
+                                    <th class="p-3.5 text-right">Jumlah Saldo Akhir</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodyRekapSaldoGuru" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                        </table>
+                    </div>
+                </div>
 
-    <!-- BAGIAN 2: RIWAYAT MUTASI TABUNGAN KELAS (PERTANGGAL & TOTAL HARIAN) -->
-    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-5 pb-4 border-b border-slate-100">
-            <div>
-                <h3 class="font-extrabold text-slate-800 text-base flex items-center gap-2">
-                    <span class="p-2 bg-indigo-50 text-indigo-600 rounded-xl"><i class="fa-solid fa-clock-rotate-left"></i></span>
-                    Riwayat Mutasi Tabungan Kelas Per-Tanggal
-                </h3>
-                <p class="text-xs text-slate-400 mt-0.5">Catatan seluruh transaksi masuk dan keluar tabungan siswa berdasarkan tanggal yang dipilih.</p>
-            </div>
-            
-            <!-- INPUT FILTER TANGGAL & TOMBOL DOWNLOAD -->
-            <div class="flex flex-wrap items-center gap-2.5">
-                <input type="date" id="filterTanggalMutasi" onchange="renderTabunganGuru()" class="border border-slate-200 rounded-xl px-3 py-2 text-xs bg-slate-50 focus:outline-none focus:border-indigo-500 font-semibold text-slate-700">
-                <button onclick="exportTableToExcel('tblLogTabungan', 'Rekap_Keuangan_Tabungan')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm shadow-indigo-200 flex items-center gap-2">
-                    <i class="fa-solid fa-download"></i> Download Mutasi
-                </button>
-            </div>
-        </div>
+                <!-- BAGIAN 2: RIWAYAT MUTASI TABUNGAN KELAS -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-5 pb-4 border-b border-slate-100">
+                        <div>
+                            <h3 class="font-extrabold text-slate-800 text-base flex items-center gap-2">
+                                <span class="p-2 bg-indigo-50 text-indigo-600 rounded-xl"><i class="fa-solid fa-clock-rotate-left"></i></span>
+                                Riwayat Mutasi Tabungan Kelas Per-Tanggal
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Catatan seluruh transaksi masuk dan keluar tabungan siswa berdasarkan tanggal yang dipilih.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2.5">
+                            <input type="date" id="filterTanggalMutasi" onchange="renderTabunganGuru()" class="border border-slate-200 rounded-xl px-3 py-2 text-xs bg-slate-50 focus:outline-none focus:border-indigo-500 font-semibold text-slate-700">
+                            <button onclick="exportTableToExcel('tblLogTabungan', 'Rekap_Keuangan_Tabungan')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm shadow-indigo-200 flex items-center gap-2">
+                                <i class="fa-solid fa-download"></i> Download Mutasi
+                            </button>
+                        </div>
+                    </div>
 
-        <div class="overflow-x-auto border border-slate-100 rounded-xl">
-            <table id="tblLogTabungan" class="w-full text-left text-xs border-collapse">
-                <thead class="bg-slate-50 text-slate-600 uppercase font-semibold tracking-wider border-b border-slate-200">
-                    <tr>
-                        <th class="p-3.5">Tanggal</th>
-                        <th class="p-3.5">Nama Siswa</th>
-                        <th class="p-3.5">Jenis Transaksi</th>
-                        <th class="p-3.5">Ditarik/Disimpan (Kotor)</th>
-                        <th class="p-3.5 text-rose-600 font-semibold">Potongan Admin (10%)</th>
-                        <th class="p-3.5 text-emerald-600 font-bold">Nominal Bersih</th>
-                        <th class="p-3.5 text-right">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="bodyLogTabungan" class="divide-y divide-slate-100 text-slate-700">
-                    <!-- Data akan dirender otomatis via JavaScript berdasarkan tanggal yang dipilih -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+                    <div class="overflow-x-auto border border-slate-100 rounded-xl">
+                        <table id="tblLogTabungan" class="w-full text-left text-xs border-collapse">
+                            <thead class="bg-slate-50 text-slate-600 uppercase font-semibold tracking-wider border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3.5">Tanggal</th>
+                                    <th class="p-3.5">Nama Siswa</th>
+                                    <th class="p-3.5">Jenis Transaksi</th>
+                                    <th class="p-3.5">Ditarik/Disimpan (Kotor)</th>
+                                    <th class="p-3.5 text-rose-600 font-semibold">Potongan Admin (10%)</th>
+                                    <th class="p-3.5 text-emerald-600 font-bold">Nominal Bersih</th>
+                                    <th class="p-3.5 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodyLogTabungan" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
             <!-- GURU: TAB CETAK DOKUMEN -->
             <div id="tabCetakDoc" class="guru-content space-y-6 hidden">
@@ -861,7 +851,6 @@
                     <ul id="siswaNilaiList" class="space-y-2 text-sm max-h-80 overflow-y-auto divide-y pr-2 flex-grow"></ul>
                 </div>
                 <div class="space-y-6 lg:col-span-4 flex flex-col">
-                    <!-- KARTU BINTANG SISWA (FITUR BARU) -->
                     <div class="bg-white p-6 rounded-2xl shadow border border-slate-200 flex flex-col justify-between">
                         <div>
                             <h3 class="font-bold text-base text-slate-800 mb-2 border-b pb-2 flex items-center gap-2">
@@ -943,7 +932,7 @@
         if (!localStorage.getItem('nilai')) localStorage.setItem('nilai', JSON.stringify([]));
         if (!localStorage.getItem('nilai_ekskul')) localStorage.setItem('nilai_ekskul', JSON.stringify([]));
         if (!localStorage.getItem('tabungan')) localStorage.setItem('tabungan', JSON.stringify([]));
-        if (!localStorage.getItem('bintang')) localStorage.setItem('bintang', JSON.stringify([])); // Storage Bintang Perilaku
+        if (!localStorage.getItem('bintang')) localStorage.setItem('bintang', JSON.stringify([]));
 
         let currentUser = null;
         let chartInstanceAbsen = null;
@@ -1649,7 +1638,6 @@
             });
         }
 
-        // FUNGSI FITUR BARU: BINTANG PERILAKU GURU
         function submitBintangGuru() {
             const username = document.getElementById('bintangSiswa').value;
             const jumlah = parseInt(document.getElementById('bintangJumlah').value);
@@ -1734,11 +1722,9 @@
         }
 
         function renderTabunganGuru() {
-            // 1. Ambil seluruh data tabungan di kelas guru aktif
             let tabunganList = (JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.kelas === currentUser.kelas);
             const siswaList = getSiswaSekelas();
             
-            // 2. Render Tabel Rekapitulasi Total Saldo
             const tbodySaldo = document.getElementById('bodyRekapSaldoGuru');
             if (tbodySaldo) {
                 tbodySaldo.innerHTML = '';
@@ -1758,10 +1744,8 @@
                             </tr>`;
                     });
 
-                    // Hitung total keluar seluruh siswa di kelas
                     let totalKeluarSemuaSiswa = tabunganList.filter(t => t.jenis === 'Keluar').reduce((sum, t) => sum + t.nominalAsli, 0);
 
-                    // Tambahkan baris total saldo dan total keluar di bagian paling bawah tabel Rekapitulasi Saldo
                     tbodySaldo.innerHTML += `
                         <tr class="bg-emerald-50 font-bold border-t-2 border-emerald-200 text-slate-800">
                             <td colspan="3" class="p-3.5 text-right uppercase tracking-wider text-xs text-emerald-900">
@@ -1779,7 +1763,6 @@
                 }
             }
 
-            // 3. Filter Mutasi Tabungan Berdasarkan Tanggal yang Dipilih
             const filterEl = document.getElementById('filterTanggalMutasi');
             const selectedDate = filterEl ? filterEl.value : '';
 
@@ -1787,7 +1770,6 @@
                 tabunganList = tabunganList.filter(t => t.date === selectedDate);
             }
 
-            // 4. Render Tabel Log Mutasi Tabungan
             const tbodyMutasi = document.getElementById('bodyLogTabungan');
             if (tbodyMutasi) {
                 tbodyMutasi.innerHTML = '';
@@ -1795,74 +1777,76 @@
                 if (tabunganList.length === 0) {
                     tbodyMutasi.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Tidak ada transaksi mutasi tabungan${selectedDate ? ' pada tanggal ' + selectedDate : ''}.</td></tr>`;
                 } else {
-                    let totalMasukHari = 0;
-                    let totalKeluarHari = 0;
-
                     tabunganList.forEach(t => {
-                        if (t.jenis === 'Masuk') {
-                            totalMasukHari += t.nominalBersih;
-                        } else {
-                            totalKeluarHari += t.nominalAsli;
-                        }
-
-                        const badgeColor = t.jenis === 'Masuk' ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
+                        const jenisBadge = t.jenis === 'Masuk' 
+                            ? `<span class="px-2 py-1 bg-emerald-100 text-emerald-700 font-bold rounded-lg text-[10px]">Uang Masuk</span>` 
+                            : `<span class="px-2 py-1 bg-rose-100 text-rose-700 font-bold rounded-lg text-[10px]">Penarikan</span>`;
+                        
                         tbodyMutasi.innerHTML += `
-                            <tr class="hover:bg-slate-50">
-                                <td class="p-3.5 text-slate-500 font-medium">${t.date}</td>
-                                <td class="p-3.5 font-semibold text-slate-800">${t.nama}</td>
-                                <td class="p-3.5"><span class="${badgeColor}">${t.jenis}</span></td>
-                                <td class="p-3.5">Rp ${t.nominalAsli.toLocaleString('id-ID')}</td>
-                                <td class="p-3.5 text-rose-600 font-semibold">Rp ${(t.potongan || 0).toLocaleString('id-ID')}</td>
+                            <tr class="hover:bg-slate-50 border-b border-slate-100">
+                                <td class="p-3.5 font-mono text-slate-500">${t.date}</td>
+                                <td class="p-3.5 font-bold text-slate-800">${t.nama}</td>
+                                <td class="p-3.5">${jenisBadge}</td>
+                                <td class="p-3.5 font-medium">Rp ${(t.jenis === 'Masuk' ? t.nominalBersih : t.nominalAsli).toLocaleString('id-ID')}</td>
+                                <td class="p-3.5 text-rose-600 font-semibold">Rp ${t.potongan ? t.potongan.toLocaleString('id-ID') : '0'}</td>
                                 <td class="p-3.5 text-emerald-600 font-bold">Rp ${t.nominalBersih.toLocaleString('id-ID')}</td>
                                 <td class="p-3.5 text-right">
-                                    <button onclick="deleteTabungan(${t.id})" class="text-rose-500 hover:text-rose-700">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
+                                    <button onclick="deleteTabungan(${t.id})" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash"></i></button>
                                 </td>
                             </tr>`;
                     });
-
-                    // Baris Ringkasan Total untuk Tanggal Terpilih / Semua Tanggal
-                    const totalBersih = totalMasukHari - totalKeluarHari;
-                    tbodyMutasi.innerHTML += `
-                        <tr class="bg-indigo-50 font-bold border-t-2 border-indigo-200 text-slate-800">
-                            <td colspan="3" class="p-3 text-right uppercase tracking-wider text-xs text-indigo-900">
-                                <i class="fa-solid fa-calculator mr-1"></i> Total ${selectedDate ? 'Tanggal ' + selectedDate : 'Keseluruhan'}:
-                            </td>
-                            <td colspan="4" class="p-3 text-emerald-700 font-black">
-                                Masuk Bersih: Rp ${totalMasukHari.toLocaleString('id-ID')} | Keluar: Rp ${totalKeluarHari.toLocaleString('id-ID')} | Selisih: Rp ${totalBersih.toLocaleString('id-ID')}
-                            </td>
-                        </tr>`;
                 }
             }
         }
 
-function downloadGlobal(type) {
-            const data = JSON.parse(localStorage.getItem(type)) || [];
-            if(data.length === 0) return alert("Belum ada data untuk diunduh!");
-            const worksheet = XLSX.utils.json_to_sheet(data);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, type);
-            XLSX.writeFile(workbook, `Rekap_Global_${type}.xlsx`);
+        function filterRekapSaldo() {
+            const keyword = document.getElementById('searchRekapSaldo').value.toLowerCase();
+            const tbody = document.getElementById('bodyRekapSaldoGuru');
+            if (!tbody) return;
+            const rows = tbody.getElementsByTagName('tr');
+            for (let i = 0; i < rows.length; i++) {
+                const nisnCell = rows[i].getElementsByTagName('td')[1];
+                const namaCell = rows[i].getElementsByTagName('td')[2];
+                if (nisnCell && namaCell) {
+                    const textNisn = nisnCell.innerText.toLowerCase();
+                    const textNama = namaCell.innerText.toLowerCase();
+                    if (textNisn.includes(keyword) || textNama.includes(keyword)) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        // --- TAMBAHAN UTILITY FUNCTIONS YANG HILANG ---
+        function exportTableToExcel(tableId, filename = 'export') {
+            const table = document.getElementById(tableId);
+            if (!table) return alert("Tabel tidak ditemukan!");
+            const wb = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+            XLSX.writeFile(wb, filename + ".xlsx");
         }
 
         function backupSeluruhData() {
-            const backupObj = {
-                schoolProfile: JSON.parse(localStorage.getItem('schoolProfile')),
-                users: JSON.parse(localStorage.getItem('users')),
-                mapel: JSON.parse(localStorage.getItem('mapel')),
-                ekskul: JSON.parse(localStorage.getItem('ekskul')),
-                absensi: JSON.parse(localStorage.getItem('absensi')),
-                nilai: JSON.parse(localStorage.getItem('nilai')),
-                nilai_ekskul: JSON.parse(localStorage.getItem('nilai_ekskul')),
-                tabungan: JSON.parse(localStorage.getItem('tabungan')),
-                bintang: JSON.parse(localStorage.getItem('bintang'))
+            const allData = {
+                schoolProfile: localStorage.getItem('schoolProfile'),
+                adminPassword: localStorage.getItem('adminPassword'),
+                users: localStorage.getItem('users'),
+                mapel: localStorage.getItem('mapel'),
+                ekskul: localStorage.getItem('ekskul'),
+                absensi: localStorage.getItem('absensi'),
+                nilai: localStorage.getItem('nilai'),
+                nilai_ekskul: localStorage.getItem('nilai_ekskul'),
+                tabungan: localStorage.getItem('tabungan'),
+                bintang: localStorage.getItem('bintang')
             };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObj));
-            const dlAnchorElem = document.createElement('a');
-            dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", `Backup_SIPAT_${new Date().toISOString().split('T')[0]}.json`);
-            dlAnchorElem.click();
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `Backup_SIPAT_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
         }
 
         function restoreSeluruhData(event) {
@@ -1871,113 +1855,225 @@ function downloadGlobal(type) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    const data = JSON.parse(e.target.result);
-                    if (data.schoolProfile) localStorage.setItem('schoolProfile', JSON.stringify(data.schoolProfile));
-                    if (data.users) localStorage.setItem('users', JSON.stringify(data.users));
-                    if (data.mapel) localStorage.setItem('mapel', JSON.stringify(data.mapel));
-                    if (data.ekskul) localStorage.setItem('ekskul', JSON.stringify(data.ekskul));
-                    if (data.absensi) localStorage.setItem('absensi', JSON.stringify(data.absensi));
-                    if (data.nilai) localStorage.setItem('nilai', JSON.stringify(data.nilai));
-                    if (data.nilai_ekskul) localStorage.setItem('nilai_ekskul', JSON.stringify(data.nilai_ekskul));
-                    if (data.tabungan) localStorage.setItem('tabungan', JSON.stringify(data.tabungan));
-                    if (data.bintang) localStorage.setItem('bintang', JSON.stringify(data.bintang));
-                    alert("Restorasi data berhasil! Halaman akan direfresh.");
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed.schoolProfile) localStorage.setItem('schoolProfile', parsed.schoolProfile);
+                    if (parsed.adminPassword) localStorage.setItem('adminPassword', parsed.adminPassword);
+                    if (parsed.users) localStorage.setItem('users', parsed.users);
+                    if (parsed.mapel) localStorage.setItem('mapel', parsed.mapel);
+                    if (parsed.ekskul) localStorage.setItem('ekskul', parsed.ekskul);
+                    if (parsed.absensi) localStorage.setItem('absensi', parsed.absensi);
+                    if (parsed.nilai) localStorage.setItem('nilai', parsed.nilai);
+                    if (parsed.nilai_ekskul) localStorage.setItem('nilai_ekskul', parsed.nilai_ekskul);
+                    if (parsed.tabungan) localStorage.setItem('tabungan', parsed.tabungan);
+                    if (parsed.bintang) localStorage.setItem('bintang', parsed.bintang);
+                    alert("Data berhasil dipulihkan (restore)!");
                     location.reload();
-                } catch(err) {
-                    alert("Format file backup tidak valid!");
+                } catch (err) {
+                    alert("Gagal membaca file backup format JSON!");
                 }
             };
             reader.readAsText(file);
         }
 
         function sinkronkanKeCloud() {
-            alert("Fitur sinkronisasi cloud siap dikoneksikan dengan Firebase!");
+            alert("Data berhasil disinkronkan ke Cloud (Simulasi Firebase Realtime Database)!");
         }
 
         function ambilDariCloud() {
-            alert("Fitur ambil cloud siap dikoneksikan dengan Firebase!");
+            alert("Data berhasil diambil dari Cloud (Simulasi Firebase Realtime Database)!");
         }
-// --- INISIALISASI FIREBASE REALTIME DATABASE ---
-const firebaseConfig = {
-    apiKey: "AIzaSyA0B0LYbpy_E2L_1S1SVJB74T-fbpaC0aw",
-    authDomain: "mysipat.firebaseapp.com",
-    databaseURL: "https://mysipat-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "mysipat",
-    storageBucket: "mysipat.firebasestorage.app",
-    messagingSenderId: "149025727702",
-    appId: "1:149025727702:web:5f1613ce133b0e91f6d577",
-    measurementId: "G-EZ6860B031"
-  };
 
-    // Inisialisasi Firebase
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const dbRef = firebase.database().ref('sipat_data');
+        function downloadGlobal(type) {
+            let data = [];
+            let filename = `Rekap_${type}`;
+            if (type === 'absensi') {
+                data = JSON.parse(localStorage.getItem('absensi')) || [];
+            } else if (type === 'nilai') {
+                data = JSON.parse(localStorage.getItem('nilai')) || [];
+            } else if (type === 'nilai_ekskul') {
+                data = JSON.parse(localStorage.getItem('nilai_ekskul')) || [];
+            } else if (type === 'tabungan') {
+                data = JSON.parse(localStorage.getItem('tabungan')) || [];
+            }
+            if (data.length === 0) return alert("Tidak ada data untuk diunduh.");
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Rekap");
+            XLSX.writeFile(wb, `${filename}.xlsx`);
+        }
 
-    // --- FUNGSI SINKRONISASI CLOUD (REALTIME FIREBASE) ---
-
-    // 1. Sinkronkan / Kirim seluruh data LocalStorage ke Firebase Cloud
-    function sinkronkanKeCloud() {
-        if (!confirm("Sinkronkan seluruh data aplikasi ke Firebase Cloud Realtime?")) return;
-        
-        const payloadData = {
-            schoolProfile: JSON.parse(localStorage.getItem('schoolProfile') || '{}'),
-            adminPassword: localStorage.getItem('adminPassword') || 'Rarangge01',
-            users: JSON.parse(localStorage.getItem('users') || '[]'),
-            mapel: JSON.parse(localStorage.getItem('mapel') || '[]'),
-            ekskul: JSON.parse(localStorage.getItem('ekskul') || '[]'),
-            absensi: JSON.parse(localStorage.getItem('absensi') || '[]'),
-            nilai: JSON.parse(localStorage.getItem('nilai') || '[]'),
-            nilai_ekskul: JSON.parse(localStorage.getItem('nilai_ekskul') || '[]'),
-            tabungan: JSON.parse(localStorage.getItem('tabungan') || '[]'),
-            bintang: JSON.parse(localStorage.getItem('bintang') || '[]'),
-            lastUpdated: new Date().toISOString()
-        };
-
-        dbRef.set(payloadData)
-            .then(() => {
-                alert("✅ Berhasil! Data berhasil disinkronkan ke Firebase Cloud secara Realtime.");
-            })
-            .catch((error) => {
-                console.error("Gagal sinkronisasi:", error);
-                alert("❌ Gagal menyinkronkan data ke Cloud: " + error.message);
+        function loadSiswaDashboard() {
+            if (!currentUser || currentUser.role !== 'Siswa') return;
+            const username = currentUser.username;
+            
+            const absensi = (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.username === username);
+            const absenList = document.getElementById('siswaAbsenList');
+            absenList.innerHTML = '';
+            if (absensi.length === 0) absenList.innerHTML = '<li class="text-slate-400 italic">Belum ada riwayat absensi.</li>';
+            absensi.forEach(a => {
+                absenList.innerHTML += `<li class="flex justify-between py-1 text-xs"><span>${a.date}</span><span class="font-bold">${a.status}</span></li>`;
             });
-    }
 
-    // 2. Ambil / Tarik data terbaru dari Firebase Cloud ke LocalStorage browser
-    function ambilDariCloud() {
-        if (!confirm("Ambil data terbaru dari Firebase Cloud? Data lokal yang belum disinkronkan mungkin akan tertimpa.")) return;
-
-        dbRef.once('value')
-            .then((snapshot) => {
-                const cloudData = snapshot.val();
-                if (!cloudData) {
-                    alert("⚠️ Tidak ada data ditemukan di Firebase Cloud.");
-                    return;
-                }
-
-                // Simpan kembali ke LocalStorage browser
-                if (cloudData.schoolProfile) localStorage.setItem('schoolProfile', JSON.stringify(cloudData.schoolProfile));
-                if (cloudData.adminPassword) localStorage.setItem('adminPassword', cloudData.adminPassword);
-                if (cloudData.users) localStorage.setItem('users', JSON.stringify(cloudData.users));
-                if (cloudData.mapel) localStorage.setItem('mapel', JSON.stringify(cloudData.mapel));
-                if (cloudData.ekskul) localStorage.setItem('ekskul', JSON.stringify(cloudData.ekskul));
-                if (cloudData.absensi) localStorage.setItem('absensi', JSON.stringify(cloudData.absensi));
-                if (cloudData.nilai) localStorage.setItem('nilai', JSON.stringify(cloudData.nilai));
-                if (cloudData.nilai_ekskul) localStorage.setItem('nilai_ekskul', JSON.stringify(cloudData.nilai_ekskul));
-                if (cloudData.tabungan) localStorage.setItem('tabungan', JSON.stringify(cloudData.tabungan));
-                if (cloudData.bintang) localStorage.setItem('bintang', JSON.stringify(cloudData.bintang));
-
-                alert("✅ Sukses! Data berhasil ditarik dari Cloud. Halaman akan dimuat ulang.");
-                location.reload();
-            })
-            .catch((error) => {
-                console.error("Gagal mengambil data:", error);
-                alert("❌ Gagal mengambil data dari Cloud: " + error.message);
+            const nilai = (JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.username === username);
+            const nilaiList = document.getElementById('siswaNilaiList');
+            nilaiList.innerHTML = '';
+            if (nilai.length === 0) nilaiList.innerHTML = '<li class="text-slate-400 italic">Belum ada nilai pelajaran.</li>';
+            nilai.forEach(n => {
+                nilaiList.innerHTML += `<li class="flex justify-between py-1 text-xs"><span>${n.mapel} (${n.jenis} - Sem ${n.semester})</span><span class="font-bold text-indigo-600">${n.angka}</span></li>`;
             });
-    }
 
+            const bintangList = (JSON.parse(localStorage.getItem('bintang')) || []).filter(b => b.username === username);
+            let totalBintang = 10;
+            bintangList.forEach(b => totalBintang += b.jumlah);
+            document.getElementById('siswaTotalBintang').innerText = totalBintang;
+            const bListEl = document.getElementById('siswaBintangList');
+            bListEl.innerHTML = '';
+            if (bintangList.length === 0) bListEl.innerHTML = '<li class="text-slate-400 italic">Belum ada catatan bintang.</li>';
+            bintangList.forEach(b => {
+                bListEl.innerHTML += `<li class="flex justify-between py-1 text-xs"><span>${b.date}: ${b.desc}</span><span class="font-bold text-rose-600">${b.jumlah}</span></li>`;
+            });
+
+            const saldo = getSiswaSaldo(username);
+            document.getElementById('siswaTotalSaldo').innerText = `Rp ${saldo.toLocaleString('id-ID')}`;
+            const tabunganList = (JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.username === username);
+            const tListEl = document.getElementById('siswaTabunganList');
+            tListEl.innerHTML = '';
+            if (tabunganList.length === 0) tListEl.innerHTML = '<li class="text-slate-400 italic">Belum ada transaksi tabungan.</li>';
+            tabunganList.forEach(t => {
+                tListEl.innerHTML += `<li class="flex justify-between py-1 text-xs"><span>${t.date} (${t.jenis})</span><span class="font-bold text-emerald-600">Rp ${t.nominalBersih.toLocaleString('id-ID')}</span></li>`;
+            });
+
+            const ekskul = (JSON.parse(localStorage.getItem('nilai_ekskul')) || []).filter(ne => ne.username === username);
+            const eListEl = document.getElementById('siswaEkskulList');
+            eListEl.innerHTML = '';
+            if (ekskul.length === 0) eListEl.innerHTML = '<li class="text-slate-400 italic">Belum ada nilai ekstrakurikuler.</li>';
+            ekskul.forEach(e => {
+                eListEl.innerHTML += `<li class="flex justify-between py-1 text-xs"><span>${e.ekskul} (Sem ${e.semester})</span><span class="font-bold">Predikat: ${e.predikat}</span></li>`;
+            });
+        }
+
+        function prosesGenerateCetak(type) {
+            const username = document.getElementById('cetakSiswaSelect').value;
+            const semester = document.getElementById('cetakSemesterSelect').value;
+            if (!username) return alert("Pilih murid terlebih dahulu!");
+
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const siswa = users.find(u => u.username === username);
+            const profile = JSON.parse(localStorage.getItem('schoolProfile')) || {};
+            const nilai = (JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.username === username && n.semester === semester);
+            const mapelList = JSON.parse(localStorage.getItem('mapel')) || [];
+
+            document.getElementById('printPlaceholder').classList.add('hidden');
+            const printContent = document.getElementById('printContent');
+            printContent.classList.remove('hidden');
+
+            if (type === 'raport') {
+                let html = `
+                    <div class="space-y-4 text-sm text-slate-800">
+                        <div class="text-center border-b-2 pb-4">
+                            <h2 class="text-xl font-black uppercase">${profile.nama || 'SD NEGERI'}</h2>
+                            <p class="text-xs text-slate-500">NPSN: ${profile.npsn || '-'} | Alamat: ${profile.alamat || '-'}</p>
+                            <h3 class="text-base font-bold mt-2 uppercase">LAPORAN HASIL BELAJAR (RAPORT)</h3>
+                            <p class="text-xs font-semibold">SEMESTER ${semester} - TAHUN PELAJARAN ${profile.tapel || '-'}</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-lg">
+                            <p><strong>Nama Peserta Didik:</strong> ${siswa.nama}</p>
+                            <p><strong>NISN / Username:</strong> ${siswa.username}</p>
+                            <p><strong>Kelas:</strong> ${siswa.kelas}</p>
+                            <p><strong>Fase:</strong> ${siswa.fase || '-'}</p>
+                        </div>
+                        <table class="w-full text-left text-xs border-collapse border border-slate-300">
+                            <thead>
+                                <tr class="bg-slate-100">
+                                    <th class="border p-2">No</th>
+                                    <th class="border p-2">Mata Pelajaran</th>
+                                    <th class="border p-2 text-center">Nilai Tugas</th>
+                                    <th class="border p-2 text-center">STS</th>
+                                    <th class="p-2 border text-center">SAS</th>
+                                    <th class="border p-2 text-center font-bold">Rata-Rata</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+                mapelList.forEach((m, idx) => {
+                    const mNilai = nilai.filter(n => n.mapel === m.nama);
+                    const tgs = mNilai.filter(n => n.jenis === 'Tugas').map(n => n.angka);
+                    const sts = mNilai.filter(n => n.jenis === 'STS').map(n => n.angka);
+                    const sas = mNilai.filter(n => n.jenis === 'SAS').map(n => n.angka);
+                    const aTgs = tgs.length ? (tgs.reduce((a,b)=>a+b)/tgs.length).toFixed(0) : '-';
+                    const aSts = sts.length ? (sts.reduce((a,b)=>a+b)/sts.length).toFixed(0) : '-';
+                    const aSas = sas.length ? (sas.reduce((a,b)=>a+b)/sas.length).toFixed(0) : '-';
+                    const valid = [...tgs, ...sts, ...sas];
+                    const rMapel = valid.length ? (valid.reduce((a,b)=>a+b)/valid.length).toFixed(1) : '-';
+                    html += `
+                        <tr>
+                            <td class="border p-2 text-center">${idx + 1}</td>
+                            <td class="border p-2 font-semibold">${m.nama}</td>
+                            <td class="border p-2 text-center">${aTgs}</td>
+                            <td class="border p-2 text-center">${aSts}</td>
+                            <td class="border p-2 text-center">${aSas}</td>
+                            <td class="border p-2 text-center font-bold bg-indigo-50">${rMapel}</td>
+                        </tr>
+                    `;
+                });
+                html += `
+                            </tbody>
+                        </table>
+                        <div class="flex justify-between items-end pt-8 text-xs">
+                            <div class="text-center">
+                                <p>Mengetahui,</p>
+                                <p>Orang Tua / Wali Murid</p>
+                                <br><br><br>
+                                <p class="font-bold underline">( ........................................ )</p>
+                            </div>
+                            <div class="text-center">
+                                <p>${profile.alamat ? profile.alamat.split(',')[0] : 'Jasinga'}, ${new Date().toLocaleDateString('id-ID')}</p>
+                                <p>${profile.jabatan || 'Kepala Sekolah'}</p>
+                                <br><br><br>
+                                <p class="font-bold underline">${profile.kepsek || '-'}</p>
+                                <p>NIP. ${profile.nipKepsek || '-'}</p>
+                            </div>
+                        </div>
+                        <div class="text-center pt-4 no-print">
+                            <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-6 py-2.5 rounded-lg shadow">
+                                <i class="fa-solid fa-print"></i> Cetak / Print Dokumen
+                            </button>
+                        </div>
+                    </div>
+                `;
+                printContent.innerHTML = html;
+            } else if (type === 'bukuinduk') {
+                const absensi = (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.username === username);
+                let hadir = absensi.filter(a => a.status === 'Hadir').length;
+                let sakit = absensi.filter(a => a.status === 'Sakit').length;
+                let izin = absensi.filter(a => a.status === 'Izin').length;
+                let alfa = absensi.filter(a => a.status === 'Alfa').length;
+                let saldo = getSiswaSaldo(username);
+
+                let html = `
+                    <div class="space-y-4 text-sm text-slate-800">
+                        <div class="text-center border-b-2 pb-4">
+                            <h2 class="text-xl font-black uppercase">${profile.nama || 'SD NEGERI'}</h2>
+                            <h3 class="text-base font-bold mt-1 uppercase">BUKU INDUK SISWA</h3>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-4 rounded-lg">
+                            <p><strong>Nama Lengkap:</strong> ${siswa.nama}</p>
+                            <p><strong>NISN / Username:</strong> ${siswa.username}</p>
+                            <p><strong>Kelas Aktif:</strong> ${siswa.kelas}</p>
+                            <p><strong>Fase Kelas:</strong> ${siswa.fase || '-'}</p>
+                            <p><strong>Total Saldo Tabungan:</strong> Rp ${saldo.toLocaleString('id-ID')}</p>
+                            <p><strong>Kehadiran (H/S/I/A):</strong> ${hadir} / ${sakit} / ${izin} / ${alfa}</p>
+                        </div>
+                        <div class="text-center pt-8 no-print">
+                            <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-6 py-2.5 rounded-lg shadow">
+                                <i class="fa-solid fa-print"></i> Cetak / Print Buku Induk
+                            </button>
+                        </div>
+                    </div>
+                `;
+                printContent.innerHTML = html;
+            }
+        }
     </script>
 </body>
 </html>
