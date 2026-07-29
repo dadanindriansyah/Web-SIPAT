@@ -763,11 +763,16 @@
                     <span class="p-2 bg-indigo-50 text-indigo-600 rounded-xl"><i class="fa-solid fa-clock-rotate-left"></i></span>
                     Riwayat Mutasi Tabungan Kelas Per-Tanggal
                 </h3>
-                <p class="text-xs text-slate-400 mt-0.5">Catatan seluruh transaksi masuk dan keluar tabungan siswa yang dikelompokkan pertanggal.</p>
+                <p class="text-xs text-slate-400 mt-0.5">Catatan seluruh transaksi masuk dan keluar tabungan siswa berdasarkan tanggal yang dipilih.</p>
             </div>
-            <button onclick="exportTableToExcel('tblLogTabungan', 'Rekap_Keuangan_Tabungan')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm shadow-indigo-200 flex items-center gap-2">
-                <i class="fa-solid fa-download"></i> Download Mutasi
-            </button>
+            
+            <!-- INPUT FILTER TANGGAL & TOMBOL DOWNLOAD -->
+            <div class="flex flex-wrap items-center gap-2.5">
+                <input type="date" id="filterTanggalMutasi" onchange="renderTabunganGuru()" class="border border-slate-200 rounded-xl px-3 py-2 text-xs bg-slate-50 focus:outline-none focus:border-indigo-500 font-semibold text-slate-700">
+                <button onclick="exportTableToExcel('tblLogTabungan', 'Rekap_Keuangan_Tabungan')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm shadow-indigo-200 flex items-center gap-2">
+                    <i class="fa-solid fa-download"></i> Download Mutasi
+                </button>
+            </div>
         </div>
 
         <div class="overflow-x-auto border border-slate-100 rounded-xl">
@@ -784,12 +789,11 @@
                     </tr>
                 </thead>
                 <tbody id="bodyLogTabungan" class="divide-y divide-slate-100 text-slate-700">
-                    <!-- Data akan dirender otomatis via JavaScript dikelompokkan pertanggal -->
+                    <!-- Data akan dirender otomatis via JavaScript berdasarkan tanggal yang dipilih -->
                 </tbody>
             </table>
         </div>
     </div>
-
 </div>
 
             <!-- GURU: TAB CETAK DOKUMEN -->
@@ -1710,158 +1714,119 @@
             renderTabunganGuru();
         }
 
-        function renderTabunganGuru() {
-            const tabunganList = (JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.kelas === currentUser.kelas);
-            const siswaList = getSiswaSekelas();
-            
-            const tbodyMutasi = document.getElementById('bodyLogTabungan');
-            if (tbodyMutasi) {
-                tbodyMutasi.innerHTML = '';
-
-                if (tabunganList.length === 0) {
-                    tbodyMutasi.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Belum ada mutasi tabungan recorded.</td></tr>`;
-                } else {
-                    // Kelompokkan data tabungan berdasarkan tanggal
-                    const groupedByDate = {};
-                    tabunganList.forEach(t => {
-                        const dateKey = t.date || 'Lainnya';
-                        if (!groupedByDate[dateKey]) groupedByDate[dateKey] = [];
-                        groupedByDate[dateKey].push(t);
-                    });
-
-                    // Urutkan tanggal secara menurun (terbaru ke terlama)
-                    const sortedDates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
-
-                    let totalMasukGlobal = 0;
-                    let totalKeluarGlobal = 0;
-
-                    sortedDates.forEach(date => {
-                        const items = groupedByDate[date];
-                        let totalMasukHari = 0;
-                        let totalKeluarHari = 0;
-
-                        items.forEach(t => {
-                            if (t.jenis === 'Masuk') {
-                                totalMasukHari += t.nominalBersih;
-                                totalMasukGlobal += t.nominalBersih;
-                            } else {
-                                totalKeluarHari += t.nominalAsli;
-                                totalKeluarGlobal += t.nominalAsli;
-                            }
-
-                            const badgeColor = t.jenis === 'Masuk' ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
-                            tbodyMutasi.innerHTML += `
-                                <tr class="hover:bg-slate-50">
-                                    <td class="p-3.5 text-slate-500 font-medium">${t.date}</td>
-                                    <td class="p-3.5 font-semibold text-slate-800">${t.nama}</td>
-                                    <td class="p-3.5"><span class="${badgeColor}">${t.jenis}</span></td>
-                                    <td class="p-3.5">Rp ${t.nominalAsli.toLocaleString('id-ID')}</td>
-                                    <td class="p-3.5 text-rose-600 font-semibold">Rp ${t.potongan.toLocaleString('id-ID')}</td>
-                                    <td class="p-3.5 text-emerald-600 font-bold">Rp ${t.nominalBersih.toLocaleString('id-ID')}</td>
-                                    <td class="p-3.5 text-right">
-                                        <button onclick="deleteTabungan(${t.id})" class="text-rose-500 hover:text-rose-700">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>`;
-                        });
-
-                        // Baris Subtotal per Tanggal
-                        const totalHariBersih = totalMasukHari - totalKeluarHari;
-                        tbodyMutasi.innerHTML += `
-                            <tr class="bg-slate-100/80 font-bold border-y border-slate-200 text-slate-700">
-                                <td colspan="3" class="p-2.5 text-right uppercase tracking-wider text-[11px] text-indigo-900">
-                                    <i class="fa-solid fa-calculator mr-1"></i> Total Tanggal ${date}:
-                                </td>
-                                <td colspan="2" class="p-2.5 text-xs text-slate-600">
-                                    Masuk: <span class="text-emerald-600 font-extrabold">Rp ${totalMasukHari.toLocaleString('id-ID')}</span> | 
-                                    Keluar: <span class="text-rose-600 font-extrabold">Rp ${totalKeluarHari.toLocaleString('id-ID')}</span>
-                                </td>
-                                <td colspan="2" class="p-2.5 text-right text-xs text-indigo-700 font-black">
-                                    Nett Hari Ini: Rp ${totalHariBersih.toLocaleString('id-ID')}
-                                </td>
-                            </tr>`;
-                    });
-
-                    // Baris Total Akumulasi Keseluruhan Mutasi
-                    const grandTotalMutasi = totalMasukGlobal - totalKeluarGlobal;
-                    tbodyMutasi.innerHTML += `
-                        <tr class="bg-indigo-900 text-white font-black border-t-2 border-indigo-950">
-                            <td colspan="3" class="p-3.5 text-right uppercase tracking-wider text-xs">
-                                TOTAL KESELURUHAN MUTASI KELAS:
-                            </td>
-                            <td colspan="2" class="p-3.5 text-xs text-indigo-100">
-                                Masuk: <span class="text-emerald-300 font-extrabold">Rp ${totalMasukGlobal.toLocaleString('id-ID')}</span> | 
-                                Keluar: <span class="text-rose-300 font-extrabold">Rp ${totalKeluarGlobal.toLocaleString('id-ID')}</span>
-                            </td>
-                            <td colspan="2" class="p-3.5 text-right text-sm text-yellow-300">
-                                Total Bersih: Rp ${grandTotalMutasi.toLocaleString('id-ID')}
-                            </td>
-                        </tr>`;
-                }
-            }
-
-            // Render Rekap Saldo Per Siswa dan Hitung Total Keseluruhan
-            const tbodySaldo = document.getElementById('bodyRekapSaldoGuru');
-            if (tbodySaldo) {
-                tbodySaldo.innerHTML = '';
-                let grandTotalSaldo = 0;
-
-                siswaList.forEach((s, index) => {
-                    const mutasiSiswa = tabunganList.filter(t => t.username === s.username);
-                    let saldoAkhir = 0;
-                    mutasiSiswa.forEach(t => {
-                        if (t.jenis === 'Masuk') saldoAkhir += t.nominalBersih;
-                        else saldoAkhir -= t.nominalAsli;
-                    });
-
-                    grandTotalSaldo += saldoAkhir;
-
-                    tbodySaldo.innerHTML += `
-                        <tr class="hover:bg-slate-50/50">
-                            <td class="p-3.5 text-center font-medium text-slate-400">${index + 1}</td>
-                            <td class="p-3.5 font-mono text-slate-600">${s.username}</td>
-                            <td class="p-3.5 font-bold text-slate-800">${s.nama}</td>
-                            <td class="p-3.5 text-right font-black text-emerald-600">Rp ${saldoAkhir.toLocaleString('id-ID')}</td>
-                        </tr>`;
-                });
-
+       function renderTabunganGuru() {
+    // 1. Ambil seluruh data tabungan di kelas guru aktif
+    let tabunganList = (JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.kelas === currentUser.kelas);
+    const siswaList = getSiswaSekelas();
+    
+    // 2. Render Tabel Rekapitulasi Total Saldo
+    const tbodySaldo = document.getElementById('bodyRekapSaldoGuru');
+    if (tbodySaldo) {
+        tbodySaldo.innerHTML = '';
+        if (siswaList.length === 0) {
+            tbodySaldo.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 italic">Belum ada data siswa.</td></tr>`;
+        } else {
+            siswaList.forEach((s, idx) => {
+                const saldoSiswa = getSiswaSaldo(s.username);
                 tbodySaldo.innerHTML += `
-                    <tr class="bg-emerald-50/60 font-black border-t-2 border-emerald-100 text-slate-800">
-                        <td colspan="3" class="p-4 text-right uppercase tracking-wider text-xs text-emerald-900">Total Keseluruhan Saldo Tabungan Kelas:</td>
-                        <td class="p-4 text-right text-sm text-emerald-700">Rp ${grandTotalSaldo.toLocaleString('id-ID')}</td>
+                    <tr class="hover:bg-slate-50 border-b border-slate-100">
+                        <td class="p-3.5 text-center font-bold text-slate-400">${idx + 1}</td>
+                        <td class="p-3.5 font-mono text-slate-600">${s.username}</td>
+                        <td class="p-3.5 font-bold text-slate-800">${s.nama}</td>
+                        <td class="p-3.5 text-right font-extrabold text-emerald-600">Rp ${saldoSiswa.toLocaleString('id-ID')}</td>
                     </tr>`;
-            }
-        }
-
-        function getSiswaSaldo(username) {
-            const tabungan = (JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.username === username);
-            let saldo = 0;
-            tabungan.forEach(t => {
-                if(t.jenis === 'Masuk') saldo += t.nominalBersih;
-                else saldo -= t.nominalAsli;
-            });
-            return saldo;
-        }
-
-        function deleteTabungan(id) {
-            if(confirm("Hapus transaksi ini?")) {
-                let tabungan = JSON.parse(localStorage.getItem('tabungan')) || [];
-                tabungan = tabungan.filter(t => t.id !== id);
-                localStorage.setItem('tabungan', JSON.stringify(tabungan));
-                renderTabunganGuru();
-            }
-        }
-
-        function filterRekapSaldo() {
-            const keyword = document.getElementById('searchRekapSaldo').value.toLowerCase();
-            const rows = document.querySelectorAll('#tblRekapSaldoGuru tbody tr');
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                if (row.classList.contains('bg-emerald-50/60')) return;
-                row.style.display = text.includes(keyword) ? '' : 'none';
             });
         }
+    }
+
+    // 3. Filter Mutasi Tabungan Berdasarkan Tanggal yang Dipilih
+    const filterEl = document.getElementById('filterTanggalMutasi');
+    const selectedDate = filterEl ? filterEl.value : '';
+
+    if (selectedDate) {
+        tabunganList = tabunganList.filter(t => t.date === selectedDate);
+    }
+
+    // 4. Render Tabel Log Mutasi Tabungan
+    const tbodyMutasi = document.getElementById('bodyLogTabungan');
+    if (tbodyMutasi) {
+        tbodyMutasi.innerHTML = '';
+
+        if (tabunganList.length === 0) {
+            tbodyMutasi.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400 italic">Tidak ada transaksi mutasi tabungan${selectedDate ? ' pada tanggal ' + selectedDate : ''}.</td></tr>`;
+        } else {
+            let totalMasukHari = 0;
+            let totalKeluarHari = 0;
+
+            tabunganList.forEach(t => {
+                if (t.jenis === 'Masuk') {
+                    totalMasukHari += t.nominalBersih;
+                } else {
+                    totalKeluarHari += t.nominalAsli;
+                }
+
+                const badgeColor = t.jenis === 'Masuk' ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
+                tbodyMutasi.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3.5 text-slate-500 font-medium">${t.date}</td>
+                        <td class="p-3.5 font-semibold text-slate-800">${t.nama}</td>
+                        <td class="p-3.5"><span class="${badgeColor}">${t.jenis}</span></td>
+                        <td class="p-3.5">Rp ${t.nominalAsli.toLocaleString('id-ID')}</td>
+                        <td class="p-3.5 text-rose-600 font-semibold">Rp ${(t.potongan || 0).toLocaleString('id-ID')}</td>
+                        <td class="p-3.5 text-emerald-600 font-bold">Rp ${t.nominalBersih.toLocaleString('id-ID')}</td>
+                        <td class="p-3.5 text-right">
+                            <button onclick="deleteTabungan(${t.id})" class="text-rose-500 hover:text-rose-700">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+
+            // Baris Ringkasan Total untuk Tanggal Terpilih / Semua Tanggal
+            const totalBersih = totalMasukHari - totalKeluarHari;
+            tbodyMutasi.innerHTML += `
+                <tr class="bg-indigo-50 font-bold border-t-2 border-indigo-200 text-slate-800">
+                    <td colspan="3" class="p-3 text-right uppercase tracking-wider text-xs text-indigo-900">
+                        <i class="fa-solid fa-calculator mr-1"></i> Total ${selectedDate ? 'Tanggal ' + selectedDate : 'Keseluruhan'}:
+                    </td>
+                    <td colspan="4" class="p-3 text-xs">
+                        Masuk: <span class="text-emerald-600 font-extrabold mr-3">Rp ${totalMasukHari.toLocaleString('id-ID')}</span> | 
+                        Keluar: <span class="text-rose-600 font-extrabold mr-3">Rp ${totalKeluarHari.toLocaleString('id-ID')}</span> | 
+                        Netto: <span class="${totalBersih >= 0 ? 'text-emerald-700' : 'text-rose-700'} font-black">Rp ${totalBersih.toLocaleString('id-ID')}</span>
+                    </td>
+                </tr>`;
+        }
+    }
+}
+
+// Tambahkan juga fungsi pembantu pendukung jika belum ada:
+function getSiswaSaldo(username) {
+    const tabungan = (JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.username === username);
+    let total = 0;
+    tabungan.forEach(t => {
+        if (t.jenis === 'Masuk') total += t.nominalBersih;
+        else if (t.jenis === 'Keluar') total -= t.nominalAsli;
+    });
+    return total;
+}
+
+function deleteTabungan(id) {
+    if (confirm("Hapus transaksi tabungan ini?")) {
+        let tabungan = JSON.parse(localStorage.getItem('tabungan')) || [];
+        tabungan = tabungan.filter(t => t.id !== id);
+        localStorage.setItem('tabungan', JSON.stringify(tabungan));
+        renderTabunganGuru();
+    }
+}
+
+function filterRekapSaldo() {
+    const keyword = document.getElementById('searchRekapSaldo').value.toLowerCase();
+    const rows = document.querySelectorAll('#bodyRekapSaldoGuru tr');
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(keyword) ? '' : 'none';
+    });
+}
 
         function prosesGenerateCetak(type) {
             const username = document.getElementById('cetakSiswaSelect').value;
