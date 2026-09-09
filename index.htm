@@ -33,7 +33,42 @@
         input, select { border-radius: 12px !important; }
         .kid-card { border: 3px solid #dbeafe; }
         .kid-title { color:#1d4ed8; font-weight:900; }
-    </style>
+    
+        /* ===== DOKUMEN RAPORT & BUKU INDUK KURIKULUM MERDEKA ===== */
+        .dokumen-km { font-family: Arial, Helvetica, sans-serif; color:#111827; font-size:11px; line-height:1.35; }
+        .dok-header { display:grid; grid-template-columns:72px 1fr 72px; align-items:center; gap:10px; border-bottom:2px solid #111827; padding-bottom:8px; margin-bottom:10px; }
+        .dok-logo { width:64px; height:64px; display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid #cbd5e1; border-radius:4px; font-size:8px; color:#94a3b8; }
+        .dok-logo img { width:100%; height:100%; object-fit:contain; }
+        .dok-title { text-align:center; }
+        .dok-school { font-size:15px; font-weight:900; text-transform:uppercase; }
+        .dok-meta { font-size:9px; margin-top:2px; }
+        .dok-heading { font-size:14px; font-weight:900; margin-top:5px; text-transform:uppercase; }
+        .dok-subheading { font-size:10px; font-weight:700; margin-top:2px; }
+        .dok-identity { display:grid; grid-template-columns:1fr 1fr; gap:4px 12px; border:1px solid #94a3b8; padding:7px; margin-bottom:10px; }
+        .dok-identity div { display:grid; grid-template-columns:130px 1fr; gap:5px; }
+        .dok-identity b { font-weight:700; }
+        .dok-table { width:100%; border-collapse:collapse; margin-bottom:8px; }
+        .dok-table th,.dok-table td { border:1px solid #64748b; padding:4px 5px; vertical-align:middle; }
+        .dok-table th { background:#f1f5f9; font-weight:800; text-align:center; }
+        .dok-table .center { text-align:center; }
+        .dok-table .bold,.bold { font-weight:800; }
+        .dok-grid { display:grid; grid-template-columns:1.35fr .8fr; gap:10px; }
+        .dokumen-km h4 { font-size:10px; font-weight:900; margin:8px 0 4px; }
+        .dok-note { border:1px solid #cbd5e1; background:#f8fafc; padding:6px 8px; margin:8px 0; font-size:9px; }
+        .muted { color:#64748b; font-style:italic; }
+        .semester-block { page-break-inside:avoid; }
+        .dok-sign { display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:28px; text-align:center; }
+        .sign-space { height:48px; }
+        @media print {
+            #printArea { box-shadow:none !important; border:0 !important; padding:0 !important; min-height:0 !important; }
+            .dokumen-km { font-size:10px; }
+            .dok-header { grid-template-columns:60px 1fr 60px; }
+            .dok-logo { width:54px; height:54px; }
+            .dok-school { font-size:14px; }
+            .dok-table th,.dok-table td { padding:3px 4px; }
+            .semester-block { page-break-inside:avoid; }
+        }
+</style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -168,6 +203,27 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase">Jabatan</label>
                             <input type="text" id="schJabatan" class="mt-1 block w-full rounded-lg border border-slate-300 p-2.5 text-sm" placeholder="Kepala Sekolah">
+                        </div>
+                    </div>
+                    <div class="mt-4 rounded-xl border-2 border-dashed border-indigo-200 bg-indigo-50/50 p-4">
+                        <div class="flex flex-col md:flex-row items-center gap-4">
+                            <div class="shrink-0 w-24 h-24 bg-white border rounded-xl flex items-center justify-center overflow-hidden shadow-sm">
+                                <img id="schoolLogoPreview" src="" alt="Logo Sekolah" class="max-w-full max-h-full object-contain hidden">
+                                <span id="schoolLogoEmpty" class="text-[10px] text-slate-400 text-center px-2">Belum ada logo</span>
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-xs font-black text-indigo-700 uppercase mb-1">Logo Sekolah</label>
+                                <p class="text-xs text-slate-500 mb-2">Upload logo (PNG/JPG). Logo otomatis diperkecil agar penyimpanan Firebase tetap ringan dan akan tampil di kiri & kanan judul Raport serta Buku Induk.</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <label class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-bold cursor-pointer">
+                                        <i class="fa-solid fa-image"></i> Pilih Logo
+                                        <input type="file" id="schoolLogoInput" class="hidden" accept="image/png,image/jpeg,image/webp" onchange="handleSchoolLogoUpload(event)">
+                                    </label>
+                                    <button type="button" onclick="removeSchoolLogo()" class="bg-rose-100 hover:bg-rose-200 text-rose-700 px-4 py-2 rounded-lg text-xs font-bold">
+                                        <i class="fa-solid fa-trash"></i> Hapus Logo
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <button onclick="saveSchoolProfile()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition">
@@ -1122,6 +1178,7 @@
             document.getElementById('schKepsek').value = profile.kepsek || "";
             document.getElementById('schNipKepsek').value = profile.nipKepsek || "";
             document.getElementById('schJabatan').value = profile.jabatan || "";
+            renderSchoolLogo(profile.logo || '');
             loadAdminMetadata();
             loadAdminUsers();
         }
@@ -1137,10 +1194,54 @@
                     saveAppData('nilai_ekskul', JSON.stringify([]));
                     saveAppData('tabungan', JSON.stringify([]));
                     saveAppData('bintang', JSON.stringify([]));
-                    alert("Sistem berhasil dikosongkan!");
+                    showSaveToast("Data sistem dikosongkan");
                     initAdminDashboard();
                 }
             }
+        }
+
+        function renderSchoolLogo(src) {
+            const img = document.getElementById('schoolLogoPreview');
+            const empty = document.getElementById('schoolLogoEmpty');
+            if (!img || !empty) return;
+            if (src) { img.src = src; img.classList.remove('hidden'); empty.classList.add('hidden'); }
+            else { img.removeAttribute('src'); img.classList.add('hidden'); empty.classList.remove('hidden'); }
+        }
+
+        function handleSchoolLogoUpload(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) return alert('Pilih file gambar PNG/JPG/WebP.');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const max = 320;
+                    const scale = Math.min(1, max / Math.max(img.width, img.height));
+                    const canvas = document.createElement('canvas');
+                    canvas.width = Math.max(1, Math.round(img.width * scale));
+                    canvas.height = Math.max(1, Math.round(img.height * scale));
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const dataUrl = canvas.toDataURL('image/png', 0.88);
+                    const profile = JSON.parse(localStorage.getItem('schoolProfile')) || {};
+                    profile.logo = dataUrl;
+                    saveAppData('schoolProfile', JSON.stringify(profile));
+                    renderSchoolLogo(dataUrl);
+                    showCloudStatus('online');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        function removeSchoolLogo() {
+            const profile = JSON.parse(localStorage.getItem('schoolProfile')) || {};
+            delete profile.logo;
+            saveAppData('schoolProfile', JSON.stringify(profile));
+            renderSchoolLogo('');
         }
 
         function saveSchoolProfile() {
@@ -1151,9 +1252,11 @@
             const kepsek = document.getElementById('schKepsek').value.trim();
             const nipKepsek = document.getElementById('schNipKepsek').value.trim();
             const jabatan = document.getElementById('schJabatan').value.trim();
-            saveAppData('schoolProfile', JSON.stringify({ nama, npsn, alamat, tapel, kepsek, nipKepsek, jabatan }));
+            const oldProfile = JSON.parse(localStorage.getItem('schoolProfile')) || {};
+            saveAppData('schoolProfile', JSON.stringify({ nama, npsn, alamat, tapel, kepsek, nipKepsek, jabatan, logo: oldProfile.logo || '' }));
             loadNavSchool();
-            alert("Profil sekolah berhasil disimpan!");
+            renderSchoolLogo(oldProfile.logo || '');
+            showCloudStatus('online');
         }
 
         function loadAdminMetadata() {
@@ -1230,7 +1333,7 @@
             const pass = document.getElementById('newAdminPass').value.trim();
             if(pass) {
                 saveAppData('adminPassword', pass);
-                alert("Password Admin diperbarui!");
+                showSaveToast("Password admin diperbarui");
                 document.getElementById('newAdminPass').value = '';
             }
         }
@@ -1361,7 +1464,7 @@
                     users[index].fase = fase;
                     if(role === 'Guru') users[index].nip = nip;
                     saveAppData('users', JSON.stringify(users));
-                    alert("Data pengguna berhasil diperbarui!");
+                    showSaveToast("Data pengguna diperbarui");
                     cancelEditUser(role);
                     loadAdminUsers();
                 }
@@ -1369,7 +1472,7 @@
                 if(users.find(u => u.username === user)) return alert("Username sudah terdaftar!");
                 users.push({ username: user, password: pass, nama, kelas, role, nip, fase });
                 saveAppData('users', JSON.stringify(users));
-                alert("Berhasil ditambahkan!");
+                showSaveToast("Data berhasil ditambahkan");
                 loadAdminUsers();
                 document.getElementById(role === 'Guru' ? 'guruUser' : 'siswaUser').value = '';
                 document.getElementById(role === 'Guru' ? 'guruPass' : 'siswaPass').value = '';
@@ -1513,7 +1616,7 @@
 
     renderAbsensiGuru();
     renderRekapAbsenSiswa(); // <-- Pastikan terpanggil di sini
-    alert("Absensi berhasil disimpan!");
+    showSaveToast("Absensi tersimpan");
 }
 
         function deleteAbsen(id) {
@@ -1568,7 +1671,7 @@ renderRekapAbsenSiswa();
             saveAppData('nilai', JSON.stringify(nilai));
             renderNilaiGuru();
             renderLegger();
-            alert("Penilaian berhasil disimpan!");
+            showSaveToast("Penilaian tersimpan");
         }
 
         function deleteNilai(id) {
@@ -1679,7 +1782,7 @@ renderRekapAbsenSiswa();
             nilaiEkskul.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: currentUser.kelas, ekskul, semester, predikat, desc, tapel: profile.tapel || "-" });
             saveAppData('nilai_ekskul', JSON.stringify(nilaiEkskul));
             renderNilaiEkskulGuru();
-            alert("Nilai ekskul berhasil disimpan!");
+            showSaveToast("Nilai ekskul tersimpan");
         }
 
         function deleteNilaiEkskul(id) {
@@ -1714,7 +1817,7 @@ renderRekapAbsenSiswa();
             saveAppData('bintang', JSON.stringify(bintangList));
             document.getElementById('bintangDesc').value = '';
             renderBintangGuru();
-            alert("Catatan bintang/pelanggaran berhasil disimpan!");
+            showSaveToast("Catatan bintang tersimpan");
         }
 
         function deleteBintang(id) {
@@ -1771,7 +1874,7 @@ renderRekapAbsenSiswa();
             tabungan.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: currentUser.kelas, jenis, nominalAsli: nominalKotor, nominalBersih, potongan, date, tapel: profile.tapel || "-" });
             saveAppData('tabungan', JSON.stringify(tabungan));
             renderTabunganGuru();
-            alert("Transaksi tabungan berhasil dijalankan!");
+            showSaveToast("Transaksi tersimpan");
         }
 
         function deleteTabungan(id) {
@@ -1916,152 +2019,98 @@ renderRekapAbsenSiswa();
 
             const users = JSON.parse(localStorage.getItem('users')) || [];
             const sObj = users.find(u => u.username === username);
+            if(!sObj) return alert("Data siswa tidak ditemukan!");
             const profile = JSON.parse(localStorage.getItem('schoolProfile')) || {};
             const mapelList = JSON.parse(localStorage.getItem('mapel')) || [];
-            const nilaiList = (JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.username === username && n.semester === semester);
-            const ekskulList = (JSON.parse(localStorage.getItem('nilai_ekskul')) || []).filter(ne => ne.username === username && ne.semester === semester);
-            const absensiList = (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.username === username);
+            const allNilai = JSON.parse(localStorage.getItem('nilai')) || [];
+            const allEkskul = JSON.parse(localStorage.getItem('nilai_ekskul')) || [];
+            const allAbsensi = JSON.parse(localStorage.getItem('absensi')) || [];
+            const nilaiList = allNilai.filter(n => n.username === username && String(n.semester) === String(semester));
+            const ekskulList = allEkskul.filter(ne => ne.username === username && String(ne.semester) === String(semester));
+            const absensiList = allAbsensi.filter(a => a.username === username);
+            const logo = profile.logo || '';
+            const esc = v => String(v ?? '-').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+            const fmt = n => typeof n === 'number' && !isNaN(n) ? n.toFixed(1) : '-';
+            const nilaiRata = (items) => items.length ? items.reduce((a,b)=>a + Number(b), 0) / items.length : null;
+            const header = (judul, subjudul) => `
+                <div class="dok-header">
+                    <div class="dok-logo">${logo ? `<img src="${logo}" alt="Logo Sekolah">` : `<span>LOGO</span>`}</div>
+                    <div class="dok-title">
+                        <div class="dok-school">${esc(profile.nama || 'SEKOLAH DASAR')}</div>
+                        <div class="dok-meta">NPSN: ${esc(profile.npsn || '-')} &nbsp;|&nbsp; ${esc(profile.alamat || '-')}</div>
+                        <div class="dok-heading">${judul}</div>
+                        <div class="dok-subheading">${subjudul}</div>
+                    </div>
+                    <div class="dok-logo">${logo ? `<img src="${logo}" alt="Logo Sekolah">` : `<span>LOGO</span>`}</div>
+                </div>`;
+            const identity = `
+                <div class="dok-identity">
+                    <div><b>Nama Peserta Didik</b><span>${esc(sObj.nama)}</span></div>
+                    <div><b>Nomor Induk / NISN</b><span>${esc(sObj.username)}</span></div>
+                    <div><b>Kelas</b><span>${esc(sObj.kelas || '-')}</span></div>
+                    <div><b>Fase</b><span>${esc(sObj.fase || '-')}</span></div>
+                    <div><b>Tahun Pelajaran</b><span>${esc(profile.tapel || '-')}</span></div>
+                    <div><b>Status</b><span>Peserta Didik Aktif</span></div>
+                </div>`;
+            let absenStats = { Hadir: 0, Sakit: 0, Izin: 0, Alfa: 0 };
+            absensiList.forEach(a => { if(absenStats[a.status] !== undefined) absenStats[a.status]++; });
 
             document.getElementById('printPlaceholder').classList.add('hidden');
             const contentEl = document.getElementById('printContent');
             contentEl.classList.remove('hidden');
 
-            let absenStats = { Hadir: 0, Sakit: 0, Izin: 0, Alfa: 0 };
-            absensiList.forEach(a => { if(absenStats[a.status] !== undefined) absenStats[a.status]++; });
-
             if (type === 'raport') {
-                let html = `
-                    <div class="space-y-6 text-slate-800">
-                        <div class="text-center border-b-2 pb-4 border-slate-800">
-                            <h2 class="text-lg font-black uppercase">${profile.nama || 'SEKOLAH DASAR'}</h2>
-                            <p class="text-xs">NPSN: ${profile.npsn || '-'} | Alamat: ${profile.alamat || '-'}</p>
-                            <h3 class="text-md font-bold mt-2 uppercase">LAPORAN HASIL BELAJAR (RAPORT)</h3>
-                            <p class="text-xs font-semibold">KURIKULUM MERDEKA - SEMESTER ${semester} (${profile.tapel || '-'})</p>
-                        </div>
-                        <div class="grid grid-cols-2 text-xs gap-2 bg-slate-50 p-3 rounded-lg">
-                            <div><strong class="uppercase text-slate-500">Nama Peserta Didik:</strong> <span class="font-bold text-slate-800">${sObj.nama}</span></div>
-                            <div><strong class="uppercase text-slate-500">Nomor Induk / NISN:</strong> <span class="font-bold text-slate-800">${sObj.username}</span></div>
-                            <div><strong class="uppercase text-slate-500">Kelas / Fase:</strong> <span class="font-bold text-slate-800">${sObj.kelas} / ${sObj.fase || '-'}</span></div>
-                            <div><strong class="uppercase text-slate-500">Tahun Pelajaran:</strong> <span class="font-bold text-slate-800">${profile.tapel || '-'}</span></div>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-xs uppercase text-indigo-700 mb-2">A. Nilai Akademik Mata Pelajaran</h4>
-                            <table class="w-full text-xs border-collapse border border-slate-300">
-                                <thead class="bg-slate-100 text-slate-700">
-                                    <tr>
-                                        <th class="border p-2 w-10 text-center">No</th>
-                                        <th class="border p-2">Mata Pelajaran</th>
-                                        <th class="border p-2 text-center">Nilai Tugas</th>
-                                        <th class="border p-2 text-center">STS</th>
-                                        <th class="border p-2 text-center">SAS</th>
-                                        <th class="border p-2 text-center font-bold">Rata-Rata</th>
-                                    </tr>
-                                </thead>
-                                <tbody>`;
-                
+                let html = `<div class="dokumen-km">${header('LAPORAN HASIL BELAJAR PESERTA DIDIK', `KURIKULUM MERDEKA — SEMESTER ${esc(semester)} (${esc(profile.tapel || '-')})`)}${identity}
+                    <section><h4>A. NILAI AKADEMIK MATA PELAJARAN</h4>
+                    <table class="dok-table"><thead><tr><th>No</th><th>Mata Pelajaran</th><th>Tugas</th><th>STS</th><th>SAS</th><th>Nilai Akhir</th></tr></thead><tbody>`;
                 mapelList.forEach((m, i) => {
-                    const mNilai = nilaiList.filter(n => n.mapel === m.nama);
-                    const tgs = mNilai.filter(n => n.jenis === 'Tugas').map(n => n.angka);
-                    const sts = mNilai.filter(n => n.jenis === 'STS').map(n => n.angka);
-                    const sas = mNilai.filter(n => n.jenis === 'SAS').map(n => n.angka);
-                    const avgTgs = tgs.length ? tgs.reduce((a,b)=>a+b)/tgs.length : '-';
-                    const avgSts = sts.length ? sts.reduce((a,b)=>a+b)/sts.length : '-';
-                    const avgSas = sas.length ? sas.reduce((a,b)=>a+b)/sas.length : '-';
-
-                    let valArr = [];
-                    if(tgs.length) valArr.push(tgs.reduce((a,b)=>a+b)/tgs.length);
-                    if(sts.length) valArr.push(sts.reduce((a,b)=>a+b)/sts.length);
-                    if(sas.length) valArr.push(sas.reduce((a,b)=>a+b)/sas.length);
-                    const finalAvg = valArr.length ? (valArr.reduce((a,b)=>a+b)/valArr.length).toFixed(1) : '-';
-
-                    html += `<tr>
-                        <td class="border p-2 text-center">${i+1}</td>
-                        <td class="border p-2 font-medium">${m.nama}</td>
-                        <td class="border p-2 text-center">${typeof avgTgs === 'number' ? avgTgs.toFixed(0) : '-'}</td>
-                        <td class="border p-2 text-center">${typeof avgSts === 'number' ? avgSts.toFixed(0) : '-'}</td>
-                        <td class="border p-2 text-center">${typeof avgSas === 'number' ? avgSas.toFixed(0) : '-'}</td>
-                        <td class="border p-2 text-center font-bold text-indigo-700">${finalAvg}</td>
-                    </tr>`;
+                    const rows = nilaiList.filter(n => n.mapel === m.nama);
+                    const tgs = nilaiRata(rows.filter(n=>n.jenis==='Tugas').map(n=>Number(n.angka)));
+                    const sts = nilaiRata(rows.filter(n=>n.jenis==='STS').map(n=>Number(n.angka)));
+                    const sas = nilaiRata(rows.filter(n=>n.jenis==='SAS').map(n=>Number(n.angka)));
+                    const valid = [tgs,sts,sas].filter(v=>v !== null);
+                    const akhir = valid.length ? nilaiRata(valid) : null;
+                    html += `<tr><td class="center">${i+1}</td><td>${esc(m.nama)}</td><td class="center">${fmt(tgs)}</td><td class="center">${fmt(sts)}</td><td class="center">${fmt(sas)}</td><td class="center bold">${fmt(akhir)}</td></tr>`;
                 });
-
-                html += `</tbody></table></div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <h4 class="font-bold text-xs uppercase text-indigo-700 mb-2">B. Ekstrakurikuler</h4>
-                                <table class="w-full text-xs border-collapse border border-slate-300">
-                                    <thead class="bg-slate-100"><tr><th class="border p-2">Kegiatan</th><th class="border p-2 text-center">Predikat</th><th class="border p-2">Keterangan</th></tr></thead>
-                                    <tbody>`;
-                if(ekskulList.length === 0) {
-                    html += `<tr><td colspan="3" class="border p-2 text-center text-slate-400">Belum ada catatan ekskul.</td></tr>`;
-                } else {
-                    ekskulList.forEach(e => {
-                        html += `<tr><td class="border p-2">${e.ekskul}</td><td class="border p-2 text-center font-bold">${e.predikat}</td><td class="border p-2">${e.desc}</td></tr>`;
-                    });
-                }
-                html += `</tbody></table></div>
-                            <div>
-                                <h4 class="font-bold text-xs uppercase text-indigo-700 mb-2">C. Ketidakhadiran</h4>
-                                <table class="w-full text-xs border-collapse border border-slate-300">
-                                    <tbody>
-                                        <tr><td class="border p-2">Sakit</td><td class="border p-2 font-bold text-center">${absenStats.Sakit} hari</td></tr>
-                                        <tr><td class="border p-2">Izin</td><td class="border p-2 font-bold text-center">${absenStats.Izin} hari</td></tr>
-                                        <tr><td class="border p-2">Tanpa Keterangan (Alfa)</td><td class="border p-2 font-bold text-center">${absenStats.Alfa} hari</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="flex justify-between pt-12 text-xs">
-                            <div class="text-center">
-                                <p>Mengetahui,</p>
-                                <p class="font-bold">Orang Tua / Wali Murid</p>
-                                <div class="h-16"></div>
-                                <p class="border-b border-slate-800 w-40 mx-auto"></p>
-                            </div>
-                            <div class="text-center">
-                                <p>Jasinga, ${new Date().toLocaleDateString('id-ID')}</p>
-                                <p class="font-bold">${profile.jabatan || 'Kepala Sekolah'} / Guru Kelas</p>
-                                <div class="h-16"></div>
-                                <p class="font-bold underline">${profile.kepsek || 'Dadan Indriansyah, S.Pd., M.Pd.'}</p>
-                                <p>NIP. ${profile.nipKepsek || '-'}</p>
-                            </div>
-                        </div>
-                    </div>`;
+                html += `</tbody></table></section>
+                    <div class="dok-grid"><section><h4>B. EKSTRAKURIKULER</h4><table class="dok-table"><thead><tr><th>Kegiatan</th><th>Predikat</th><th>Keterangan</th></tr></thead><tbody>`;
+                if(!ekskulList.length) html += `<tr><td colspan="3" class="center muted">Belum ada catatan.</td></tr>`;
+                ekskulList.forEach(e => html += `<tr><td>${esc(e.ekskul)}</td><td class="center bold">${esc(e.predikat)}</td><td>${esc(e.desc)}</td></tr>`);
+                html += `</tbody></table></section><section><h4>C. KETIDAKHADIRAN</h4><table class="dok-table"><tbody>
+                    <tr><td>Sakit</td><td class="center bold">${absenStats.Sakit} hari</td></tr>
+                    <tr><td>Izin</td><td class="center bold">${absenStats.Izin} hari</td></tr>
+                    <tr><td>Alfa</td><td class="center bold">${absenStats.Alfa} hari</td></tr>
+                    </tbody></table></section></div>
+                    <div class="dok-sign"><div>Mengetahui,<br><b>Orang Tua / Wali</b><div class="sign-space"></div><u>________________________</u></div><div>${esc(profile.alamat || 'Jasinga')}, ${new Date().toLocaleDateString('id-ID')}<br><b>${esc(profile.jabatan || 'Kepala Sekolah')}</b><div class="sign-space"></div><b><u>${esc(profile.kepsek || '-')}</u></b><br>NIP. ${esc(profile.nipKepsek || '-')}</div></div></div>`;
                 contentEl.innerHTML = html;
             } else {
-                let html = `
-                    <div class="space-y-6 text-slate-800">
-                        <div class="text-center border-b-2 pb-4 border-slate-800">
-                            <h2 class="text-lg font-black uppercase">${profile.nama || 'SEKOLAH DASAR'}</h2>
-                            <p class="text-xs">NPSN: ${profile.npsn || '-'} | Alamat: ${profile.alamat || '-'}</p>
-                            <h3 class="text-md font-bold mt-2 uppercase">BUKU INDUK PESERTA DIDIK</h3>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-2">
-                            <div class="grid grid-cols-2">
-                                <div><strong>Nama Lengkap:</strong> ${sObj.nama}</div>
-                                <div><strong>Nomor Induk / NISN:</strong> ${sObj.username}</div>
-                            </div>
-                            <div class="grid grid-cols-2">
-                                <div><strong>Kelas Saat Ini:</strong> ${sObj.kelas}</div>
-                                <div><strong>Fase:</strong> ${sObj.fase || '-'}</div>
-                            </div>
-                            <div class="grid grid-cols-2">
-                                <div><strong>Status Akun:</strong> Aktif</div>
-                                <div><strong>Tahun Pelajaran:</strong> ${profile.tapel || '-'}</div>
-                            </div>
-                        </div>
-                        <div class="flex justify-end pt-16 text-xs">
-                            <div class="text-center">
-                                <p>Jasinga, ${new Date().toLocaleDateString('id-ID')}</p>
-                                <p class="font-bold">${profile.jabatan || 'Kepala Sekolah'}</p>
-                                <div class="h-16"></div>
-                                <p class="font-bold underline">${profile.kepsek || 'Dadan Indriansyah, S.Pd., M.Pd.'}</p>
-                                <p>NIP. ${profile.nipKepsek || '-'}</p>
-                            </div>
-                        </div>
-                    </div>`;
-                contentEl.innerHTML = html;
+                // Buku induk: otomatis menggabungkan seluruh nilai mapel, ekskul, dan absensi untuk Semester 1 dan 2.
+                const semesterRows = [1,2].map(sem => {
+                    const list = allNilai.filter(n => n.username === username && String(n.semester) === String(sem));
+                    let rows = '';
+                    mapelList.forEach((m,i) => {
+                        const vals = list.filter(n=>n.mapel===m.nama);
+                        const tgs = nilaiRata(vals.filter(n=>n.jenis==='Tugas').map(n=>Number(n.angka)));
+                        const sts = nilaiRata(vals.filter(n=>n.jenis==='STS').map(n=>Number(n.angka)));
+                        const sas = nilaiRata(vals.filter(n=>n.jenis==='SAS').map(n=>Number(n.angka)));
+                        const valid=[tgs,sts,sas].filter(v=>v!==null);
+                        const akhir=valid.length?nilaiRata(valid):null;
+                        rows += `<tr><td class="center">${i+1}</td><td>${esc(m.nama)}</td><td class="center">${fmt(tgs)}</td><td class="center">${fmt(sts)}</td><td class="center">${fmt(sas)}</td><td class="center bold">${fmt(akhir)}</td></tr>`;
+                    });
+                    return `<section class="semester-block"><h4>NILAI AKADEMIK — SEMESTER ${sem}</h4><table class="dok-table"><thead><tr><th>No</th><th>Mata Pelajaran</th><th>Tugas</th><th>STS</th><th>SAS</th><th>Nilai Akhir</th></tr></thead><tbody>${rows || `<tr><td colspan="6" class="center muted">Belum ada data nilai.</td></tr>`}</tbody></table></section>`;
+                }).join('');
+                const allEks = allEkskul.filter(e=>e.username===username);
+                const eksRows = allEks.map(e=>`<tr><td>${esc(e.eksiklus || e.ekskul)}</td><td class="center">Semester ${esc(e.semester)}</td><td class="center bold">${esc(e.predikat)}</td><td>${esc(e.desc)}</td></tr>`).join('');
+                const absenRows = `<tr><td>Hadir</td><td class="center bold">${absenStats.Hadir} hari</td></tr><tr><td>Sakit</td><td class="center bold">${absenStats.Sakit} hari</td></tr><tr><td>Izin</td><td class="center bold">${absenStats.Izin} hari</td></tr><tr><td>Alfa</td><td class="center bold">${absenStats.Alfa} hari</td></tr>`;
+                contentEl.innerHTML = `<div class="dokumen-km buku-induk">${header('BUKU INDUK PESERTA DIDIK', `KURIKULUM MERDEKA — TAHUN PELAJARAN ${esc(profile.tapel || '-')}`)}${identity}
+                    <div class="dok-note"><b>Catatan:</b> Buku induk menampilkan seluruh mata pelajaran dan rekap penilaian Semester 1–2, kegiatan ekstrakurikuler, serta ketidakhadiran yang sudah tersimpan pada sistem.</div>
+                    ${semesterRows}
+                    <section><h4>REKAP EKSTRAKURIKULER</h4><table class="dok-table"><thead><tr><th>Kegiatan</th><th>Semester</th><th>Predikat</th><th>Keterangan</th></tr></thead><tbody>${eksRows || `<tr><td colspan="4" class="center muted">Belum ada data ekstrakurikuler.</td></tr>`}</tbody></table></section>
+                    <section><h4>REKAP KETIDAKHADIRAN</h4><table class="dok-table"><tbody>${absenRows}</tbody></table></section>
+                    <div class="dok-sign"><div>Mengetahui,<br><b>Orang Tua / Wali</b><div class="sign-space"></div><u>________________________</u></div><div>${esc(profile.alamat || 'Jasinga')}, ${new Date().toLocaleDateString('id-ID')}<br><b>${esc(profile.jabatan || 'Kepala Sekolah')}</b><div class="sign-space"></div><b><u>${esc(profile.kepsek || '-')}</u></b><br>NIP. ${esc(profile.nipKepsek || '-')}</div></div></div>`;
             }
-            window.print();
+            // Preview dirender segera; pencetakan dilakukan setelah browser selesai mengecat halaman.
+            requestAnimationFrame(() => setTimeout(() => window.print(), 30));
         }
 
         // DASHBOARD SISWA
@@ -2211,9 +2260,13 @@ function toFirebaseValue(key, value) {
 }
 
 function saveAppData(key, value) {
+    // UI/local cache langsung selesai; Firebase dikirim tanpa menahan alur pengguna.
     localStorage.setItem(key, value);
+    showCloudStatus('online');
     if (!firebaseReady || applyingFirebaseData || !CLOUD_KEYS.includes(key)) return;
-    dbRef.child(key).set(toFirebaseValue(key, value)).catch(err => {
+    dbRef.child(key).set(toFirebaseValue(key, value)).then(() => {
+        showCloudStatus('online');
+    }).catch(err => {
         console.error('Gagal menyimpan ke Firebase:', key, err);
         showCloudStatus('offline', 'Perubahan tersimpan lokal, Firebase belum tersambung.');
     });
@@ -2227,6 +2280,18 @@ function saveAllAppDataToFirebase() {
     });
     payload.lastUpdated = new Date().toISOString();
     return dbRef.update(payload);
+}
+
+function showSaveToast(message='Data tersimpan') {
+    let el = document.getElementById('saveToast');
+    if (!el) {
+        el = document.createElement('div'); el.id='saveToast';
+        el.className='fixed right-5 bottom-5 z-[100] hidden px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold shadow-xl';
+        document.body.appendChild(el);
+    }
+    el.textContent='✓ ' + message; el.classList.remove('hidden');
+    clearTimeout(window.__saveToastTimer);
+    window.__saveToastTimer=setTimeout(()=>el.classList.add('hidden'),1400);
 }
 
 function showCloudStatus(state='online', message='Data tersimpan otomatis ke Firebase') {
