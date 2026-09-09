@@ -14,6 +14,7 @@
     <!-- Chart.js & SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link class="no-print" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
@@ -38,7 +39,7 @@
         .dokumen-km { font-family: Arial, Helvetica, sans-serif; color:#111827; font-size:11px; line-height:1.35; }
         .dok-header { display:grid; grid-template-columns:72px 1fr 72px; align-items:center; gap:10px; border-bottom:2px solid #111827; padding-bottom:8px; margin-bottom:10px; }
         .dok-logo { width:64px; height:64px; display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid #cbd5e1; border-radius:4px; font-size:8px; color:#94a3b8; }
-        .dok-logo img { width:100%; height:100%; object-fit:contain; }
+        .dok-logo img { width:auto; height:100%; max-width:100%; object-fit:contain; display:block; }
         .dok-title { text-align:center; }
         .dok-school { font-size:15px; font-weight:900; text-transform:uppercase; }
         .dok-meta { font-size:9px; margin-top:2px; }
@@ -203,6 +204,14 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase">Jabatan</label>
                             <input type="text" id="schJabatan" class="mt-1 block w-full rounded-lg border border-slate-300 p-2.5 text-sm" placeholder="Kepala Sekolah">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Tempat Cetak Raport / Buku Induk</label>
+                            <input type="text" id="schTempat" class="mt-1 block w-full rounded-lg border border-slate-300 p-2.5 text-sm" placeholder="Contoh: Jasinga">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Tanggal Raport / Buku Induk</label>
+                            <input type="date" id="schTanggalDokumen" class="mt-1 block w-full rounded-lg border border-slate-300 p-2.5 text-sm">
                         </div>
                     </div>
                     <div class="mt-4 rounded-xl border-2 border-dashed border-indigo-200 bg-indigo-50/50 p-4">
@@ -932,67 +941,22 @@
         <!-- SECTION 4: DASHBOARD SISWA -->
         <section id="secSiswa" class="hidden space-y-6 no-print">
             <div class="bg-gradient-to-r from-violet-800 to-indigo-700 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center flex-wrap">
-                <div>
-                    <h2 class="text-2xl font-black" id="siswaTitle">Hallo My Little Bolu Ketan, Selamat Datang!</h2>
-                    <p class="text-indigo-200 text-sm">Akses cepat laporan belajar harian, penilaian mata pelajaran, laporan ekskul, dan tabungan Anda di bawah ini.</p>
-                </div>
-              <div class="flex items-center gap-2 mt-3 sm:mt-0 flex-wrap">
-                    <span id="txtSiswaTapel" class="bg-indigo-900 px-4 py-1.5 rounded-full text-xs font-black border border-indigo-400/30 shadow-md">TP: -</span>
-                    <span id="txtSiswaRankSem1" class="bg-amber-500 text-white px-4 py-1.5 rounded-full text-xs font-black border border-amber-400/30 shadow-md hidden">🏆 Rank Sem 1: -</span>
-                    <span id="txtSiswaRankSem2" class="bg-amber-500 text-white px-4 py-1.5 rounded-full text-xs font-black border border-amber-400/30 shadow-md hidden">🏆 Rank Sem 2: -</span>
-                </div>
+                <div><h2 class="text-2xl font-black" id="siswaTitle">Hallo, Selamat Datang!</h2><p class="text-indigo-200 text-sm">Lihat hasil belajar yang sudah diinput guru dan unduh dokumen Anda dalam bentuk PDF.</p></div>
+                <div class="flex items-center gap-2 mt-3 sm:mt-0 flex-wrap"><span id="txtSiswaTapel" class="bg-indigo-900 px-4 py-1.5 rounded-full text-xs font-black">TP: -</span><span id="txtSiswaRankSem1" class="bg-amber-500 text-white px-4 py-1.5 rounded-full text-xs font-black hidden">🏆 Rank Sem 1: -</span><span id="txtSiswaRankSem2" class="bg-amber-500 text-white px-4 py-1.5 rounded-full text-xs font-black hidden">🏆 Rank Sem 2: -</span></div>
             </div>
-
+            <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4 border-b pb-3"><div><h3 class="font-extrabold text-base text-slate-800">📅 Rekap Kehadiran</h3><p class="text-xs text-slate-400">Hanya menampilkan total ketidakhadiran yang sudah diinput guru.</p></div><span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full">Sakit • Izin • Alfa</span></div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4"><div class="rounded-2xl border-2 border-blue-100 bg-blue-50 p-5 text-center"><div id="siswaTotalSakit" class="text-3xl font-black text-blue-600">0</div><div class="text-sm font-extrabold text-blue-800 mt-1">Sakit</div></div><div class="rounded-2xl border-2 border-amber-100 bg-amber-50 p-5 text-center"><div id="siswaTotalIzin" class="text-3xl font-black text-amber-600">0</div><div class="text-sm font-extrabold text-amber-800 mt-1">Izin</div></div><div class="rounded-2xl border-2 border-rose-100 bg-rose-50 p-5 text-center"><div id="siswaTotalAlfa" class="text-3xl font-black text-rose-600">0</div><div class="text-sm font-extrabold text-rose-800 mt-1">Alfa</div></div></div>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
+                <h3 class="font-extrabold text-base text-slate-800 mb-2">📄 Download Hasil Belajar PDF</h3><p class="text-xs text-slate-500 mb-4">Data terbaru dari input guru dan tempat/tanggal dokumen dari Admin.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3"><button onclick="downloadSiswaPDF('raport')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-sm"><i class="fa-solid fa-file-pdf"></i> Download Raport PDF</button><button onclick="downloadSiswaPDF('bukuinduk')" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-xl text-sm"><i class="fa-solid fa-address-book"></i> Download Buku Induk PDF</button><button onclick="downloadSiswaPDF('semua')" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-4 rounded-xl text-sm"><i class="fa-solid fa-file-arrow-down"></i> Download Semua Hasil PDF</button></div>
+                <div class="mt-4 flex items-center gap-3"><label class="text-xs font-bold text-slate-500">Semester Raport:</label><select id="siswaPdfSemester" class="border rounded-xl px-3 py-2 text-sm"><option value="1">Semester 1</option><option value="2">Semester 2</option></select></div>
+            </div>
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div class="bg-white p-6 rounded-2xl shadow border border-slate-200 lg:col-span-4 flex flex-col">
-                    <h3 class="font-bold text-base text-slate-800 mb-3 border-b pb-2 flex items-center gap-2">
-                        <span class="text-xl">📅</span> Riwayat Kehadiran Anda
-                    </h3>
-                    <ul id="siswaAbsenList" class="space-y-2 text-sm max-h-80 overflow-y-auto divide-y pr-2 flex-grow"></ul>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow border border-slate-200 lg:col-span-4 flex flex-col">
-                    <h3 class="font-bold text-base text-slate-800 mb-3 border-b pb-2 flex items-center gap-2">
-                        <span class="text-xl">📚</span> Hasil Nilai Pelajaran
-                    </h3>
-                    <ul id="siswaNilaiList" class="space-y-2 text-sm max-h-80 overflow-y-auto divide-y pr-2 flex-grow"></ul>
-                </div>
-                <div class="space-y-6 lg:col-span-4 flex flex-col">
-                    <!-- KARTU BINTANG SISWA -->
-                    <div class="bg-white p-6 rounded-2xl shadow border border-slate-200 flex flex-col justify-between">
-                        <div>
-                            <h3 class="font-bold text-base text-slate-800 mb-2 border-b pb-2 flex items-center gap-2">
-                                <span class="text-xl">⭐</span> Sisa Bintang Perilaku Anda
-                            </h3>
-                            <div class="text-3xl font-black text-amber-500 my-3 flex items-center gap-2">
-                                <span id="siswaTotalBintang">10</span> <span class="text-sm font-normal text-slate-500">Bintang Aktif</span>
-                            </div>
-                        </div>
-                        <div class="border-t pt-2">
-                            <h4 class="font-extrabold text-slate-400 text-[10px] uppercase tracking-wider mb-2">Riwayat / Keterangan Kesalahan</h4>
-                            <ul id="siswaBintangList" class="space-y-1 text-xs max-h-32 overflow-y-auto divide-y pr-1"></ul>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl shadow border border-slate-200 flex flex-col justify-between">
-                        <div>
-                            <h3 class="font-bold text-base text-slate-800 mb-2 border-b pb-2 flex items-center gap-2">
-                                <span class="text-xl">💰</span> Saldo Tabungan Anda
-                            </h3>
-                            <div class="text-3xl font-black text-emerald-600 my-3" id="siswaTotalSaldo">Rp 0</div>
-                        </div>
-                        <div class="border-t pt-2">
-                            <h4 class="font-extrabold text-slate-400 text-[10px] uppercase tracking-wider mb-2">Riwayat Transaksi</h4>
-                            <ul id="siswaTabunganList" class="space-y-1 text-xs max-h-28 overflow-y-auto divide-y pr-1"></ul>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-2xl shadow border border-slate-200 flex-grow">
-                        <h3 class="font-bold text-base text-slate-800 mb-2 border-b pb-2 flex items-center gap-2">
-                            <span class="text-xl">🏆</span> Kegiatan & Nilai Ekskul
-                        </h3>
-                        <ul id="siswaEkskulList" class="space-y-2 text-xs max-h-48 overflow-y-auto divide-y pr-1"></ul>
-                    </div>
-                </div>
+                <div class="bg-white p-6 rounded-2xl shadow border border-slate-200 lg:col-span-4"><h3 class="font-bold text-base text-slate-800 mb-3 border-b pb-2">📚 Hasil Nilai Pelajaran</h3><ul id="siswaNilaiList" class="space-y-2 text-sm max-h-80 overflow-y-auto divide-y pr-2"></ul></div>
+                <div class="space-y-6 lg:col-span-4"><div class="bg-white p-6 rounded-2xl shadow border border-slate-200"><h3 class="font-bold text-base text-slate-800 mb-2 border-b pb-2">⭐ Sisa Bintang Perilaku Anda</h3><div class="text-3xl font-black text-amber-500 my-3"><span id="siswaTotalBintang">10</span> <span class="text-sm font-normal text-slate-500">Bintang Aktif</span></div><div class="border-t pt-2"><h4 class="font-extrabold text-slate-400 text-[10px] uppercase mb-2">Riwayat / Keterangan Kesalahan</h4><ul id="siswaBintangList" class="space-y-1 text-xs max-h-32 overflow-y-auto divide-y"></ul></div></div><div class="bg-white p-6 rounded-2xl shadow border border-slate-200"><h3 class="font-bold text-base text-slate-800 mb-2 border-b pb-2">🏆 Kegiatan & Nilai Ekskul</h3><ul id="siswaEkskulList" class="space-y-2 text-xs max-h-48 overflow-y-auto divide-y"></ul></div></div>
+                <div class="bg-white p-6 rounded-2xl shadow border border-slate-200 lg:col-span-4"><h3 class="font-bold text-base text-slate-800 mb-2 border-b pb-2">💰 Saldo Tabungan Anda</h3><div class="text-3xl font-black text-emerald-600 my-3" id="siswaTotalSaldo">Rp 0</div><div class="border-t pt-2"><h4 class="font-extrabold text-slate-400 text-[10px] uppercase mb-2">Riwayat Transaksi</h4><ul id="siswaTabunganList" class="space-y-1 text-xs max-h-64 overflow-y-auto divide-y"></ul></div></div>
             </div>
         </section>
 
@@ -1017,7 +981,9 @@
                 tapel: "2025/2026",
                 kepsek: "Dadan Indriansyah, S.Pd., M.Pd.",
                 nipKepsek: "198501012010011002",
-                jabatan: "Kepala Sekolah"
+                jabatan: "Kepala Sekolah",
+                tempatDokumen: "Jasinga",
+                tanggalDokumen: new Date().toISOString().split('T')[0]
             }));
         }
         if (!localStorage.getItem('users')) localStorage.setItem('users', JSON.stringify([]));
@@ -1178,6 +1144,8 @@
             document.getElementById('schKepsek').value = profile.kepsek || "";
             document.getElementById('schNipKepsek').value = profile.nipKepsek || "";
             document.getElementById('schJabatan').value = profile.jabatan || "";
+            document.getElementById('schTempat').value = profile.tempatDokumen || profile.alamat || "";
+            document.getElementById('schTanggalDokumen').value = profile.tanggalDokumen || new Date().toISOString().split('T')[0];
             renderSchoolLogo(profile.logo || '');
             loadAdminMetadata();
             loadAdminUsers();
@@ -1252,8 +1220,10 @@
             const kepsek = document.getElementById('schKepsek').value.trim();
             const nipKepsek = document.getElementById('schNipKepsek').value.trim();
             const jabatan = document.getElementById('schJabatan').value.trim();
+            const tempatDokumen = document.getElementById('schTempat').value.trim();
+            const tanggalDokumen = document.getElementById('schTanggalDokumen').value || new Date().toISOString().split('T')[0];
             const oldProfile = JSON.parse(localStorage.getItem('schoolProfile')) || {};
-            saveAppData('schoolProfile', JSON.stringify({ nama, npsn, alamat, tapel, kepsek, nipKepsek, jabatan, logo: oldProfile.logo || '' }));
+            saveAppData('schoolProfile', JSON.stringify({ nama, npsn, alamat, tapel, kepsek, nipKepsek, jabatan, tempatDokumen, tanggalDokumen, logo: oldProfile.logo || '' }));
             loadNavSchool();
             renderSchoolLogo(oldProfile.logo || '');
             showCloudStatus('online');
@@ -2081,7 +2051,7 @@ renderRekapAbsenSiswa();
                     <tr><td>Izin</td><td class="center bold">${absenStats.Izin} hari</td></tr>
                     <tr><td>Alfa</td><td class="center bold">${absenStats.Alfa} hari</td></tr>
                     </tbody></table></section></div>
-                    <div class="dok-sign"><div>Mengetahui,<br><b>Orang Tua / Wali</b><div class="sign-space"></div><u>________________________</u></div><div>${esc(profile.alamat || 'Jasinga')}, ${new Date().toLocaleDateString('id-ID')}<br><b>${esc(profile.jabatan || 'Kepala Sekolah')}</b><div class="sign-space"></div><b><u>${esc(profile.kepsek || '-')}</u></b><br>NIP. ${esc(profile.nipKepsek || '-')}</div></div></div>`;
+                    <div class="dok-sign"><div>Mengetahui,<br><b>Orang Tua / Wali</b><div class="sign-space"></div><u>________________________</u></div><div>${esc(profile.tempatDokumen || profile.alamat || 'Jasinga')}, ${formatTanggalDokumen(profile.tanggalDokumen)}<br><b>${esc(profile.jabatan || 'Kepala Sekolah')}</b><div class="sign-space"></div><b><u>${esc(profile.kepsek || '-')}</u></b><br>NIP. ${esc(profile.nipKepsek || '-')}</div></div></div>`;
                 contentEl.innerHTML = html;
             } else {
                 // Buku induk: otomatis menggabungkan seluruh nilai mapel, ekskul, dan absensi untuk Semester 1 dan 2.
@@ -2101,13 +2071,13 @@ renderRekapAbsenSiswa();
                 }).join('');
                 const allEks = allEkskul.filter(e=>e.username===username);
                 const eksRows = allEks.map(e=>`<tr><td>${esc(e.eksiklus || e.ekskul)}</td><td class="center">Semester ${esc(e.semester)}</td><td class="center bold">${esc(e.predikat)}</td><td>${esc(e.desc)}</td></tr>`).join('');
-                const absenRows = `<tr><td>Hadir</td><td class="center bold">${absenStats.Hadir} hari</td></tr><tr><td>Sakit</td><td class="center bold">${absenStats.Sakit} hari</td></tr><tr><td>Izin</td><td class="center bold">${absenStats.Izin} hari</td></tr><tr><td>Alfa</td><td class="center bold">${absenStats.Alfa} hari</td></tr>`;
+                const absenRows = `<tr><td>Sakit</td><td class="center bold">${absenStats.Sakit} hari</td></tr><tr><td>Izin</td><td class="center bold">${absenStats.Izin} hari</td></tr><tr><td>Alfa</td><td class="center bold">${absenStats.Alfa} hari</td></tr>`;
                 contentEl.innerHTML = `<div class="dokumen-km buku-induk">${header('BUKU INDUK PESERTA DIDIK', `KURIKULUM MERDEKA — TAHUN PELAJARAN ${esc(profile.tapel || '-')}`)}${identity}
                     <div class="dok-note"><b>Catatan:</b> Buku induk menampilkan seluruh mata pelajaran dan rekap penilaian Semester 1–2, kegiatan ekstrakurikuler, serta ketidakhadiran yang sudah tersimpan pada sistem.</div>
                     ${semesterRows}
                     <section><h4>REKAP EKSTRAKURIKULER</h4><table class="dok-table"><thead><tr><th>Kegiatan</th><th>Semester</th><th>Predikat</th><th>Keterangan</th></tr></thead><tbody>${eksRows || `<tr><td colspan="4" class="center muted">Belum ada data ekstrakurikuler.</td></tr>`}</tbody></table></section>
                     <section><h4>REKAP KETIDAKHADIRAN</h4><table class="dok-table"><tbody>${absenRows}</tbody></table></section>
-                    <div class="dok-sign"><div>Mengetahui,<br><b>Orang Tua / Wali</b><div class="sign-space"></div><u>________________________</u></div><div>${esc(profile.alamat || 'Jasinga')}, ${new Date().toLocaleDateString('id-ID')}<br><b>${esc(profile.jabatan || 'Kepala Sekolah')}</b><div class="sign-space"></div><b><u>${esc(profile.kepsek || '-')}</u></b><br>NIP. ${esc(profile.nipKepsek || '-')}</div></div></div>`;
+                    <div class="dok-sign"><div>Mengetahui,<br><b>Orang Tua / Wali</b><div class="sign-space"></div><u>________________________</u></div><div>${esc(profile.tempatDokumen || profile.alamat || 'Jasinga')}, ${formatTanggalDokumen(profile.tanggalDokumen)}<br><b>${esc(profile.jabatan || 'Kepala Sekolah')}</b><div class="sign-space"></div><b><u>${esc(profile.kepsek || '-')}</u></b><br>NIP. ${esc(profile.nipKepsek || '-')}</div></div></div>`;
             }
             // Preview dirender segera; pencetakan dilakukan setelah browser selesai mengecat halaman.
             requestAnimationFrame(() => setTimeout(() => window.print(), 30));
@@ -2115,50 +2085,39 @@ renderRekapAbsenSiswa();
 
         // DASHBOARD SISWA
         function loadSiswaDashboard() {
-            const username = currentUser.username;
-            const absensi = (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.username === username);
-            const nilai = (JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.username === username);
-            const ekskul = (JSON.parse(localStorage.getItem('nilai_ekskul')) || []).filter(ne => ne.username === username);
-            const tabungan = (JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.username === username);
-            const bintang = (JSON.parse(localStorage.getItem('bintang')) || []).filter(b => b.username === username);
-
-            const ulAbsen = document.getElementById('siswaAbsenList');
-            ulAbsen.innerHTML = absensi.length ? '' : '<li class="text-slate-400 italic">Belum ada riwayat kehadiran.</li>';
-            absensi.forEach(a => {
-                ulAbsen.innerHTML += `<li class="flex justify-between items-center py-1"><span>${a.date}</span><span class="font-bold text-emerald-600">${a.status}</span></li>`;
-            });
-
-            const ulNilai = document.getElementById('siswaNilaiList');
-            ulNilai.innerHTML = nilai.length ? '' : '<li class="text-slate-400 italic">Belum ada nilai akademik.</li>';
-            nilai.forEach(n => {
-                ulNilai.innerHTML += `<li class="flex justify-between items-center py-1"><span>${n.mapel} (${n.jenis} - Sem ${n.semester})</span><span class="font-bold text-indigo-600">${n.angka}</span></li>`;
-            });
-
-            let totalBintang = 10;
-            const ulBintang = document.getElementById('siswaBintangList');
-            ulBintang.innerHTML = '';
-            bintang.forEach(b => {
-                totalBintang += b.jumlah;
-                ulBintang.innerHTML += `<li class="py-1 flex justify-between"><span>${b.desc}</span><span class="font-bold text-rose-500">${b.jumlah}</span></li>`;
-            });
-            document.getElementById('siswaTotalBintang').innerText = totalBintang;
-
-            let totalSaldo = 0;
-            const ulTabungan = document.getElementById('siswaTabunganList');
-            ulTabungan.innerHTML = '';
-            tabungan.forEach(t => {
-                if(t.jenis === 'Masuk') totalSaldo += t.nominalBersih;
-                else totalSaldo -= t.nominalAsli;
-                ulTabungan.innerHTML += `<li class="flex justify-between py-1"><span>${t.date} (${t.jenis})</span><span class="font-bold">Rp ${t.jenis === 'Masuk' ? t.nominalBersih.toLocaleString('id-ID') : t.nominalAsli.toLocaleString('id-ID')}</span></li>`;
-            });
-            document.getElementById('siswaTotalSaldo').innerText = `Rp ${totalSaldo.toLocaleString('id-ID')}`;
-
-            const ulEkskul = document.getElementById('siswaEkskulList');
-            ulEkskul.innerHTML = ekskul.length ? '' : '<li class="text-slate-400 italic">Belum ada nilai kegiatan ekskul.</li>';
-            ekskul.forEach(e => {
-                ulEkskul.innerHTML += `<li class="flex justify-between py-1"><span>${e.ekskul} (Sem ${e.semester})</span><span class="font-bold text-amber-600">Predikat ${e.predikat}</span></li>`;
-            });
+            const username=currentUser.username;
+            const absensi=(JSON.parse(localStorage.getItem('absensi'))||[]).filter(a=>a.username===username);
+            const nilai=(JSON.parse(localStorage.getItem('nilai'))||[]).filter(n=>n.username===username);
+            const ekskul=(JSON.parse(localStorage.getItem('nilai_ekskul'))||[]).filter(e=>e.username===username);
+            const tabungan=(JSON.parse(localStorage.getItem('tabungan'))||[]).filter(t=>t.username===username);
+            const bintang=(JSON.parse(localStorage.getItem('bintang'))||[]).filter(b=>b.username===username);
+            const profile=JSON.parse(localStorage.getItem('schoolProfile'))||{};
+            const stats={Sakit:0,Izin:0,Alfa:0}; absensi.forEach(a=>{if(stats[a.status]!==undefined)stats[a.status]++;});
+            document.getElementById('siswaTotalSakit').innerText=stats.Sakit; document.getElementById('siswaTotalIzin').innerText=stats.Izin; document.getElementById('siswaTotalAlfa').innerText=stats.Alfa;
+            const ulNilai=document.getElementById('siswaNilaiList'); ulNilai.innerHTML=nilai.length?'':'<li class="text-slate-400 italic">Belum ada nilai akademik.</li>'; nilai.forEach(n=>ulNilai.innerHTML+=`<li class="flex justify-between py-1"><span>${n.mapel} (${n.jenis} - Sem ${n.semester})</span><b class="text-indigo-600">${n.angka}</b></li>`);
+            let tb=10; const ulB=document.getElementById('siswaBintangList'); ulB.innerHTML=''; bintang.forEach(b=>{tb+=Number(b.jumlah||0);ulB.innerHTML+=`<li class="py-1 flex justify-between"><span>${b.desc}</span><b class="text-rose-500">${b.jumlah}</b></li>`}); document.getElementById('siswaTotalBintang').innerText=tb;
+            let saldo=0; const ulT=document.getElementById('siswaTabunganList'); ulT.innerHTML=''; tabungan.forEach(t=>{if(t.jenis==='Masuk')saldo+=Number(t.nominalBersih||0);else saldo-=Number(t.nominalAsli||0);ulT.innerHTML+=`<li class="flex justify-between py-1"><span>${t.date} (${t.jenis})</span><b>Rp ${Number(t.jenis==='Masuk'?t.nominalBersih:t.nominalAsli||0).toLocaleString('id-ID')}</b></li>`}); document.getElementById('siswaTotalSaldo').innerText=`Rp ${saldo.toLocaleString('id-ID')}`;
+            const ulE=document.getElementById('siswaEkskulList'); ulE.innerHTML=ekskul.length?'':'<li class="text-slate-400 italic">Belum ada nilai kegiatan ekskul.</li>'; ekskul.forEach(e=>ulE.innerHTML+=`<li class="flex justify-between py-1"><span>${e.ekskul} (Sem ${e.semester})</span><b class="text-amber-600">Predikat ${e.predikat}</b></li>`);
+            document.getElementById('txtSiswaTapel').innerText='TP: '+(profile.tapel||'-');
         }
+
+        function formatTanggalDokumen(v){ if(!v)return new Date().toLocaleDateString('id-ID'); const d=new Date(v+'T00:00:00'); return isNaN(d)?v:d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}); }
+
+        function buildSiswaPDFHTML(type){
+            const username=currentUser.username, users=JSON.parse(localStorage.getItem('users'))||[], sObj=users.find(u=>u.username===username); if(!sObj)throw new Error('Data siswa tidak ditemukan.');
+            const p=JSON.parse(localStorage.getItem('schoolProfile'))||{}, mapel=JSON.parse(localStorage.getItem('mapel'))||[], nilai=JSON.parse(localStorage.getItem('nilai'))||[], eks=JSON.parse(localStorage.getItem('nilai_ekskul'))||[], abs=JSON.parse(localStorage.getItem('absensi'))||[], tab=JSON.parse(localStorage.getItem('tabungan'))||[], bin=JSON.parse(localStorage.getItem('bintang'))||[];
+            const esc=v=>String(v??'-').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); const avg=a=>a.length?a.reduce((x,y)=>x+Number(y),0)/a.length:null; const fmt=n=>n==null?'-':Number(n).toFixed(1); const logo=p.logo||'';
+            const header=`<div class="dok-header"><div class="dok-logo">${logo?`<img src="${logo}">`:'LOGO'}</div><div class="dok-title"><div class="dok-school">${esc(p.nama||'SEKOLAH DASAR')}</div><div class="dok-meta">NPSN: ${esc(p.npsn||'-')} | ${esc(p.alamat||'-')}</div><div class="dok-heading">${type==='bukuinduk'?'BUKU INDUK PESERTA DIDIK':'LAPORAN HASIL BELAJAR PESERTA DIDIK'}</div><div class="dok-subheading">KURIKULUM MERDEKA — TAHUN PELAJARAN ${esc(p.tapel||'-')}</div></div><div class="dok-logo">${logo?`<img src="${logo}">`:'LOGO'}</div></div>`;
+            const ident=`<div class="dok-identity"><div><b>Nama Peserta Didik</b><span>${esc(sObj.nama)}</span></div><div><b>Nomor Induk / NISN</b><span>${esc(sObj.username)}</span></div><div><b>Kelas</b><span>${esc(sObj.kelas||'-')}</span></div><div><b>Fase</b><span>${esc(sObj.fase||'-')}</span></div><div><b>Tahun Pelajaran</b><span>${esc(p.tapel||'-')}</span></div><div><b>Status</b><span>Peserta Didik Aktif</span></div></div>`;
+            const a=abs.filter(x=>x.username===username), st={Sakit:0,Izin:0,Alfa:0}; a.forEach(x=>{if(st[x.status]!==undefined)st[x.status]++}); const ah=`<section><h4>KETIDAKHADIRAN</h4><table class="dok-table"><thead><tr><th>Keterangan</th><th>Jumlah</th></tr></thead><tbody><tr><td>Sakit</td><td class="center bold">${st.Sakit} hari</td></tr><tr><td>Izin</td><td class="center bold">${st.Izin} hari</td></tr><tr><td>Alfa</td><td class="center bold">${st.Alfa} hari</td></tr></tbody></table></section>`;
+            const sem=number=>{let rows='';mapel.forEach((m,i)=>{let v=nilai.filter(n=>n.username===username&&String(n.semester)===String(number)&&n.mapel===m.nama);let t=avg(v.filter(n=>n.jenis==='Tugas').map(n=>n.angka)),q=avg(v.filter(n=>n.jenis==='STS').map(n=>n.angka)),z=avg(v.filter(n=>n.jenis==='SAS').map(n=>n.angka)),ar=[t,q,z].filter(x=>x!=null);rows+=`<tr><td class="center">${i+1}</td><td>${esc(m.nama)}</td><td class="center">${fmt(t)}</td><td class="center">${fmt(q)}</td><td class="center">${fmt(z)}</td><td class="center bold">${fmt(ar.length?avg(ar):null)}</td></tr>`});return `<section><h4>NILAI AKADEMIK — SEMESTER ${number}</h4><table class="dok-table"><thead><tr><th>No</th><th>Mata Pelajaran</th><th>Tugas</th><th>STS</th><th>SAS</th><th>Nilai Akhir</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="center muted">Belum ada data nilai.</td></tr>'}</tbody></table></section>`};
+            const er=eks.filter(e=>e.username===username).map(e=>`<tr><td>${esc(e.ekskul||e.eksiklus)}</td><td class="center">Semester ${esc(e.semester)}</td><td class="center bold">${esc(e.predikat)}</td><td>${esc(e.desc)}</td></tr>`).join(''); const eh=`<section><h4>REKAP EKSTRAKURIKULER</h4><table class="dok-table"><thead><tr><th>Kegiatan</th><th>Semester</th><th>Predikat</th><th>Keterangan</th></tr></thead><tbody>${er||'<tr><td colspan="4" class="center muted">Belum ada data.</td></tr>'}</tbody></table></section>`;
+            const sign=`<div class="dok-sign"><div>Mengetahui,<br><b>Orang Tua / Wali</b><div class="sign-space"></div><u>________________________</u></div><div>${esc(p.tempatDokumen||p.alamat||'Jasinga')}, ${formatTanggalDokumen(p.tanggalDokumen)}<br><b>${esc(p.jabatan||'Kepala Sekolah')}</b><div class="sign-space"></div><b><u>${esc(p.kepsek||'-')}</u></b><br>NIP. ${esc(p.nipKepsek||'-')}</div></div>`;
+            if(type==='raport'){const ss=document.getElementById('siswaPdfSemester')?.value||'1';return `<div class="dokumen-km">${header}${ident}${sem(ss)}<div class="dok-grid">${eh}${ah}</div>${sign}</div>`}
+            if(type==='bukuinduk')return `<div class="dokumen-km buku-induk">${header}${ident}${sem(1)}${sem(2)}${eh}${ah}${sign}</div>`;
+            let saldo=0;tab.filter(t=>t.username===username).forEach(t=>{if(t.jenis==='Masuk')saldo+=Number(t.nominalBersih||0);else saldo-=Number(t.nominalAsli||0)});let bs=10+bin.filter(b=>b.username===username).reduce((x,b)=>x+Number(b.jumlah||0),0);return `<div class="dokumen-km">${header}${ident}${sem(1)}${sem(2)}${eh}${ah}<section><h4>BINTANG PERILAKU</h4><p><b>Bintang Aktif:</b> ${bs}</p></section><section><h4>SALDO TABUNGAN</h4><p><b>Saldo Akhir:</b> Rp ${saldo.toLocaleString('id-ID')}</p></section>${sign}</div>`;
+        }
+        function downloadSiswaPDF(type){if(typeof html2pdf==='undefined')return alert('Fitur PDF belum siap. Pastikan internet aktif.');try{const w=document.createElement('div');w.style.background='#fff';w.innerHTML=buildSiswaPDFHTML(type);document.body.appendChild(w);const n=(currentUser.nama||currentUser.username).replace(/[^a-z0-9]+/gi,'_');const f=type==='raport'?'Raport':type==='bukuinduk'?'Buku_Induk':'Semua_Hasil';html2pdf().set({margin:8,filename:`${f}_${n}.pdf`,image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true,backgroundColor:'#fff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(w).save().then(()=>w.remove()).catch(e=>{w.remove();console.error(e);alert('PDF gagal dibuat.');})}catch(e){console.error(e);alert(e.message||'PDF gagal dibuat.')}}
 
         // BACKUP & RESTORE / CLOUD SYNC PLACEHOLDER FUNCTIONS
         function backupSeluruhData() {
