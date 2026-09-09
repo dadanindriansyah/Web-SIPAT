@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Informasi Penilaian, Absensi, dan Tabungan</title>
+    <title>🌈 SIPAT - Portal Sekolah Dasar Ceria</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -23,6 +23,16 @@
             #printArea { position: absolute; left: 0; top: 0; width: 100%; }
             .no-print { display: none !important; }
         }
+    
+        /* ===== TEMA ANAK SEKOLAH DASAR ===== */
+        body { background: #f0f9ff; background-image: radial-gradient(#bae6fd 1px, transparent 1px); background-size: 22px 22px; }
+        header { background: linear-gradient(135deg,#2563eb,#7c3aed,#ec4899) !important; }
+        .bg-white { border-radius: 1.25rem !important; }
+        section > div, .bg-white { box-shadow: 0 8px 22px rgba(30,64,175,.08); }
+        button { border-radius: 14px !important; }
+        input, select { border-radius: 12px !important; }
+        .kid-card { border: 3px solid #dbeafe; }
+        .kid-title { color:#1d4ed8; font-weight:900; }
     </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -41,16 +51,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-4">
-                <!-- FITUR BACKUP & RESTORE DATA -->
-                <div id="cloudSyncContainer" class="hidden flex gap-2 bg-indigo-900 p-1.5 rounded-xl">
-                   <button onclick="sinkronkanKeCloud()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
-                        <i class="fa-solid fa-cloud-upload"></i> Sinkron ke Cloud
-                    </button>
-                    <button onclick="ambilDariCloud()" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg">
-                        <i class="fa-solid fa-cloud-download"></i> Ambil dari Cloud
-                    </button>
-                </div>                
-                <div class="flex gap-2 bg-indigo-800/50 p-1.5 rounded-xl border border-indigo-500/30">
+<div class="flex gap-2 bg-indigo-800/50 p-1.5 rounded-xl border border-indigo-500/30">
                     <button onclick="backupSeluruhData()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition shadow flex items-center gap-1">
                         <i class="fa-solid fa-cloud-arrow-down"></i> Backup Data
                     </button>
@@ -64,6 +65,7 @@
                     <span id="txtActiveUser" class="font-bold bg-indigo-800 px-4 py-1.5 rounded-full text-sm flex items-center gap-2">
                         <i class="fa-solid fa-circle-user"></i> Loading...
                     </span>
+                    <span id="cloudStatus" class="text-xs font-bold px-3 py-1.5 rounded-full bg-sky-100 text-sky-700">☁️ Menghubungkan...</span>
                     <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-4 py-1.5 rounded-full transition shadow-md">
                         <i class="fa-solid fa-right-from-bracket"></i> Keluar
                     </button>
@@ -73,18 +75,15 @@
     </header>
 
     <main class="container mx-auto px-4 py-8">
+        <div class="no-print mb-6 rounded-3xl p-5 bg-gradient-to-r from-yellow-200 via-pink-200 to-blue-200 border-4 border-white shadow-lg text-center">
+            <div class="text-4xl mb-1">🎒📚✏️🌈</div>
+            <h2 class="text-2xl md:text-3xl font-black text-blue-800">Belajar, Berkarya, dan Bertumbuh Bersama!</h2>
+            <p class="text-sm font-bold text-blue-700 mt-1">Portal sekolah dasar yang ceria, ramah anak, dan data tersimpan otomatis ☁️</p>
+        </div>
         
         <!-- SECTION 1: AUTENTIKASI LOGIN -->
         <section id="secLogin" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-slate-200 mt-12 transition-all no-print">
-            <div class="mt-6 p-4 bg-slate-50 rounded-xl border border-dashed border-slate-300">
-                <p class="text-xs text-center text-slate-500 mb-3 font-semibold">Tekan Tombol Cloud Dulu Sebelum Login !!!:</p>
-                <div class="flex gap-2 justify-center">
-                    <button onclick="ambilDariCloud()" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition">
-                        <i class="fa-solid fa-cloud-download"></i> Ambil dari Cloud
-                    </button>
-                </div>
-            </div>
-            <div class="min-h-screen flex items-center justify-center bg-[#F0F9FF] p-6 font-sans">
+<div class="min-h-screen flex items-center justify-center bg-[#F0F9FF] p-6 font-sans">
                 <div class="w-full max-w-sm bg-white p-8 rounded-[2rem] shadow-[0_10px_25px_rgba(0,0,0,0.05)] border-2 border-blue-100">
                     <div class="text-center mb-8">
                         <div class="text-6xl mb-2">🏫</div>
@@ -1064,12 +1063,6 @@
 
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
             const currentTapel = profile.tapel || "-";
-            
-            const syncContainer = document.getElementById('cloudSyncContainer');
-            if (syncContainer) {
-                if (role === "Siswa") syncContainer.classList.add('hidden');
-                else syncContainer.classList.remove('hidden');
-            }
 
             if (role === "Admin") {
                 document.getElementById('secAdmin').classList.remove('hidden');
@@ -1136,14 +1129,14 @@
         function clearAllSystemData() {
             if (confirm("🚨 KOSONGKAN DATA?\n\nTindakan ini menghapus bersih seluruh akun, nilai, absensi, ekskul, tabungan, dan bintang.")) {
                 if (confirm("Konfirmasi akhir: Hapus semua data?")) {
-                    localStorage.setItem('users', JSON.stringify([]));
-                    localStorage.setItem('mapel', JSON.stringify([]));
-                    localStorage.setItem('ekskul', JSON.stringify([]));
-                    localStorage.setItem('absensi', JSON.stringify([]));
-                    localStorage.setItem('nilai', JSON.stringify([]));
-                    localStorage.setItem('nilai_ekskul', JSON.stringify([]));
-                    localStorage.setItem('tabungan', JSON.stringify([]));
-                    localStorage.setItem('bintang', JSON.stringify([]));
+                    saveAppData('users', JSON.stringify([]));
+                    saveAppData('mapel', JSON.stringify([]));
+                    saveAppData('ekskul', JSON.stringify([]));
+                    saveAppData('absensi', JSON.stringify([]));
+                    saveAppData('nilai', JSON.stringify([]));
+                    saveAppData('nilai_ekskul', JSON.stringify([]));
+                    saveAppData('tabungan', JSON.stringify([]));
+                    saveAppData('bintang', JSON.stringify([]));
                     alert("Sistem berhasil dikosongkan!");
                     initAdminDashboard();
                 }
@@ -1158,7 +1151,7 @@
             const kepsek = document.getElementById('schKepsek').value.trim();
             const nipKepsek = document.getElementById('schNipKepsek').value.trim();
             const jabatan = document.getElementById('schJabatan').value.trim();
-            localStorage.setItem('schoolProfile', JSON.stringify({ nama, npsn, alamat, tapel, kepsek, nipKepsek, jabatan }));
+            saveAppData('schoolProfile', JSON.stringify({ nama, npsn, alamat, tapel, kepsek, nipKepsek, jabatan }));
             loadNavSchool();
             alert("Profil sekolah berhasil disimpan!");
         }
@@ -1183,7 +1176,7 @@
             if(!val) return alert("Isi nama mapel!");
             let mapel = JSON.parse(localStorage.getItem('mapel')) || [];
             mapel.push({ id: Date.now(), nama: val });
-            localStorage.setItem('mapel', JSON.stringify(mapel));
+            saveAppData('mapel', JSON.stringify(mapel));
             document.getElementById('newMapel').value = '';
             loadAdminMetadata();
         }
@@ -1193,7 +1186,7 @@
             if(!val) return alert("Isi nama ekskul!");
             let ekskul = JSON.parse(localStorage.getItem('ekskul')) || [];
             ekskul.push({ id: Date.now(), nama: val });
-            localStorage.setItem('ekskul', JSON.stringify(ekskul));
+            saveAppData('ekskul', JSON.stringify(ekskul));
             document.getElementById('newEkskul').value = '';
             loadAdminMetadata();
         }
@@ -1202,7 +1195,7 @@
             if(confirm("Hapus item ini?")) {
                 let data = JSON.parse(localStorage.getItem(type));
                 data.splice(index, 1);
-                localStorage.setItem(type, JSON.stringify(data));
+                saveAppData(type, JSON.stringify(data));
                 loadAdminMetadata();
             }
         }
@@ -1226,7 +1219,7 @@
                         count++;
                     }
                 });
-                localStorage.setItem(type, JSON.stringify(storedData));
+                saveAppData(type, JSON.stringify(storedData));
                 alert(`Berhasil mengimpor ${count} data ${type}!`);
                 loadAdminMetadata();
             };
@@ -1236,7 +1229,7 @@
         function changeAdminPass() {
             const pass = document.getElementById('newAdminPass').value.trim();
             if(pass) {
-                localStorage.setItem('adminPassword', pass);
+                saveAppData('adminPassword', pass);
                 alert("Password Admin diperbarui!");
                 document.getElementById('newAdminPass').value = '';
             }
@@ -1282,7 +1275,7 @@
             if (confirm(`🚨 PERINGATAN!\n\nAnda akan menghapus SEMUA siswa dari Kelas ${filterKelas}. Tindakan ini tidak dapat dibatalkan. Lanjutkan?`)) {
                 let users = JSON.parse(localStorage.getItem('users')) || [];
                 const updatedUsers = users.filter(u => !(u.role === 'Siswa' && u.kelas === filterKelas));
-                localStorage.setItem('users', JSON.stringify(updatedUsers));
+                saveAppData('users', JSON.stringify(updatedUsers));
                 loadAdminUsers();
                 alert(`Semua siswa di Kelas ${filterKelas} berhasil dihapus.`);
             }
@@ -1367,7 +1360,7 @@
                     users[index].kelas = kelas;
                     users[index].fase = fase;
                     if(role === 'Guru') users[index].nip = nip;
-                    localStorage.setItem('users', JSON.stringify(users));
+                    saveAppData('users', JSON.stringify(users));
                     alert("Data pengguna berhasil diperbarui!");
                     cancelEditUser(role);
                     loadAdminUsers();
@@ -1375,7 +1368,7 @@
             } else {
                 if(users.find(u => u.username === user)) return alert("Username sudah terdaftar!");
                 users.push({ username: user, password: pass, nama, kelas, role, nip, fase });
-                localStorage.setItem('users', JSON.stringify(users));
+                saveAppData('users', JSON.stringify(users));
                 alert("Berhasil ditambahkan!");
                 loadAdminUsers();
                 document.getElementById(role === 'Guru' ? 'guruUser' : 'siswaUser').value = '';
@@ -1391,7 +1384,7 @@
             if(confirm("Hapus user ini?")) {
                 let users = JSON.parse(localStorage.getItem('users'));
                 users.splice(index, 1);
-                localStorage.setItem('users', JSON.stringify(users));
+                saveAppData('users', JSON.stringify(users));
                 loadAdminUsers();
             }
         }
@@ -1422,7 +1415,7 @@
                         }
                     }
                 });
-                localStorage.setItem('users', JSON.stringify(users));
+                saveAppData('users', JSON.stringify(users));
                 alert(`Berhasil mengimpor ${count} akun ${role}!`);
                 loadAdminUsers();
             };
@@ -1495,11 +1488,11 @@
         function clearAllGuruData() {
             if (confirm("Hapus semua inputan kelas Anda?")) {
                 const kelasGuru = currentUser.kelas;
-                localStorage.setItem('absensi', JSON.stringify((JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.kelas !== kelasGuru)));
-                localStorage.setItem('nilai', JSON.stringify((JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.kelas !== kelasGuru)));
-                localStorage.setItem('nilai_ekskul', JSON.stringify((JSON.parse(localStorage.getItem('nilai_ekskul')) || []).filter(ne => ne.kelas !== kelasGuru)));
-                localStorage.setItem('bintang', JSON.stringify((JSON.parse(localStorage.getItem('bintang')) || []).filter(b => b.kelas !== kelasGuru)));
-                localStorage.setItem('tabungan', JSON.stringify((JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.kelas !== kelasGuru)));
+                saveAppData('absensi', JSON.stringify((JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.kelas !== kelasGuru)));
+                saveAppData('nilai', JSON.stringify((JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.kelas !== kelasGuru)));
+                saveAppData('nilai_ekskul', JSON.stringify((JSON.parse(localStorage.getItem('nilai_ekskul')) || []).filter(ne => ne.kelas !== kelasGuru)));
+                saveAppData('bintang', JSON.stringify((JSON.parse(localStorage.getItem('bintang')) || []).filter(b => b.kelas !== kelasGuru)));
+                saveAppData('tabungan', JSON.stringify((JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.kelas !== kelasGuru)));
                 alert("Data dibersihkan!");
                 initGuruViews();
             }
@@ -1516,7 +1509,7 @@
     const profile = JSON.parse(localStorage.getItem('schoolProfile'));
 
     absensi.push({ id: Date.now(), date, username: userSiswa, nama: sObj ? sObj.nama : userSiswa, kelas: currentUser.kelas, status, tapel: profile.tapel || "-" });
-    localStorage.setItem('absensi', JSON.stringify(absensi));
+    saveAppData('absensi', JSON.stringify(absensi));
 
     renderAbsensiGuru();
     renderRekapAbsenSiswa(); // <-- Pastikan terpanggil di sini
@@ -1525,7 +1518,7 @@
 
         function deleteAbsen(id) {
             if(confirm("Hapus?")) {
-                localStorage.setItem('absensi', JSON.stringify((JSON.parse(localStorage.getItem('absensi'))).filter(a => a.id !== id)));
+                saveAppData('absensi', JSON.stringify((JSON.parse(localStorage.getItem('absensi'))).filter(a => a.id !== id)));
                 renderAbsensiGuru();
 renderRekapAbsenSiswa();
             }
@@ -1572,7 +1565,7 @@ renderRekapAbsenSiswa();
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
 
             nilai.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: currentUser.kelas, mapel, semester, jenis, date, angka, tapel: profile.tapel || "-" });
-            localStorage.setItem('nilai', JSON.stringify(nilai));
+            saveAppData('nilai', JSON.stringify(nilai));
             renderNilaiGuru();
             renderLegger();
             alert("Penilaian berhasil disimpan!");
@@ -1580,7 +1573,7 @@ renderRekapAbsenSiswa();
 
         function deleteNilai(id) {
             if(confirm("Hapus?")) {
-                localStorage.setItem('nilai', JSON.stringify((JSON.parse(localStorage.getItem('nilai'))).filter(n => n.id !== id)));
+                saveAppData('nilai', JSON.stringify((JSON.parse(localStorage.getItem('nilai'))).filter(n => n.id !== id)));
                 renderNilaiGuru();
                 renderLegger();
             }
@@ -1684,14 +1677,14 @@ renderRekapAbsenSiswa();
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
 
             nilaiEkskul.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: currentUser.kelas, ekskul, semester, predikat, desc, tapel: profile.tapel || "-" });
-            localStorage.setItem('nilai_ekskul', JSON.stringify(nilaiEkskul));
+            saveAppData('nilai_ekskul', JSON.stringify(nilaiEkskul));
             renderNilaiEkskulGuru();
             alert("Nilai ekskul berhasil disimpan!");
         }
 
         function deleteNilaiEkskul(id) {
             if(confirm("Hapus?")) {
-                localStorage.setItem('nilai_ekskul', JSON.stringify((JSON.parse(localStorage.getItem('nilai_ekskul'))).filter(ne => ne.id !== id)));
+                saveAppData('nilai_ekskul', JSON.stringify((JSON.parse(localStorage.getItem('nilai_ekskul'))).filter(ne => ne.id !== id)));
                 renderNilaiEkskulGuru();
             }
         }
@@ -1718,7 +1711,7 @@ renderRekapAbsenSiswa();
             const date = new Date().toISOString().split('T')[0];
 
             bintangList.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: currentUser.kelas, jumlah, desc, date });
-            localStorage.setItem('bintang', JSON.stringify(bintangList));
+            saveAppData('bintang', JSON.stringify(bintangList));
             document.getElementById('bintangDesc').value = '';
             renderBintangGuru();
             alert("Catatan bintang/pelanggaran berhasil disimpan!");
@@ -1728,7 +1721,7 @@ renderRekapAbsenSiswa();
             if(confirm("Hapus catatan bintang ini?")) {
                 let bintangList = JSON.parse(localStorage.getItem('bintang')) || [];
                 bintangList = bintangList.filter(b => b.id !== id);
-                localStorage.setItem('bintang', JSON.stringify(bintangList));
+                saveAppData('bintang', JSON.stringify(bintangList));
                 renderBintangGuru();
             }
         }
@@ -1776,7 +1769,7 @@ renderRekapAbsenSiswa();
                 if (getSiswaSaldo(username) < nominalKotor) return alert("Saldo tidak mencukupi!");
             }
             tabungan.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: currentUser.kelas, jenis, nominalAsli: nominalKotor, nominalBersih, potongan, date, tapel: profile.tapel || "-" });
-            localStorage.setItem('tabungan', JSON.stringify(tabungan));
+            saveAppData('tabungan', JSON.stringify(tabungan));
             renderTabunganGuru();
             alert("Transaksi tabungan berhasil dijalankan!");
         }
@@ -1785,7 +1778,7 @@ renderRekapAbsenSiswa();
             if(confirm("Hapus transaksi ini?")) {
                 let tabungan = JSON.parse(localStorage.getItem('tabungan')) || [];
                 tabungan = tabungan.filter(t => t.id !== id);
-                localStorage.setItem('tabungan', JSON.stringify(tabungan));
+                saveAppData('tabungan', JSON.stringify(tabungan));
                 renderTabunganGuru();
             }
         }
@@ -2148,16 +2141,16 @@ renderRekapAbsenSiswa();
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
-                    if(data.schoolProfile) localStorage.setItem('schoolProfile', data.schoolProfile);
-                    if(data.adminPassword) localStorage.setItem('adminPassword', data.adminPassword);
-                    if(data.users) localStorage.setItem('users', data.users);
-                    if(data.mapel) localStorage.setItem('mapel', data.mapel);
-                    if(data.ekskul) localStorage.setItem('ekskul', data.ekskul);
-                    if(data.absensi) localStorage.setItem('absensi', data.absensi);
-                    if(data.nilai) localStorage.setItem('nilai', data.nilai);
-                    if(data.nilai_ekskul) localStorage.setItem('nilai_ekskul', data.nilai_ekskul);
-                    if(data.tabungan) localStorage.setItem('tabungan', data.tabungan);
-                    if(data.bintang) localStorage.setItem('bintang', data.bintang);
+                    if(data.schoolProfile) saveAppData('schoolProfile', data.schoolProfile);
+                    if(data.adminPassword) saveAppData('adminPassword', data.adminPassword);
+                    if(data.users) saveAppData('users', data.users);
+                    if(data.mapel) saveAppData('mapel', data.mapel);
+                    if(data.ekskul) saveAppData('ekskul', data.ekskul);
+                    if(data.absensi) saveAppData('absensi', data.absensi);
+                    if(data.nilai) saveAppData('nilai', data.nilai);
+                    if(data.nilai_ekskul) saveAppData('nilai_ekskul', data.nilai_ekskul);
+                    if(data.tabungan) saveAppData('tabungan', data.tabungan);
+                    if(data.bintang) saveAppData('bintang', data.bintang);
                     alert("Data berhasil dipulihkan (restore)!");
                     location.reload();
                 } catch(err) {
@@ -2165,15 +2158,6 @@ renderRekapAbsenSiswa();
                 }
             };
             reader.readAsText(file);
-        }
-
-        function sinkronkanKeCloud() {
-            alert("Fitur Sinkronisasi Cloud aktif menggunakan penyimpanan lokal browser (LocalStorage) tersinkronisasi.");
-        }
-
-        function ambilDariCloud() {
-            alert("Data berhasil dimuat dari database lokal/cloud.");
-            loadNavSchool();
         }
 
         function exportTableToExcel(tableId, filename) {
@@ -2191,7 +2175,16 @@ renderRekapAbsenSiswa();
             XLSX.utils.book_append_sheet(workbook, worksheet, type);
             XLSX.writeFile(workbook, `Rekap_Global_${type}.xlsx`);
         }
-// --- INISIALISASI FIREBASE REALTIME DATABASE ---
+function refreshCurrentView() {
+    if (!currentUser) return;
+    try {
+        if (currentUser.role === 'Admin' && typeof initAdminDashboard === 'function') initAdminDashboard();
+        if (currentUser.role === 'Guru' && typeof initGuruViews === 'function') initGuruViews();
+        if (currentUser.role === 'Siswa' && typeof loadSiswaDashboard === 'function') loadSiswaDashboard();
+    } catch (e) { console.warn('Refresh realtime:', e); }
+}
+
+// --- FIREBASE REALTIME DATABASE: PENYIMPANAN OTOMATIS ---
 const firebaseConfig = {
     apiKey: "AIzaSyA0B0LYbpy_E2L_1S1SVJB74T-fbpaC0aw",
     authDomain: "mysipat.firebaseapp.com",
@@ -2201,76 +2194,76 @@ const firebaseConfig = {
     messagingSenderId: "149025727702",
     appId: "1:149025727702:web:5f1613ce133b0e91f6d577",
     measurementId: "G-EZ6860B031"
-  };
+};
 
-    // Inisialisasi Firebase
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const dbRef = firebase.database().ref('sipat_data');
+
+// Semua perubahan aplikasi ditulis langsung ke LocalStorage (cache) DAN Firebase.
+// Tidak ada lagi tombol Sinkron ke Cloud / Ambil dari Cloud.
+const CLOUD_KEYS = ['schoolProfile','adminPassword','users','mapel','ekskul','absensi','nilai','nilai_ekskul','tabungan','bintang'];
+let firebaseReady = false;
+let applyingFirebaseData = false;
+
+function toFirebaseValue(key, value) {
+    if (key === 'adminPassword') return value;
+    try { return JSON.parse(value); } catch(e) { return value; }
+}
+
+function saveAppData(key, value) {
+    localStorage.setItem(key, value);
+    if (!firebaseReady || applyingFirebaseData || !CLOUD_KEYS.includes(key)) return;
+    dbRef.child(key).set(toFirebaseValue(key, value)).catch(err => {
+        console.error('Gagal menyimpan ke Firebase:', key, err);
+        showCloudStatus('offline', 'Perubahan tersimpan lokal, Firebase belum tersambung.');
+    });
+}
+
+function saveAllAppDataToFirebase() {
+    const payload = {};
+    CLOUD_KEYS.forEach(key => {
+        const raw = localStorage.getItem(key);
+        if (raw !== null) payload[key] = toFirebaseValue(key, raw);
+    });
+    payload.lastUpdated = new Date().toISOString();
+    return dbRef.update(payload);
+}
+
+function showCloudStatus(state='online', message='Data tersimpan otomatis ke Firebase') {
+    const el = document.getElementById('cloudStatus');
+    if (!el) return;
+    el.textContent = state === 'online' ? '☁️ Tersimpan otomatis' : '⚠️ ' + message;
+    el.className = state === 'online'
+      ? 'text-xs font-bold px-3 py-1.5 rounded-full bg-green-100 text-green-700'
+      : 'text-xs font-bold px-3 py-1.5 rounded-full bg-yellow-100 text-yellow-700';
+}
+
+// Saat aplikasi dibuka, data Firebase menjadi sumber data bersama dan diperbarui realtime.
+dbRef.on('value', snapshot => {
+    const cloud = snapshot.val();
+    firebaseReady = true;
+    if (!cloud) {
+        saveAllAppDataToFirebase().then(() => showCloudStatus('online')).catch(() => showCloudStatus('offline', 'Gagal membuat data awal Firebase.'));
+        return;
     }
-    const dbRef = firebase.database().ref('sipat_data');
+    applyingFirebaseData = true;
+    try {
+        CLOUD_KEYS.forEach(key => {
+            if (cloud[key] !== undefined) {
+                const value = key === 'adminPassword' ? cloud[key] : JSON.stringify(cloud[key]);
+                localStorage.setItem(key, value);
+            }
+        });
+    } finally { applyingFirebaseData = false; }
+    showCloudStatus('online');
+    loadNavSchool();
+    if (typeof refreshCurrentView === 'function') refreshCurrentView();
+}, err => {
+    console.error('Firebase listener error:', err);
+    firebaseReady = false;
+    showCloudStatus('offline', 'Firebase tidak tersambung');
+});
 
-    // --- FUNGSI SINKRONISASI CLOUD (REALTIME FIREBASE) ---
-
-    // 1. Sinkronkan / Kirim seluruh data LocalStorage ke Firebase Cloud
-    function sinkronkanKeCloud() {
-        if (!confirm("Sinkronkan seluruh data aplikasi ke Firebase Cloud Realtime?")) return;
-        
-        const payloadData = {
-            schoolProfile: JSON.parse(localStorage.getItem('schoolProfile') || '{}'),
-            adminPassword: localStorage.getItem('adminPassword') || 'Rarangge01',
-            users: JSON.parse(localStorage.getItem('users') || '[]'),
-            mapel: JSON.parse(localStorage.getItem('mapel') || '[]'),
-            ekskul: JSON.parse(localStorage.getItem('ekskul') || '[]'),
-            absensi: JSON.parse(localStorage.getItem('absensi') || '[]'),
-            nilai: JSON.parse(localStorage.getItem('nilai') || '[]'),
-            nilai_ekskul: JSON.parse(localStorage.getItem('nilai_ekskul') || '[]'),
-            tabungan: JSON.parse(localStorage.getItem('tabungan') || '[]'),
-            bintang: JSON.parse(localStorage.getItem('bintang') || '[]'),
-            lastUpdated: new Date().toISOString()
-        };
-
-        dbRef.set(payloadData)
-            .then(() => {
-                alert("✅ Berhasil! Data berhasil disinkronkan ke Firebase Cloud secara Realtime.");
-            })
-            .catch((error) => {
-                console.error("Gagal sinkronisasi:", error);
-                alert("❌ Gagal menyinkronkan data ke Cloud: " + error.message);
-            });
-    }
-
-    // 2. Ambil / Tarik data terbaru dari Firebase Cloud ke LocalStorage browser
-    function ambilDariCloud() {
-        if (!confirm("Ambil data terbaru dari Firebase Cloud? Data lokal yang belum disinkronkan mungkin akan tertimpa.")) return;
-
-        dbRef.once('value')
-            .then((snapshot) => {
-                const cloudData = snapshot.val();
-                if (!cloudData) {
-                    alert("⚠️ Tidak ada data ditemukan di Firebase Cloud.");
-                    return;
-                }
-
-                // Simpan kembali ke LocalStorage browser
-                if (cloudData.schoolProfile) localStorage.setItem('schoolProfile', JSON.stringify(cloudData.schoolProfile));
-                if (cloudData.adminPassword) localStorage.setItem('adminPassword', cloudData.adminPassword);
-                if (cloudData.users) localStorage.setItem('users', JSON.stringify(cloudData.users));
-                if (cloudData.mapel) localStorage.setItem('mapel', JSON.stringify(cloudData.mapel));
-                if (cloudData.ekskul) localStorage.setItem('ekskul', JSON.stringify(cloudData.ekskul));
-                if (cloudData.absensi) localStorage.setItem('absensi', JSON.stringify(cloudData.absensi));
-                if (cloudData.nilai) localStorage.setItem('nilai', JSON.stringify(cloudData.nilai));
-                if (cloudData.nilai_ekskul) localStorage.setItem('nilai_ekskul', JSON.stringify(cloudData.nilai_ekskul));
-                if (cloudData.tabungan) localStorage.setItem('tabungan', JSON.stringify(cloudData.tabungan));
-                if (cloudData.bintang) localStorage.setItem('bintang', JSON.stringify(cloudData.bintang));
-
-                alert("✅ Sukses! Data berhasil ditarik dari Cloud. Halaman akan dimuat ulang.");
-                location.reload();
-            })
-            .catch((error) => {
-                console.error("Gagal mengambil data:", error);
-                alert("❌ Gagal mengambil data dari Cloud: " + error.message);
-            });
-    }
 function filterRekapSaldo() {
     const input = document.getElementById('searchRekapSaldo');
     const filter = input.value.toLowerCase();
