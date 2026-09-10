@@ -37,7 +37,7 @@
     
         /* ===== DOKUMEN RAPORT & BUKU INDUK KURIKULUM MERDEKA ===== */
         .dokumen-km { font-family: Arial, Helvetica, sans-serif; color:#111827; font-size:11px; line-height:1.35; }
-        .dok-header { display:grid; grid-template-columns:72px 1fr 72px; align-items:center; gap:10px; border-bottom:2px solid #111827; padding-bottom:8px; margin-bottom:10px; }
+        .dok-header { display:grid; grid-template-columns:72px 1fr; align-items:center; gap:10px; border-bottom:2px solid #111827; padding-bottom:8px; margin-bottom:10px; }
         .dok-logo { width:64px; height:64px; display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid #cbd5e1; border-radius:4px; font-size:8px; color:#94a3b8; }
         .dok-logo img { width:auto; height:100%; max-width:100%; object-fit:contain; display:block; }
         .dok-title { text-align:center; }
@@ -63,7 +63,7 @@
         @media print {
             #printArea { box-shadow:none !important; border:0 !important; padding:0 !important; min-height:0 !important; }
             .dokumen-km { font-size:10px; }
-            .dok-header { grid-template-columns:60px 1fr 60px; }
+            .dok-header { grid-template-columns:60px 1fr; }
             .dok-logo { width:54px; height:54px; }
             .dok-school { font-size:14px; }
             .dok-table th,.dok-table td { padding:3px 4px; }
@@ -223,7 +223,7 @@
                             </div>
                             <div class="flex-1">
                                 <label class="block text-xs font-black text-indigo-700 uppercase mb-1">Logo Sekolah</label>
-                                <p class="text-xs text-slate-500 mb-2">Upload logo (PNG/JPG). Logo otomatis diperkecil agar penyimpanan Firebase tetap ringan dan akan tampil di kiri & kanan judul Raport serta Buku Induk.</p>
+                                <p class="text-xs text-slate-500 mb-2">Upload logo (PNG/JPG). Logo otomatis diperkecil agar penyimpanan Firebase tetap ringan dan akan tampil di sebelah kiri judul Raport serta Buku Induk.</p>
                                 <div class="flex flex-wrap gap-2">
                                     <label class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-bold cursor-pointer">
                                         <i class="fa-solid fa-image"></i> Pilih Logo
@@ -2028,7 +2028,6 @@
                         <div class="dok-heading">${judul}</div>
                         <div class="dok-subheading">${subjudul}</div>
                     </div>
-                    <div class="dok-logo">${logo ? `<img src="${logo}" alt="Logo Sekolah">` : `<span>LOGO</span>`}</div>
                 </div>`;
             const identity = `
                 <div class="dok-identity">
@@ -2132,7 +2131,7 @@
             const username=currentUser.username, users=JSON.parse(localStorage.getItem('users'))||[], sObj=users.find(u=>u.username===username); if(!sObj)throw new Error('Data siswa tidak ditemukan.');
             const p=JSON.parse(localStorage.getItem('schoolProfile'))||{}, mapel=JSON.parse(localStorage.getItem('mapel'))||[], nilai=JSON.parse(localStorage.getItem('nilai'))||[], eks=JSON.parse(localStorage.getItem('nilai_ekskul'))||[], abs=JSON.parse(localStorage.getItem('absensi'))||[], tab=JSON.parse(localStorage.getItem('tabungan'))||[], bin=JSON.parse(localStorage.getItem('bintang'))||[];
             const esc=v=>String(v??'-').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); const avg=a=>a.length?a.reduce((x,y)=>x+Number(y),0)/a.length:null; const fmt=n=>n==null?'-':Number(n).toFixed(1); const logo=p.logo||'';
-            const header=`<div class="dok-header"><div class="dok-logo">${logo?`<img src="${logo}">`:'LOGO'}</div><div class="dok-title"><div class="dok-school">${esc(p.nama||'SEKOLAH DASAR')}</div><div class="dok-meta">NPSN: ${esc(p.npsn||'-')} | ${esc(p.alamat||'-')}</div><div class="dok-heading">${type==='bukuinduk'?'BUKU INDUK PESERTA DIDIK':'LAPORAN HASIL BELAJAR PESERTA DIDIK'}</div><div class="dok-subheading">KURIKULUM MERDEKA — TAHUN PELAJARAN ${esc(p.tapel||'-')}</div></div><div class="dok-logo">${logo?`<img src="${logo}">`:'LOGO'}</div></div>`;
+            const header=`<div class="dok-header"><div class="dok-logo">${logo?`<img src="${logo}">`:'LOGO'}</div><div class="dok-title"><div class="dok-school">${esc(p.nama||'SEKOLAH DASAR')}</div><div class="dok-meta">NPSN: ${esc(p.npsn||'-')} | ${esc(p.alamat||'-')}</div><div class="dok-heading">${type==='bukuinduk'?'BUKU INDUK PESERTA DIDIK':'LAPORAN HASIL BELAJAR PESERTA DIDIK'}</div><div class="dok-subheading">KURIKULUM MERDEKA — TAHUN PELAJARAN ${esc(p.tapel||'-')}</div></div></div>`;
             const ident=`<div class="dok-identity"><div><b>Nama Peserta Didik</b><span>${esc(sObj.nama)}</span></div><div><b>Nomor Induk / NISN</b><span>${esc(sObj.username)}</span></div><div><b>Kelas</b><span>${esc(sObj.kelas||'-')}</span></div><div><b>Fase</b><span>${esc(sObj.fase||'-')}</span></div><div><b>Tahun Pelajaran</b><span>${esc(p.tapel||'-')}</span></div><div><b>Status</b><span>Peserta Didik Aktif</span></div></div>`;
             const a=abs.filter(x=>x.username===username), st={Sakit:0,Izin:0,Alfa:0}; a.forEach(x=>{if(st[x.status]!==undefined)st[x.status]++}); const ah=`<section><h4>KETIDAKHADIRAN</h4><table class="dok-table"><thead><tr><th>Keterangan</th><th>Jumlah</th></tr></thead><tbody><tr><td>Sakit</td><td class="center bold">${st.Sakit} hari</td></tr><tr><td>Izin</td><td class="center bold">${st.Izin} hari</td></tr><tr><td>Alfa</td><td class="center bold">${st.Alfa} hari</td></tr></tbody></table></section>`;
             const sem=number=>{let rows='';mapel.forEach((m,i)=>{let v=nilai.filter(n=>n.username===username&&String(n.semester)===String(number)&&n.mapel===m.nama);let t=avg(v.filter(n=>n.jenis==='Tugas').map(n=>n.angka)),q=avg(v.filter(n=>n.jenis==='STS').map(n=>n.angka)),z=avg(v.filter(n=>n.jenis==='SAS').map(n=>n.angka)),ar=[t,q,z].filter(x=>x!=null);rows+=`<tr><td class="center">${i+1}</td><td>${esc(m.nama)}</td><td class="center">${fmt(t)}</td><td class="center">${fmt(q)}</td><td class="center">${fmt(z)}</td><td class="center bold">${fmt(ar.length?avg(ar):null)}</td></tr>`});return `<section><h4>NILAI AKADEMIK — SEMESTER ${number}</h4><table class="dok-table"><thead><tr><th>No</th><th>Mata Pelajaran</th><th>Tugas</th><th>STS</th><th>SAS</th><th>Nilai Akhir</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="center muted">Belum ada data nilai.</td></tr>'}</tbody></table></section>`};
