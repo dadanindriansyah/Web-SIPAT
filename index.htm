@@ -468,7 +468,14 @@
             <div id="tabAbsensi" class="guru-content space-y-6 no-print">
                 <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
                     <h3 class="text-lg font-bold mb-4 text-emerald-700"><i class="fa-solid fa-calendar-plus"></i> Input Presensi Bulanan Siswa</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Semester</label>
+                            <select id="absensiSemester" onchange="renderAbsensiGuru(); renderRekapAbsenSiswa();" class="mt-1 w-full border rounded-lg p-2.5 text-sm bg-white">
+                                <option value="1">Semester 1</option>
+                                <option value="2">Semester 2</option>
+                            </select>
+                        </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase">Pilih Tanggal Absen</label>
                             <input type="date" id="absensiDate" class="mt-1 w-full border rounded-lg p-2.5 text-sm">
@@ -545,7 +552,7 @@
                         <div class="overflow-y-auto max-h-60 border rounded-xl">
                             <table id="tblLogAbsen" class="w-full text-left text-xs">
                                 <thead class="bg-slate-50">
-                                    <tr><th class="p-3">Tanggal</th><th class="p-3">Nama</th><th class="p-3">Status</th><th class="p-3 text-right">Aksi</th></tr>
+                                    <tr><th class="p-3">Tanggal</th><th class="p-3">Semester</th><th class="p-3">Nama</th><th class="p-3">Status</th><th class="p-3 text-right">Aksi</th></tr>
                                 </thead>
                                 <tbody id="bodyLogAbsen" class="divide-y"></tbody>
                             </table>
@@ -950,7 +957,13 @@
             </div>
             <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4 border-b pb-3"><div><h3 class="font-extrabold text-base text-slate-800">📅 Rekap Kehadiran</h3><p class="text-xs text-slate-400">Hanya menampilkan total ketidakhadiran yang sudah diinput guru.</p></div><span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full">Sakit • Izin • Alfa</span></div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4"><div class="rounded-2xl border-2 border-blue-100 bg-blue-50 p-5 text-center"><div id="siswaTotalSakit" class="text-3xl font-black text-blue-600">0</div><div class="text-sm font-extrabold text-blue-800 mt-1">Sakit</div></div><div class="rounded-2xl border-2 border-amber-100 bg-amber-50 p-5 text-center"><div id="siswaTotalIzin" class="text-3xl font-black text-amber-600">0</div><div class="text-sm font-extrabold text-amber-800 mt-1">Izin</div></div><div class="rounded-2xl border-2 border-rose-100 bg-rose-50 p-5 text-center"><div id="siswaTotalAlfa" class="text-3xl font-black text-rose-600">0</div><div class="text-sm font-extrabold text-rose-800 mt-1">Alfa</div></div></div>
+                <div class="mb-4 flex items-center gap-3">
+                     <label class="text-xs font-black text-slate-600">Pilih Semester:</label>
+                     <select id="siswaAbsensiSemester" onchange="loadSiswaDashboard()" class="border rounded-xl px-3 py-2 text-sm font-bold bg-white">
+                         <option value="1">Semester 1</option><option value="2">Semester 2</option>
+                     </select>
+                 </div>
+                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4"><div class="rounded-2xl border-2 border-blue-100 bg-blue-50 p-5 text-center"><div id="siswaTotalSakit" class="text-3xl font-black text-blue-600">0</div><div class="text-sm font-extrabold text-blue-800 mt-1">Sakit</div></div><div class="rounded-2xl border-2 border-amber-100 bg-amber-50 p-5 text-center"><div id="siswaTotalIzin" class="text-3xl font-black text-amber-600">0</div><div class="text-sm font-extrabold text-amber-800 mt-1">Izin</div></div><div class="rounded-2xl border-2 border-rose-100 bg-rose-50 p-5 text-center"><div id="siswaTotalAlfa" class="text-3xl font-black text-rose-600">0</div><div class="text-sm font-extrabold text-rose-800 mt-1">Alfa</div></div></div>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
                 <h3 class="font-extrabold text-base text-slate-800 mb-2">📄 Download Hasil Belajar PDF</h3><p class="text-xs text-slate-500 mb-4">Data terbaru dari input guru dan tempat/tanggal dokumen dari Admin.</p>
@@ -1575,7 +1588,19 @@
             }
         }
 
-        function submitAbsensi() {
+        function getAbsensiSemester(a) {
+    if (a && a.semester !== undefined && a.semester !== null && a.semester !== '') return String(a.semester);
+    // Kompatibilitas data lama: Juli-Desember = Sem 1, Januari-Juni = Sem 2.
+    const month = Number(String(a?.date || '').split('-')[1]);
+    return (month >= 7 || month === 0) ? '1' : '2';
+}
+
+function getAbsensiSemesterAktif() {
+    return String(document.getElementById('absensiSemester')?.value || '1');
+}
+
+function submitAbsensi() {
+    const semester = getAbsensiSemesterAktif();
     const date = document.getElementById('absensiDate').value;
     const userSiswa = document.getElementById('absensiSiswa').value;
     const status = document.getElementById('absensiStatus').value;
@@ -1583,14 +1608,18 @@
 
     let absensi = JSON.parse(localStorage.getItem('absensi')) || [];
     const sObj = getSiswaSekelas().find(s => s.username === userSiswa);
-    const profile = JSON.parse(localStorage.getItem('schoolProfile'));
+    const profile = JSON.parse(localStorage.getItem('schoolProfile')) || {};
 
-    absensi.push({ id: Date.now(), date, username: userSiswa, nama: sObj ? sObj.nama : userSiswa, kelas: currentUser.kelas, status, tapel: profile.tapel || "-" });
+    // Satu siswa pada tanggal yang sama dan semester yang sama diperbarui, bukan dibuat ganda.
+    const idx = absensi.findIndex(a => a.username === userSiswa && a.date === date && a.kelas === currentUser.kelas && getAbsensiSemester(a) === semester);
+    const dataBaru = { id: idx >= 0 ? absensi[idx].id : Date.now(), date, username: userSiswa, nama: sObj ? sObj.nama : userSiswa, kelas: currentUser.kelas, status, semester, tapel: profile.tapel || "-" };
+    if (idx >= 0) absensi[idx] = dataBaru; else absensi.push(dataBaru);
     saveAppData('absensi', JSON.stringify(absensi));
 
     renderAbsensiGuru();
-    renderRekapAbsenSiswa(); // <-- Pastikan terpanggil di sini
-    showSaveToast("Absensi tersimpan");
+    renderRekapAbsenSiswa();
+    if (typeof loadSiswaDashboard === 'function' && currentUser.role === 'Siswa') loadSiswaDashboard();
+    showSaveToast(`Absensi Semester ${semester} tersimpan`);
 }
 
         function deleteAbsen(id) {
@@ -1615,7 +1644,8 @@
         }
 
         function renderAbsensiGuru() {
-            const absensi = (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.kelas === currentUser.kelas);
+            const semester = getAbsensiSemesterAktif();
+            const absensi = (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.kelas === currentUser.kelas && getAbsensiSemester(a) === semester);
             const tbody = document.getElementById('bodyLogAbsen');
             if(!tbody) return;
             tbody.innerHTML = '';
@@ -1623,7 +1653,7 @@
 
             absensi.forEach(a => {
                 chartData[a.status] = (chartData[a.status] || 0) + 1;
-                tbody.innerHTML += `<tr><td class="p-3">${a.date}</td><td class="p-3 font-semibold">${a.nama}</td><td><span class="px-2 py-0.5 rounded text-xs">${a.status}</span></td><td class="text-right"><button onclick="deleteAbsen(${a.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                tbody.innerHTML += `<tr><td class="p-3">${a.date}</td><td class="p-3">Sem ${getAbsensiSemester(a)}</td><td class="p-3 font-semibold">${a.nama}</td><td><span class="px-2 py-0.5 rounded text-xs">${a.status}</span></td><td class="text-right"><button onclick="deleteAbsen(${a.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
 
             if (chartInstanceAbsen) chartInstanceAbsen.destroy();
@@ -2102,7 +2132,9 @@
         // DASHBOARD SISWA
         function loadSiswaDashboard() {
             const username=currentUser.username;
-            const absensi=(JSON.parse(localStorage.getItem('absensi'))||[]).filter(a=>a.username===username);
+            const absensiAll=(JSON.parse(localStorage.getItem('absensi'))||[]).filter(a=>a.username===username);
+            const semSiswa=document.getElementById('siswaAbsensiSemester')?.value || '1';
+            const absensi=absensiAll.filter(a=>getAbsensiSemester(a)===String(semSiswa));
             const nilai=(JSON.parse(localStorage.getItem('nilai'))||[]).filter(n=>n.username===username);
             const ekskul=(JSON.parse(localStorage.getItem('nilai_ekskul'))||[]).filter(e=>e.username===username);
             const tabungan=(JSON.parse(localStorage.getItem('tabungan'))||[]).filter(t=>t.username===username);
@@ -2133,13 +2165,14 @@
             const esc=v=>String(v??'-').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); const avg=a=>a.length?a.reduce((x,y)=>x+Number(y),0)/a.length:null; const fmt=n=>n==null?'-':Number(n).toFixed(1); const logo=p.logo||'';
             const header=`<div class="dok-header"><div class="dok-logo">${logo?`<img src="${logo}">`:'LOGO'}</div><div class="dok-title"><div class="dok-school">${esc(p.nama||'SEKOLAH DASAR')}</div><div class="dok-meta">NPSN: ${esc(p.npsn||'-')} | ${esc(p.alamat||'-')}</div><div class="dok-heading">${type==='bukuinduk'?'BUKU INDUK PESERTA DIDIK':'LAPORAN HASIL BELAJAR PESERTA DIDIK'}</div><div class="dok-subheading">KURIKULUM MERDEKA — TAHUN PELAJARAN ${esc(p.tapel||'-')}</div></div></div>`;
             const ident=`<div class="dok-identity"><div><b>Nama Peserta Didik</b><span>${esc(sObj.nama)}</span></div><div><b>Nomor Induk / NISN</b><span>${esc(sObj.username)}</span></div><div><b>Kelas</b><span>${esc(sObj.kelas||'-')}</span></div><div><b>Fase</b><span>${esc(sObj.fase||'-')}</span></div><div><b>Tahun Pelajaran</b><span>${esc(p.tapel||'-')}</span></div><div><b>Status</b><span>Peserta Didik Aktif</span></div></div>`;
-            const a=abs.filter(x=>x.username===username), st={Sakit:0,Izin:0,Alfa:0}; a.forEach(x=>{if(st[x.status]!==undefined)st[x.status]++}); const ah=`<section><h4>KETIDAKHADIRAN</h4><table class="dok-table"><thead><tr><th>Keterangan</th><th>Jumlah</th></tr></thead><tbody><tr><td>Sakit</td><td class="center bold">${st.Sakit} hari</td></tr><tr><td>Izin</td><td class="center bold">${st.Izin} hari</td></tr><tr><td>Alfa</td><td class="center bold">${st.Alfa} hari</td></tr></tbody></table></section>`;
+            const countAbsen=semester=>{const a=abs.filter(x=>x.username===username&&getAbsensiSemester(x)===String(semester));const st={Sakit:0,Izin:0,Alfa:0};a.forEach(x=>{if(st[x.status]!==undefined)st[x.status]++});return st};
+            const ah=semester=>{const st=countAbsen(semester);return `<section><h4>KETIDAKHADIRAN — SEMESTER ${semester}</h4><table class="dok-table"><thead><tr><th>Keterangan</th><th>Jumlah</th></tr></thead><tbody><tr><td>Sakit</td><td class="center bold">${st.Sakit} hari</td></tr><tr><td>Izin</td><td class="center bold">${st.Izin} hari</td></tr><tr><td>Alfa</td><td class="center bold">${st.Alfa} hari</td></tr></tbody></table></section>`};
             const sem=number=>{let rows='';mapel.forEach((m,i)=>{let v=nilai.filter(n=>n.username===username&&String(n.semester)===String(number)&&n.mapel===m.nama);let t=avg(v.filter(n=>n.jenis==='Tugas').map(n=>n.angka)),q=avg(v.filter(n=>n.jenis==='STS').map(n=>n.angka)),z=avg(v.filter(n=>n.jenis==='SAS').map(n=>n.angka)),ar=[t,q,z].filter(x=>x!=null);rows+=`<tr><td class="center">${i+1}</td><td>${esc(m.nama)}</td><td class="center">${fmt(t)}</td><td class="center">${fmt(q)}</td><td class="center">${fmt(z)}</td><td class="center bold">${fmt(ar.length?avg(ar):null)}</td></tr>`});return `<section><h4>NILAI AKADEMIK — SEMESTER ${number}</h4><table class="dok-table"><thead><tr><th>No</th><th>Mata Pelajaran</th><th>Tugas</th><th>STS</th><th>SAS</th><th>Nilai Akhir</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="center muted">Belum ada data nilai.</td></tr>'}</tbody></table></section>`};
             const er=eks.filter(e=>e.username===username).map(e=>`<tr><td>${esc(e.ekskul||e.eksiklus)}</td><td class="center">Semester ${esc(e.semester)}</td><td class="center bold">${esc(e.predikat)}</td><td>${esc(e.desc)}</td></tr>`).join(''); const eh=`<section><h4>REKAP EKSTRAKURIKULER</h4><table class="dok-table"><thead><tr><th>Kegiatan</th><th>Semester</th><th>Predikat</th><th>Keterangan</th></tr></thead><tbody>${er||'<tr><td colspan="4" class="center muted">Belum ada data.</td></tr>'}</tbody></table></section>`;
             const sign=buildSignatureHTML(p);
-            if(type==='raport'){const ss=document.getElementById('siswaPdfSemester')?.value||'1';return `<div class="dokumen-km">${header}${ident}${sem(ss)}<div class="dok-grid">${eh}${ah}</div>${sign}</div>`}
-            if(type==='bukuinduk')return `<div class="dokumen-km buku-induk">${header}${ident}${sem(1)}${sign}${sem(2)}${sign}${eh}${ah}</div>`;
-            let saldo=0;tab.filter(t=>t.username===username).forEach(t=>{if(t.jenis==='Masuk')saldo+=Number(t.nominalBersih||0);else saldo-=Number(t.nominalAsli||0)});let bs=10+bin.filter(b=>b.username===username).reduce((x,b)=>x+Number(b.jumlah||0),0);return `<div class="dokumen-km">${header}${ident}${sem(1)}${sem(2)}${eh}${ah}<section><h4>BINTANG PERILAKU</h4><p><b>Bintang Aktif:</b> ${bs}</p></section><section><h4>SALDO TABUNGAN</h4><p><b>Saldo Akhir:</b> Rp ${saldo.toLocaleString('id-ID')}</p></section>${sign}</div>`;
+            if(type==='raport'){const ss=document.getElementById('siswaPdfSemester')?.value||'1';return `<div class="dokumen-km">${header}${ident}${sem(ss)}<div class="dok-grid">${eh}${ah(ss)}</div>${sign}</div>`}
+            if(type==='bukuinduk')return `<div class="dokumen-km buku-induk">${header}${ident}${sem(1)}<div class="dok-grid">${eh}${ah(1)}</div>${sign}${sem(2)}<div class="dok-grid">${eh}${ah(2)}</div>${sign}</div>`;
+            let saldo=0;tab.filter(t=>t.username===username).forEach(t=>{if(t.jenis==='Masuk')saldo+=Number(t.nominalBersih||0);else saldo-=Number(t.nominalAsli||0)});let bs=10+bin.filter(b=>b.username===username).reduce((x,b)=>x+Number(b.jumlah||0),0);return `<div class="dokumen-km">${header}${ident}${sem(1)}<div class="dok-grid">${eh}${ah(1)}</div>${sem(2)}<div class="dok-grid">${eh}${ah(2)}</div><section><h4>BINTANG PERILAKU</h4><p><b>Bintang Aktif:</b> ${bs}</p></section><section><h4>SALDO TABUNGAN</h4><p><b>Saldo Akhir:</b> Rp ${saldo.toLocaleString('id-ID')}</p></section>${sign}</div>`;
         }
         function downloadSiswaPDF(type){if(typeof html2pdf==='undefined')return alert('Fitur PDF belum siap. Pastikan internet aktif.');try{const w=document.createElement('div');w.style.background='#fff';w.innerHTML=buildSiswaPDFHTML(type);document.body.appendChild(w);const n=(currentUser.nama||currentUser.username).replace(/[^a-z0-9]+/gi,'_');const f=type==='raport'?'Raport':type==='bukuinduk'?'Buku_Induk':'Semua_Hasil';html2pdf().set({margin:8,filename:`${f}_${n}.pdf`,image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true,backgroundColor:'#fff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(w).save().then(()=>w.remove()).catch(e=>{w.remove();console.error(e);alert('PDF gagal dibuat.');})}catch(e){console.error(e);alert(e.message||'PDF gagal dibuat.')}}
 
@@ -2339,7 +2372,8 @@ function filterRekapSaldo() {
 }
 function renderRekapAbsenSiswa() {
     const siswaList = getSiswaSekelas();
-    const absensiList = (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.kelas === currentUser.kelas);
+    const semester = getAbsensiSemesterAktif();
+    const absensiList = (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.kelas === currentUser.kelas && getAbsensiSemester(a) === semester);
     const searchKeyword = document.getElementById('searchRekapAbsenSiswa') ? document.getElementById('searchRekapAbsenSiswa').value.toLowerCase().trim() : '';
     const tbody = document.getElementById('bodyRekapAbsenSiswa');
     if (!tbody) return;
