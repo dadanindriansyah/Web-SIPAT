@@ -60,20 +60,37 @@
         .semester-block { page-break-inside:avoid; }
         .dok-sign { display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:28px; text-align:center; }
         .sign-space { height:48px; }
-        /* ===== CETAK / DOWNLOAD PDF SISWA - A4 RAPI ===== */
+        /* ===== CETAK / DOWNLOAD PDF SISWA - A4 TERKUNCI ===== */
+        /* A4 = 210 x 297 mm. Area isi dikunci 190 x 277 mm
+           sehingga selalu menyisakan margin 10 mm di kiri/kanan/atas/bawah. */
         .pdf-export-root {
-            width: 190mm;
-            max-width: 190mm;
+            width: 190mm !important;
+            max-width: 190mm !important;
+            min-width: 190mm !important;
             margin: 0 auto;
+            padding: 0;
             background: #fff;
             box-sizing: border-box;
+            overflow: visible;
         }
         .pdf-export-root .dokumen-km {
-            width: 190mm;
-            max-width: 190mm;
+            width: 190mm !important;
+            max-width: 190mm !important;
+            min-width: 0 !important;
             box-sizing: border-box;
             background: #fff;
-            overflow: hidden;
+            overflow: visible;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10px;
+            line-height: 1.28;
+        }
+        .pdf-export-root * {
+            box-sizing: border-box;
+            max-width: 100%;
+        }
+        .pdf-export-root img {
+            max-width: 100%;
+            height: auto;
         }
         .pdf-export-root .dok-table {
             width: 100%;
@@ -2261,6 +2278,8 @@ function submitAbsensi() {
                         type==='bukuinduk'?'Buku_Induk':'Semua_Hasil';
 
                 const options={
+                    // A4 portrait 210 x 297 mm dengan margin aman 10 mm setiap sisi.
+                    // Lebar efektif = 190 mm, tinggi efektif = 277 mm.
                     margin:[10,10,10,10],
                     filename:`${f}_${n}.pdf`,
                     image:{type:'jpeg',quality:.98},
@@ -2271,21 +2290,30 @@ function submitAbsensi() {
                         letterRendering:true,
                         scrollX:0,
                         scrollY:0,
-                        windowWidth:794
+                        windowWidth:718,
+                        windowHeight:1047
                     },
                     jsPDF:{
                         unit:'mm',
                         format:'a4',
                         orientation:'portrait',
-                        compress:true
+                        compress:true,
+                        hotfixes:['px_scaling']
                     },
                     pagebreak:{
                         mode:['css','legacy'],
                         before:[],
                         after:[],
-                        avoid:['.dok-header','.dok-identity','.dok-sign','.semester-block']
+                        avoid:['.dok-header','.dok-identity','.dok-sign','.semester-block','tr']
                     }
                 };
+
+                // Pastikan ukuran root benar-benar sama dengan area cetak A4.
+                w.style.setProperty('width','190mm','important');
+                w.style.setProperty('max-width','190mm','important');
+                w.style.setProperty('min-width','190mm','important');
+                w.style.setProperty('margin','0','important');
+                w.style.setProperty('padding','0','important');
 
                 html2pdf().set(options).from(w).save()
                     .then(()=>w.remove())
