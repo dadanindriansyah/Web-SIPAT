@@ -206,12 +206,13 @@
                             <input type="text" id="schJabatan" class="mt-1 block w-full rounded-lg border border-slate-300 p-2.5 text-sm" placeholder="Kepala Sekolah">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase">Tempat Cetak Raport / Buku Induk</label>
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Tempat Dokumen (Raport / Buku Induk)</label>
                             <input type="text" id="schTempat" class="mt-1 block w-full rounded-lg border border-slate-300 p-2.5 text-sm" placeholder="Contoh: Jasinga">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 uppercase">Tanggal Raport / Buku Induk</label>
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Tanggal Dokumen (Raport / Buku Induk)</label>
                             <input type="date" id="schTanggalDokumen" class="mt-1 block w-full rounded-lg border border-slate-300 p-2.5 text-sm">
+                            <p class="text-[10px] text-slate-400 mt-1">Dipakai otomatis pada tanda tangan Raport dan Buku Induk guru.</p>
                         </div>
                     </div>
                     <div class="mt-4 rounded-xl border-2 border-dashed border-indigo-200 bg-indigo-50/50 p-4">
@@ -536,6 +537,9 @@
                             <h3 class="font-extrabold text-slate-700">Daftar Kehadiran Kelas</h3>
                             <button onclick="exportTableToExcel('tblLogAbsen', 'Rekap_Presensi_Kelas')" class="bg-indigo-600 text-white text-xs px-3 py-1.5 rounded hover:bg-indigo-700 font-bold">
                                 <i class="fa-solid fa-download"></i> Download Rekap
+                            </button>
+                            <button onclick="deleteAllAbsenGuru()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded hover:bg-rose-700 font-bold">
+                                <i class="fa-solid fa-trash"></i> Hapus Data
                             </button>
                         </div>
                         <div class="overflow-y-auto max-h-60 border rounded-xl">
@@ -1590,11 +1594,24 @@
 }
 
         function deleteAbsen(id) {
-            if(confirm("Hapus?")) {
-                saveAppData('absensi', JSON.stringify((JSON.parse(localStorage.getItem('absensi'))).filter(a => a.id !== id)));
+            if(confirm("Hapus data kehadiran ini?")) {
+                saveAppData('absensi', JSON.stringify((JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.id !== id)));
                 renderAbsensiGuru();
-renderRekapAbsenSiswa();
+                renderRekapAbsenSiswa();
+                showSaveToast("Data kehadiran dihapus");
             }
+        }
+
+        function deleteAllAbsenGuru() {
+            const kelasGuru = currentUser && currentUser.kelas ? currentUser.kelas : '';
+            const data = JSON.parse(localStorage.getItem('absensi')) || [];
+            const jumlah = data.filter(a => a.kelas === kelasGuru).length;
+            if (!jumlah) return alert("Belum ada data kehadiran untuk kelas Anda.");
+            if (!confirm(`Hapus semua ${jumlah} data kehadiran kelas ${kelasGuru}?\n\nData yang dihapus tidak dapat dikembalikan.`)) return;
+            saveAppData('absensi', JSON.stringify(data.filter(a => a.kelas !== kelasGuru)));
+            renderAbsensiGuru();
+            renderRekapAbsenSiswa();
+            showSaveToast("Semua data kehadiran kelas dihapus");
         }
 
         function renderAbsensiGuru() {
@@ -2051,7 +2068,7 @@ renderRekapAbsenSiswa();
                     <tr><td>Izin</td><td class="center bold">${absenStats.Izin} hari</td></tr>
                     <tr><td>Alfa</td><td class="center bold">${absenStats.Alfa} hari</td></tr>
                     </tbody></table></section></div>
-                    <div class="dok-sign"><div>Mengetahui,<br><b>Orang Tua / Wali</b><div class="sign-space"></div><u>________________________</u></div><div>${esc(profile.tempatDokumen || profile.alamat || 'Jasinga')}, ${formatTanggalDokumen(profile.tanggalDokumen)}<br><b>${esc(profile.jabatan || 'Kepala Sekolah')}</b><div class="sign-space"></div><b><u>${esc(profile.kepsek || '-')}</u></b><br>NIP. ${esc(profile.nipKepsek || '-')}</div></div></div>`;
+                    ${buildSignatureHTML(profile)}</div>`;
                 contentEl.innerHTML = html;
             } else {
                 // Buku induk: otomatis menggabungkan seluruh nilai mapel, ekskul, dan absensi untuk Semester 1 dan 2.
@@ -2067,7 +2084,7 @@ renderRekapAbsenSiswa();
                         const akhir=valid.length?nilaiRata(valid):null;
                         rows += `<tr><td class="center">${i+1}</td><td>${esc(m.nama)}</td><td class="center">${fmt(tgs)}</td><td class="center">${fmt(sts)}</td><td class="center">${fmt(sas)}</td><td class="center bold">${fmt(akhir)}</td></tr>`;
                     });
-                    return `<section class="semester-block"><h4>NILAI AKADEMIK — SEMESTER ${sem}</h4><table class="dok-table"><thead><tr><th>No</th><th>Mata Pelajaran</th><th>Tugas</th><th>STS</th><th>SAS</th><th>Nilai Akhir</th></tr></thead><tbody>${rows || `<tr><td colspan="6" class="center muted">Belum ada data nilai.</td></tr>`}</tbody></table></section>`;
+                    return `<section class="semester-block"><h4>NILAI AKADEMIK — SEMESTER ${sem}</h4><table class="dok-table"><thead><tr><th>No</th><th>Mata Pelajaran</th><th>Tugas</th><th>STS</th><th>SAS</th><th>Nilai Akhir</th></tr></thead><tbody>${rows || `<tr><td colspan="6" class="center muted">Belum ada data nilai.</td></tr>`}</tbody></table>${buildSignatureHTML(profile)}</section>`;
                 }).join('');
                 const allEks = allEkskul.filter(e=>e.username===username);
                 const eksRows = allEks.map(e=>`<tr><td>${esc(e.eksiklus || e.ekskul)}</td><td class="center">Semester ${esc(e.semester)}</td><td class="center bold">${esc(e.predikat)}</td><td>${esc(e.desc)}</td></tr>`).join('');
@@ -2077,7 +2094,7 @@ renderRekapAbsenSiswa();
                     ${semesterRows}
                     <section><h4>REKAP EKSTRAKURIKULER</h4><table class="dok-table"><thead><tr><th>Kegiatan</th><th>Semester</th><th>Predikat</th><th>Keterangan</th></tr></thead><tbody>${eksRows || `<tr><td colspan="4" class="center muted">Belum ada data ekstrakurikuler.</td></tr>`}</tbody></table></section>
                     <section><h4>REKAP KETIDAKHADIRAN</h4><table class="dok-table"><tbody>${absenRows}</tbody></table></section>
-                    <div class="dok-sign"><div>Mengetahui,<br><b>Orang Tua / Wali</b><div class="sign-space"></div><u>________________________</u></div><div>${esc(profile.tempatDokumen || profile.alamat || 'Jasinga')}, ${formatTanggalDokumen(profile.tanggalDokumen)}<br><b>${esc(profile.jabatan || 'Kepala Sekolah')}</b><div class="sign-space"></div><b><u>${esc(profile.kepsek || '-')}</u></b><br>NIP. ${esc(profile.nipKepsek || '-')}</div></div></div>`;
+                    </div>`;
             }
             // Preview dirender segera; pencetakan dilakukan setelah browser selesai mengecat halaman.
             requestAnimationFrame(() => setTimeout(() => window.print(), 30));
@@ -2103,6 +2120,14 @@ renderRekapAbsenSiswa();
 
         function formatTanggalDokumen(v){ if(!v)return new Date().toLocaleDateString('id-ID'); const d=new Date(v+'T00:00:00'); return isNaN(d)?v:d.toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}); }
 
+        function buildSignatureHTML(profile){
+            const tempat = profile.tempatDokumen || profile.alamat || 'Jasinga';
+            const tanggal = formatTanggalDokumen(profile.tanggalDokumen);
+            return `<div class="dok-sign"><div>Mengetahui,<br><b>Orang Tua / Wali</b><div class="sign-space"></div><u>________________________</u></div><div>${escSafe(tempat)}, ${escSafe(tanggal)}<br><b>${escSafe(profile.jabatan || 'Kepala Sekolah')}</b><div class="sign-space"></div><b><u>${escSafe(profile.kepsek || '-')}</u></b><br>NIP. ${escSafe(profile.nipKepsek || '-')}</div></div>`;
+        }
+
+        function escSafe(v){ return String(v ?? '-').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
         function buildSiswaPDFHTML(type){
             const username=currentUser.username, users=JSON.parse(localStorage.getItem('users'))||[], sObj=users.find(u=>u.username===username); if(!sObj)throw new Error('Data siswa tidak ditemukan.');
             const p=JSON.parse(localStorage.getItem('schoolProfile'))||{}, mapel=JSON.parse(localStorage.getItem('mapel'))||[], nilai=JSON.parse(localStorage.getItem('nilai'))||[], eks=JSON.parse(localStorage.getItem('nilai_ekskul'))||[], abs=JSON.parse(localStorage.getItem('absensi'))||[], tab=JSON.parse(localStorage.getItem('tabungan'))||[], bin=JSON.parse(localStorage.getItem('bintang'))||[];
@@ -2112,9 +2137,9 @@ renderRekapAbsenSiswa();
             const a=abs.filter(x=>x.username===username), st={Sakit:0,Izin:0,Alfa:0}; a.forEach(x=>{if(st[x.status]!==undefined)st[x.status]++}); const ah=`<section><h4>KETIDAKHADIRAN</h4><table class="dok-table"><thead><tr><th>Keterangan</th><th>Jumlah</th></tr></thead><tbody><tr><td>Sakit</td><td class="center bold">${st.Sakit} hari</td></tr><tr><td>Izin</td><td class="center bold">${st.Izin} hari</td></tr><tr><td>Alfa</td><td class="center bold">${st.Alfa} hari</td></tr></tbody></table></section>`;
             const sem=number=>{let rows='';mapel.forEach((m,i)=>{let v=nilai.filter(n=>n.username===username&&String(n.semester)===String(number)&&n.mapel===m.nama);let t=avg(v.filter(n=>n.jenis==='Tugas').map(n=>n.angka)),q=avg(v.filter(n=>n.jenis==='STS').map(n=>n.angka)),z=avg(v.filter(n=>n.jenis==='SAS').map(n=>n.angka)),ar=[t,q,z].filter(x=>x!=null);rows+=`<tr><td class="center">${i+1}</td><td>${esc(m.nama)}</td><td class="center">${fmt(t)}</td><td class="center">${fmt(q)}</td><td class="center">${fmt(z)}</td><td class="center bold">${fmt(ar.length?avg(ar):null)}</td></tr>`});return `<section><h4>NILAI AKADEMIK — SEMESTER ${number}</h4><table class="dok-table"><thead><tr><th>No</th><th>Mata Pelajaran</th><th>Tugas</th><th>STS</th><th>SAS</th><th>Nilai Akhir</th></tr></thead><tbody>${rows||'<tr><td colspan="6" class="center muted">Belum ada data nilai.</td></tr>'}</tbody></table></section>`};
             const er=eks.filter(e=>e.username===username).map(e=>`<tr><td>${esc(e.ekskul||e.eksiklus)}</td><td class="center">Semester ${esc(e.semester)}</td><td class="center bold">${esc(e.predikat)}</td><td>${esc(e.desc)}</td></tr>`).join(''); const eh=`<section><h4>REKAP EKSTRAKURIKULER</h4><table class="dok-table"><thead><tr><th>Kegiatan</th><th>Semester</th><th>Predikat</th><th>Keterangan</th></tr></thead><tbody>${er||'<tr><td colspan="4" class="center muted">Belum ada data.</td></tr>'}</tbody></table></section>`;
-            const sign=`<div class="dok-sign"><div>Mengetahui,<br><b>Orang Tua / Wali</b><div class="sign-space"></div><u>________________________</u></div><div>${esc(p.tempatDokumen||p.alamat||'Jasinga')}, ${formatTanggalDokumen(p.tanggalDokumen)}<br><b>${esc(p.jabatan||'Kepala Sekolah')}</b><div class="sign-space"></div><b><u>${esc(p.kepsek||'-')}</u></b><br>NIP. ${esc(p.nipKepsek||'-')}</div></div>`;
+            const sign=buildSignatureHTML(p);
             if(type==='raport'){const ss=document.getElementById('siswaPdfSemester')?.value||'1';return `<div class="dokumen-km">${header}${ident}${sem(ss)}<div class="dok-grid">${eh}${ah}</div>${sign}</div>`}
-            if(type==='bukuinduk')return `<div class="dokumen-km buku-induk">${header}${ident}${sem(1)}${sem(2)}${eh}${ah}${sign}</div>`;
+            if(type==='bukuinduk')return `<div class="dokumen-km buku-induk">${header}${ident}${sem(1)}${sign}${sem(2)}${sign}${eh}${ah}</div>`;
             let saldo=0;tab.filter(t=>t.username===username).forEach(t=>{if(t.jenis==='Masuk')saldo+=Number(t.nominalBersih||0);else saldo-=Number(t.nominalAsli||0)});let bs=10+bin.filter(b=>b.username===username).reduce((x,b)=>x+Number(b.jumlah||0),0);return `<div class="dokumen-km">${header}${ident}${sem(1)}${sem(2)}${eh}${ah}<section><h4>BINTANG PERILAKU</h4><p><b>Bintang Aktif:</b> ${bs}</p></section><section><h4>SALDO TABUNGAN</h4><p><b>Saldo Akhir:</b> Rp ${saldo.toLocaleString('id-ID')}</p></section>${sign}</div>`;
         }
         function downloadSiswaPDF(type){if(typeof html2pdf==='undefined')return alert('Fitur PDF belum siap. Pastikan internet aktif.');try{const w=document.createElement('div');w.style.background='#fff';w.innerHTML=buildSiswaPDFHTML(type);document.body.appendChild(w);const n=(currentUser.nama||currentUser.username).replace(/[^a-z0-9]+/gi,'_');const f=type==='raport'?'Raport':type==='bukuinduk'?'Buku_Induk':'Semua_Hasil';html2pdf().set({margin:8,filename:`${f}_${n}.pdf`,image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true,backgroundColor:'#fff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(w).save().then(()=>w.remove()).catch(e=>{w.remove();console.error(e);alert('PDF gagal dibuat.');})}catch(e){console.error(e);alert(e.message||'PDF gagal dibuat.')}}
