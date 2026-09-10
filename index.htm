@@ -60,15 +60,81 @@
         .semester-block { page-break-inside:avoid; }
         .dok-sign { display:grid; grid-template-columns:1fr 1fr; gap:30px; margin-top:28px; text-align:center; }
         .sign-space { height:48px; }
+        /* ===== CETAK / DOWNLOAD PDF SISWA - A4 RAPI ===== */
+        .pdf-export-root {
+            width: 190mm;
+            max-width: 190mm;
+            margin: 0 auto;
+            background: #fff;
+            box-sizing: border-box;
+        }
+        .pdf-export-root .dokumen-km {
+            width: 190mm;
+            max-width: 190mm;
+            box-sizing: border-box;
+            background: #fff;
+            overflow: hidden;
+        }
+        .pdf-export-root .dok-table {
+            width: 100%;
+            table-layout: fixed;
+            page-break-inside: auto;
+        }
+        .pdf-export-root .dok-table th,
+        .pdf-export-root .dok-table td {
+            overflow-wrap: anywhere;
+            word-break: normal;
+        }
+        .pdf-export-root .dok-header,
+        .pdf-export-root .dok-identity,
+        .pdf-export-root .dok-grid,
+        .pdf-export-root .dok-sign,
+        .pdf-export-root section {
+            box-sizing: border-box;
+            max-width: 100%;
+        }
+        .pdf-export-root .dok-header { page-break-inside: avoid; }
+        .pdf-export-root .dok-identity { page-break-inside: avoid; }
+        .pdf-export-root .dok-sign { page-break-inside: avoid; }
+        .pdf-export-root .dok-grid { align-items: start; }
+        .pdf-export-root .semester-block {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
         @media print {
-            #printArea { box-shadow:none !important; border:0 !important; padding:0 !important; min-height:0 !important; }
+            @page {
+                size: A4 portrait;
+                margin: 10mm;
+            }
+            body { margin: 0 !important; padding: 0 !important; }
+            #printArea {
+                box-shadow:none !important;
+                border:0 !important;
+                padding:0 !important;
+                margin:0 !important;
+                min-height:0 !important;
+                width:100% !important;
+            }
             .dokumen-km { font-size:10px; }
             .dok-header { grid-template-columns:60px 1fr; }
             .dok-logo { width:54px; height:54px; }
             .dok-school { font-size:14px; }
             .dok-table th,.dok-table td { padding:3px 4px; }
-            .semester-block { page-break-inside:avoid; }
         }
+
+        @media screen {
+            .pdf-export-root { box-shadow: 0 0 0 1px #e2e8f0; }
+        }
+        .pdf-export-root .dok-table th:nth-child(1),
+        .pdf-export-root .dok-table td:nth-child(1) { width: 8%; }
+        .pdf-export-root .dok-table th:nth-child(2),
+        .pdf-export-root .dok-table td:nth-child(2) { width: 38%; }
+        .pdf-export-root .dok-table th:nth-child(n+3),
+        .pdf-export-root .dok-table td:nth-child(n+3) { width: 13.5%; }
+        .pdf-export-root .dok-grid .dok-table th:first-child,
+        .pdf-export-root .dok-grid .dok-table td:first-child { width: auto; }
+
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -2174,7 +2240,65 @@ function submitAbsensi() {
             if(type==='bukuinduk')return `<div class="dokumen-km buku-induk">${header}${ident}${sem(1)}<div class="dok-grid">${eh}${ah(1)}</div>${sign}${sem(2)}<div class="dok-grid">${eh}${ah(2)}</div>${sign}</div>`;
             let saldo=0;tab.filter(t=>t.username===username).forEach(t=>{if(t.jenis==='Masuk')saldo+=Number(t.nominalBersih||0);else saldo-=Number(t.nominalAsli||0)});let bs=10+bin.filter(b=>b.username===username).reduce((x,b)=>x+Number(b.jumlah||0),0);return `<div class="dokumen-km">${header}${ident}${sem(1)}<div class="dok-grid">${eh}${ah(1)}</div>${sem(2)}<div class="dok-grid">${eh}${ah(2)}</div><section><h4>BINTANG PERILAKU</h4><p><b>Bintang Aktif:</b> ${bs}</p></section><section><h4>SALDO TABUNGAN</h4><p><b>Saldo Akhir:</b> Rp ${saldo.toLocaleString('id-ID')}</p></section>${sign}</div>`;
         }
-        function downloadSiswaPDF(type){if(typeof html2pdf==='undefined')return alert('Fitur PDF belum siap. Pastikan internet aktif.');try{const w=document.createElement('div');w.style.background='#fff';w.innerHTML=buildSiswaPDFHTML(type);document.body.appendChild(w);const n=(currentUser.nama||currentUser.username).replace(/[^a-z0-9]+/gi,'_');const f=type==='raport'?'Raport':type==='bukuinduk'?'Buku_Induk':'Semua_Hasil';html2pdf().set({margin:8,filename:`${f}_${n}.pdf`,image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true,backgroundColor:'#fff'},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(w).save().then(()=>w.remove()).catch(e=>{w.remove();console.error(e);alert('PDF gagal dibuat.');})}catch(e){console.error(e);alert(e.message||'PDF gagal dibuat.')}}
+        function downloadSiswaPDF(type){
+            if(typeof html2pdf==='undefined'){
+                return alert('Fitur PDF belum siap. Pastikan internet aktif.');
+            }
+            try{
+                const w=document.createElement('div');
+                w.className='pdf-export-root';
+                w.style.width='190mm';
+                w.style.maxWidth='190mm';
+                w.style.margin='0 auto';
+                w.style.background='#fff';
+                w.style.boxSizing='border-box';
+                w.innerHTML=buildSiswaPDFHTML(type);
+                document.body.appendChild(w);
+
+                const n=(currentUser.nama||currentUser.username)
+                    .replace(/[^a-z0-9]+/gi,'_');
+                const f=type==='raport'?'Raport':
+                        type==='bukuinduk'?'Buku_Induk':'Semua_Hasil';
+
+                const options={
+                    margin:[10,10,10,10],
+                    filename:`${f}_${n}.pdf`,
+                    image:{type:'jpeg',quality:.98},
+                    html2canvas:{
+                        scale:2,
+                        useCORS:true,
+                        backgroundColor:'#fff',
+                        letterRendering:true,
+                        scrollX:0,
+                        scrollY:0,
+                        windowWidth:794
+                    },
+                    jsPDF:{
+                        unit:'mm',
+                        format:'a4',
+                        orientation:'portrait',
+                        compress:true
+                    },
+                    pagebreak:{
+                        mode:['css','legacy'],
+                        before:[],
+                        after:[],
+                        avoid:['.dok-header','.dok-identity','.dok-sign','.semester-block']
+                    }
+                };
+
+                html2pdf().set(options).from(w).save()
+                    .then(()=>w.remove())
+                    .catch(e=>{
+                        w.remove();
+                        console.error(e);
+                        alert('PDF gagal dibuat. Silakan coba lagi.');
+                    });
+            }catch(e){
+                console.error(e);
+                alert(e.message||'PDF gagal dibuat.');
+            }
+        }
 
         // BACKUP & RESTORE / CLOUD SYNC PLACEHOLDER FUNCTIONS
         function backupSeluruhData() {
