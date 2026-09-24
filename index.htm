@@ -75,6 +75,8 @@
         }
         .pdf-export-root .dokumen-km {
             width: 190mm !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
             max-width: 190mm !important;
             min-width: 0 !important;
             box-sizing: border-box;
@@ -2338,8 +2340,8 @@ function submitAbsensi() {
                         type==='bukuinduk'?'Buku_Induk':'Semua_Hasil';
 
                 const options={
-                    // A4 portrait 210 x 297 mm dengan margin aman 10 mm setiap sisi.
-                    // Lebar efektif = 190 mm, tinggi efektif = 277 mm.
+                    // F4 portrait 210 x 330 mm dengan margin 10 mm setiap sisi.
+                    // Area isi efektif = 190 x 310 mm dan diposisikan tepat di tengah kertas.
                     margin:[10,10,10,10],
                     filename:`${f}_${n}.pdf`,
                     image:{type:'jpeg',quality:.98},
@@ -2368,11 +2370,11 @@ function submitAbsensi() {
                     }
                 };
 
-                // Pastikan ukuran root benar-benar sama dengan area cetak A4.
+                // Pastikan area hasil PDF memiliki lebar efektif 190 mm dan berada tepat di tengah kertas F4.
                 w.style.setProperty('width','190mm','important');
                 w.style.setProperty('max-width','190mm','important');
                 w.style.setProperty('min-width','190mm','important');
-                w.style.setProperty('margin','0','important');
+                w.style.setProperty('margin','0 auto','important');
                 w.style.setProperty('padding','0','important');
 
                 html2pdf().set(options).from(w).save()
