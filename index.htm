@@ -152,6 +152,43 @@
         .pdf-export-root .dok-grid .dok-table th:first-child,
         .pdf-export-root .dok-grid .dok-table td:first-child { width: auto; }
 
+        /* ===== RAPAPIAN UI & HAK AKSES ===== */
+        .admin-only { display:none !important; }
+        header .container { max-width: 1400px; }
+        main.container { max-width: 1400px; }
+        section { scroll-margin-top: 90px; }
+        .overflow-x-auto { scrollbar-width: thin; }
+        .overflow-y-auto { scrollbar-width: thin; }
+        table th { white-space: nowrap; }
+        table td { vertical-align: middle; }
+        button, label { user-select:none; }
+        button:focus-visible, input:focus-visible, select:focus-visible {
+            outline: 3px solid rgba(59,130,246,.25);
+            outline-offset: 1px;
+        }
+        #adminDataTools { align-items:center; }
+        #adminDataTools label { margin:0; }
+        #secLogin { max-width: 520px; }
+        #secLogin > div { width:100%; }
+        #secLogin .w-full.max-w-sm { max-width: 100%; }
+        #secSiswa .bg-white, #secGuru .bg-white, #secAdmin .bg-white { overflow: hidden; }
+        @media (max-width: 900px) {
+            header .container { padding-left:1rem; padding-right:1rem; }
+            header .container > div:last-child { width:100%; justify-content:center; }
+            #userInfo { width:100%; justify-content:center; flex-wrap:wrap; }
+            .admin-only { width:100%; justify-content:center; flex-wrap:wrap; }
+            #adminDataTools { width:100%; justify-content:center; }
+            #secAdmin .adm-tab-btn, #secGuru .guru-tab-btn { font-size:.75rem; padding:.55rem .7rem; }
+        }
+        @media (max-width: 640px) {
+            main.container { padding-left:.75rem; padding-right:.75rem; padding-top:1rem; }
+            header .container { padding-top:.75rem; padding-bottom:.75rem; }
+            #navSchoolName { font-size:1rem; }
+            #secLogin { margin-top:1rem; padding:1rem; }
+            #secLogin .w-full.max-w-sm { padding:1.25rem; border-radius:1.5rem; }
+            .overflow-x-auto table { min-width: max-content; }
+        }
+
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -170,16 +207,7 @@
                 </div>
             </div>
             <div class="flex items-center gap-4">
-<div class="flex gap-2 bg-indigo-800/50 p-1.5 rounded-xl border border-indigo-500/30">
-                    <button onclick="backupSeluruhData()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition shadow flex items-center gap-1">
-                        <i class="fa-solid fa-cloud-arrow-down"></i> Backup Data
-                    </button>
-                    <label class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg cursor-pointer transition shadow flex items-center gap-1">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload Ulang (Restore)
-                        <input type="file" id="fileRestore" class="hidden" accept=".json" onchange="restoreSeluruhData(event)">
-                    </label>
-                </div>
-                
+                <!-- Backup/Restore hanya tersedia untuk Admin di panel admin. -->
                 <div id="userInfo" class="flex items-center gap-4 hidden">
                     <span id="txtActiveUser" class="font-bold bg-indigo-800 px-4 py-1.5 rounded-full text-sm flex items-center gap-2">
                         <i class="fa-solid fa-circle-user"></i> Loading...
@@ -202,7 +230,7 @@
         
         <!-- SECTION 1: AUTENTIKASI LOGIN -->
         <section id="secLogin" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-xl border border-slate-200 mt-12 transition-all no-print">
-<div class="min-h-screen flex items-center justify-center bg-[#F0F9FF] p-6 font-sans">
+<div class="flex items-center justify-center p-0 font-sans">
                 <div class="w-full max-w-sm bg-white p-8 rounded-[2rem] shadow-[0_10px_25px_rgba(0,0,0,0.05)] border-2 border-blue-100">
                     <div class="text-center mb-8">
                         <div class="text-6xl mb-2">🏫</div>
@@ -237,15 +265,24 @@
         <!-- SECTION 2: DASHBOARD ADMIN -->
         <section id="secAdmin" class="hidden space-y-8 no-print">
             <div class="bg-gradient-to-r from-indigo-800 to-indigo-600 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center flex-wrap gap-4">
-                <div>
+                <div class="min-w-0">
                     <h2 class="text-2xl font-black">Panel Utama Administrator</h2>
                     <p class="text-indigo-100 text-sm">Kelola data sekolah, guru, siswa, mapel, ekskul, dan lihat rekapan global.</p>
                 </div>
-                <div class="flex items-center gap-3 flex-wrap">
-                    <button onclick="clearAllSystemData()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-black px-4 py-2 rounded-xl border-b-4 border-red-950 active:border-b-0 active:mt-0.5 transition-all shadow-md">
-                        <i class="fa-solid fa-triangle-exclamation text-yellow-300"></i> Kosongkan Semua Data Sistem
+                <div class="flex items-center gap-3 flex-wrap justify-end">
+                    <div id="adminDataTools" class="admin-only flex items-center gap-2 bg-white/10 p-1.5 rounded-xl border border-white/20">
+                        <button onclick="backupSeluruhData()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg transition shadow flex items-center gap-1.5 whitespace-nowrap">
+                            <i class="fa-solid fa-cloud-arrow-down"></i> Backup Data
+                        </button>
+                        <label class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3 py-2 rounded-lg cursor-pointer transition shadow flex items-center gap-1.5 whitespace-nowrap">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Upload Ulang
+                            <input type="file" id="fileRestore" class="hidden" accept=".json" onchange="restoreSeluruhData(event)">
+                        </label>
+                    </div>
+                    <button onclick="clearAllSystemData()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-black px-4 py-2 rounded-xl border-b-4 border-red-950 active:border-b-0 active:mt-0.5 transition-all shadow-md whitespace-nowrap">
+                        <i class="fa-solid fa-triangle-exclamation text-yellow-300"></i> Kosongkan Semua Data
                     </button>
-                    <div class="flex gap-2 bg-indigo-900/40 p-1.5 rounded-xl border border-indigo-400/20">
+                    <div class="flex gap-2 bg-indigo-900/40 p-1.5 rounded-xl border border-indigo-400/20 flex-wrap justify-end">
                         <button onclick="switchAdminTab('tabAdmProfil')" class="adm-tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-white text-indigo-700 transition">🏫 Profil & Metadata</button>
                         <button onclick="switchAdminTab('tabAdmGuruSiswa')" class="adm-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-indigo-100 hover:bg-indigo-800/50 transition">👥 Akun & Pengguna</button>
                         <button onclick="switchAdminTab('tabAdmRekap')" class="adm-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-indigo-100 hover:bg-indigo-800/50 transition">📊 Rekap & Unduh</button>
@@ -1174,6 +1211,8 @@
             document.getElementById('secGuru').classList.add('hidden');
             document.getElementById('secSiswa').classList.add('hidden');
             document.getElementById('userInfo').classList.add('hidden');
+            const adminTools = document.getElementById('adminDataTools');
+            if (adminTools) adminTools.classList.add('admin-only');
             document.getElementById('loginUser').value = '';
             document.getElementById('loginPass').value = '';
         }
@@ -1185,6 +1224,9 @@
 
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
             const currentTapel = profile.tapel || "-";
+
+            const adminTools = document.getElementById('adminDataTools');
+            if (adminTools) adminTools.classList.toggle('admin-only', role !== "Admin");
 
             if (role === "Admin") {
                 document.getElementById('secAdmin').classList.remove('hidden');
