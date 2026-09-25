@@ -468,7 +468,7 @@
                                     <option value="Guru Kelas">Guru Kelas</option>
                                     <option value="Guru Mapel">Guru Mata Pelajaran</option>
                                 </select>
-                                <input type="text" id="guruKelas" placeholder="Kelas yang diampu (Guru Kelas)" class="border p-2 rounded text-xs"><div id="guruKelasMapelWrap" class="hidden col-span-2"><label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Kelas yang Diampu Guru Mata Pelajaran (bisa pilih lebih dari satu)</label><select id="guruKelasMapel" multiple class="border p-2 rounded text-xs bg-white w-full min-h-24"></select><p class="text-[10px] text-slate-400 mt-1">Satu username Guru Mapel dapat digunakan pada beberapa kelas yang ditetapkan Admin.</p></div>
+                                <div id="guruKelasSingleWrap" class="contents"><input type="text" id="guruKelas" placeholder="Kelas yang diampu (Guru Kelas)" class="border p-2 rounded text-xs"></div><div id="guruKelasMapelWrap" class="hidden col-span-2"><label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Kelas yang Diampu Guru Mata Pelajaran (bisa pilih lebih dari satu)</label><select id="guruKelasMapel" multiple size="6" class="border p-2 rounded text-xs bg-white w-full min-h-24"></select><p class="text-[10px] text-slate-400 mt-1">Pilih satu atau beberapa kelas. Semua kelas tersimpan pada <b>satu akun/username</b>, sehingga guru cukup login satu kali lalu memilih kelas aktif di dashboard.</p></div>
                             </div>
                             <div id="guruMapelWrap" class="col-span-2 hidden">
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Mata Pelajaran yang Diampu (bisa pilih lebih dari satu)</label>
@@ -1278,9 +1278,29 @@
             if (!u) return u;
             u.tapel = u.tapel || getActiveTapel();
             u.jenisGuru = u.role === 'Guru' ? (u.jenisGuru || 'Guru Kelas') : '';
-            u.mapelDiampu = Array.isArray(u.mapelDiampu) ? u.mapelDiampu : (u.mapelDiampu ? String(u.mapelDiampu).split(',').map(x=>x.trim()).filter(Boolean) : []);
-            u.kelasDiampu = Array.isArray(u.kelasDiampu) ? u.kelasDiampu : (u.kelasDiampu ? String(u.kelasDiampu).split(',').map(x=>x.trim().toUpperCase()).filter(Boolean) : (u.jenisGuru === 'Guru Mapel' && u.kelas ? String(u.kelas).split(',').map(x=>x.trim().toUpperCase()).filter(Boolean) : []));
-            if(u.role === 'Guru' && u.jenisGuru === 'Guru Mapel' && !u.kelas && u.kelasDiampu.length) u.kelas = u.kelasDiampu[0];
+
+            // Selalu simpan penugasan mapel dan kelas dalam bentuk array.
+            u.mapelDiampu = Array.isArray(u.mapelDiampu)
+                ? [...new Set(u.mapelDiampu.map(x=>String(x).trim()).filter(Boolean))]
+                : (u.mapelDiampu
+                    ? [...new Set(String(u.mapelDiampu).split(',').map(x=>x.trim()).filter(Boolean))]
+                    : []);
+
+            const kelasSource = Array.isArray(u.kelasDiampu)
+                ? u.kelasDiampu
+                : (u.kelasDiampu
+                    ? String(u.kelasDiampu).split(',')
+                    : (u.jenisGuru === 'Guru Mapel' && u.kelas ? String(u.kelas).split(',') : []));
+
+            u.kelasDiampu = [...new Set(kelasSource
+                .map(x=>String(x).trim().toUpperCase())
+                .filter(Boolean))];
+
+            // Guru Mapel tetap mempunyai satu field kelas utama untuk kompatibilitas
+            // dengan data lama, tetapi daftar akses kelas yang sebenarnya adalah kelasDiampu.
+            if (u.role === 'Guru' && u.jenisGuru === 'Guru Mapel' && u.kelasDiampu.length) {
+                u.kelas = u.kelasDiampu[0];
+            }
             return u;
         }
 
@@ -1354,30 +1374,51 @@
             const jenis = document.getElementById('guruJenis')?.value;
             const wrap = document.getElementById('guruMapelWrap');
             const kelasWrap = document.getElementById('guruKelasMapelWrap');
+            const singleWrap = document.getElementById('guruKelasSingleWrap');
+
             if (wrap) wrap.classList.toggle('hidden', jenis !== 'Guru Mapel');
             if (kelasWrap) kelasWrap.classList.toggle('hidden', jenis !== 'Guru Mapel');
+            if (singleWrap) singleWrap.classList.toggle('hidden', jenis === 'Guru Mapel');
+
             if (jenis === 'Guru Mapel') populateAdminGuruKelas();
         }
 
         function populateAdminGuruKelas(selected=[]) {
             const el=document.getElementById('guruKelasMapel'); if(!el)return;
-            const users=JSON.parse(localStorage.getItem('users'))||[];
-            const classes=[...new Set(users.filter(u=>u.role==='Siswa' && u.kelas).map(u=>String(u.kelas).trim().toUpperCase()))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
-            const old=Array.isArray(selected)?selected.map(String):String(selected||'').split(',').map(x=>x.trim()).filter(Boolean);
-            el.innerHTML=classes.map(k=>`<option value="${k}" ${old.includes(k)?'selected':''}>Kelas ${k}</option>`).join('') || '<option value="">Belum ada kelas dari data siswa</option>';
+            const users=(JSON.parse(localStorage.getItem('users'))||[]).map(normalizeUserRecord);
+            const tapel=getActiveTapel();
+
+            // Hanya tampilkan kelas yang memang mempunyai siswa pada TP aktif.
+            // Ini mencegah kelas dari tahun pelajaran lama ikut muncul.
+            const classes=[...new Set(users
+                .filter(u=>u.role==='Siswa' && u.kelas && String(u.tapel||tapel)===String(tapel))
+                .map(u=>String(u.kelas).trim().toUpperCase())
+                .filter(Boolean))]
+                .sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+
+            const old=[...(Array.isArray(selected)?selected:String(selected||'').split(','))]
+                .map(x=>String(x).trim().toUpperCase()).filter(Boolean);
+
+            el.innerHTML=classes.map(k=>`<option value="${k}" ${old.includes(k)?'selected':''}>Kelas ${k}</option>`).join('')
+                || '<option value="" disabled>Belum ada kelas siswa pada TP aktif</option>';
         }
 
         function getGuruKelasDiampu() {
-            if(!isGuruMapel()) return currentUser?.kelas ? [String(currentUser.kelas)] : [];
+            if(!isGuruMapel()) return currentUser?.kelas ? [String(currentUser.kelas).trim().toUpperCase()] : [];
             const arr=Array.isArray(currentUser?.kelasDiampu)?currentUser.kelasDiampu:[];
-            if(arr.length) return arr.map(String);
-            return currentUser?.kelas ? String(currentUser.kelas).split(',').map(x=>x.trim()).filter(Boolean) : [];
+            const normalized=[...new Set(arr.map(x=>String(x).trim().toUpperCase()).filter(Boolean))];
+            if(normalized.length) return normalized;
+
+            // Kompatibilitas akun lama yang hanya mempunyai field kelas.
+            return currentUser?.kelas
+                ? [...new Set(String(currentUser.kelas).split(',').map(x=>x.trim().toUpperCase()).filter(Boolean))]
+                : [];
         }
 
         function getGuruKelasAktif() {
-            if(!isGuruMapel()) return currentUser?.kelas || '';
+            if(!isGuruMapel()) return String(currentUser?.kelas || '').trim().toUpperCase();
             const assigned=getGuruKelasDiampu();
-            const selected=document.getElementById('guruKelasAktif')?.value;
+            const selected=String(document.getElementById('guruKelasAktif')?.value || '').trim().toUpperCase();
             return (selected && assigned.includes(selected)) ? selected : (assigned[0] || '');
         }
 
@@ -1446,7 +1487,7 @@
 
             const users = (JSON.parse(localStorage.getItem('users')) || []).map(normalizeUserRecord);
             const foundUser = users.find(u => u.username === userIn && u.password === passIn && u.role === roleIn && String(u.tapel || '') === String(tapelIn));
-            if (!foundUser) return alert('Login gagal. Pastikan Username, Password, Peran, Kelas, dan Tahun Pelajaran akun sesuai data Admin.');
+            if (!foundUser) return alert('Login gagal. Pastikan Username, Password, Peran, dan Tahun Pelajaran akun sesuai data Admin. Guru Mata Pelajaran cukup memakai satu username; kelas dipilih setelah berhasil login.');
             currentUser = foundUser;
             showDashboard(foundUser.role);
         }
@@ -1820,11 +1861,15 @@
             const tapel = document.getElementById(isGuru ? 'guruTapel' : 'siswaTapel').value.trim() || getActiveTapel();
             const nip = isGuru ? document.getElementById('guruNip').value.trim() : '';
             const jenisGuru = isGuru ? document.getElementById('guruJenis').value : '';
-            const mapelDiampu = isGuru ? Array.from(document.getElementById('guruMapel').selectedOptions).map(o=>o.value) : [];
-            const kelasDiampu = isGuru && jenisGuru === 'Guru Mapel' ? Array.from(document.getElementById('guruKelasMapel')?.selectedOptions || []).map(o=>o.value) : (kelas ? [kelas] : []);
-            const kelasUtama = jenisGuru === 'Guru Mapel' ? (kelasDiampu[0] || kelas) : kelas;
-            if (!user || !pass || !nama || !kelasUtama || !tapel) return alert('Isi seluruh data utama termasuk kelas dan tahun pelajaran!');
+            const mapelDiampu = isGuru ? [...new Set(Array.from(document.getElementById('guruMapel')?.selectedOptions || []).map(o=>String(o.value).trim()).filter(Boolean))] : [];
+            const kelasDiampu = isGuru && jenisGuru === 'Guru Mapel'
+                ? [...new Set(Array.from(document.getElementById('guruKelasMapel')?.selectedOptions || []).map(o=>String(o.value).trim().toUpperCase()).filter(Boolean))]
+                : (kelas ? [kelas] : []);
+            const kelasUtama = jenisGuru === 'Guru Mapel' ? (kelasDiampu[0] || '') : kelas;
+
+            if (!user || !pass || !nama || !tapel) return alert('Isi Username, Password, Nama, dan Tahun Pelajaran.');
             if (isGuru && jenisGuru === 'Guru Mapel' && kelasDiampu.length === 0) return alert('Pilih minimal satu kelas yang diampu Guru Mata Pelajaran.');
+            if (isGuru && jenisGuru === 'Guru Kelas' && !kelas) return alert('Isi kelas yang diampu Guru Kelas.');
             if (isGuru && jenisGuru === 'Guru Mapel' && mapelDiampu.length === 0) return alert('Pilih minimal satu mata pelajaran untuk Guru Mata Pelajaran.');
             if (tapel !== getActiveTapel()) return alert('Tahun Pelajaran akun harus sama dengan Tahun Pelajaran Aktif Admin.');
 
@@ -1877,9 +1922,23 @@
                     const jenisGuru = role === 'Guru' ? String(row.JenisGuru || 'Guru Kelas').trim() : '';
                     const mapelDiampu = role === 'Guru' ? String(row.MapelDiampu || '').split(',').map(x=>x.trim()).filter(Boolean) : [];
 
-                    if(username && password && nama && kelas) {
+                    const kelasUtama = kelasDiampu[0] || kelas;
+                    const validGuru = role === 'Guru'
+                        ? (jenisGuru === 'Guru Mapel'
+                            ? (kelasDiampu.length > 0 && mapelDiampu.length > 0)
+                            : !!kelasUtama)
+                        : !!kelasUtama;
+
+                    // Untuk Guru Mapel, kolom Kelas boleh dikosongkan selama
+                    // KelasDiampu berisi satu atau beberapa kelas.
+                    if(username && password && nama && validGuru && tapel === getActiveTapel()) {
                         if(!users.find(u => u.username === username)) {
-                            users.push({ username, password, nama, kelas: kelasDiampu[0] || kelas, kelasDiampu, role, nip, fase, tapel, jenisGuru, mapelDiampu });
+                            users.push({
+                                username, password, nama,
+                                kelas: kelasUtama,
+                                kelasDiampu: kelasDiampu.length ? kelasDiampu : (kelas ? [kelas] : []),
+                                role, nip, fase, tapel, jenisGuru, mapelDiampu
+                            });
                             count++;
                         }
                     }
