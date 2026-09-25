@@ -593,25 +593,6 @@
 <select id="guruKelasAktif" onchange="setGuruKelasAktif(this.value)" class="w-full rounded-lg border-0 p-2 text-sm text-slate-800"></select>
 <p id="guruKelasTerhubung" class="text-[10px] text-emerald-100/80 mt-1"></p>
 </div>
-                    <div class="mt-3 bg-white/10 border border-white/20 rounded-xl p-3 max-w-2xl">
-                        <div class="flex items-center justify-between gap-3 mb-2">
-                            <div>
-                                <div class="text-xs font-black uppercase text-emerald-100">Tambah Siswa dari Akun Guru</div>
-                                <div class="text-[10px] text-emerald-100/80">Siswa otomatis tersimpan ke data Admin sesuai kelas, fase, dan Tahun Pelajaran aktif.</div>
-                            </div>
-                            <button type="button" onclick="toggleGuruTambahSiswa()" class="bg-white text-emerald-700 px-3 py-1.5 rounded-lg text-xs font-black">+ Tambah</button>
-                        </div>
-                        <div id="guruTambahSiswaForm" class="hidden grid grid-cols-1 md:grid-cols-4 gap-2">
-                            <input id="guruSiswaUsername" class="border rounded-lg p-2 text-xs text-slate-800" placeholder="NISN / Username">
-                            <input id="guruSiswaNama" class="border rounded-lg p-2 text-xs text-slate-800 md:col-span-2" placeholder="Nama lengkap siswa">
-                            <input id="guruSiswaPass" type="password" class="border rounded-lg p-2 text-xs text-slate-800" placeholder="Password (opsional)">
-                            <select id="guruSiswaFase" class="border rounded-lg p-2 text-xs text-slate-800 md:col-span-2"></select>
-                            <div class="md:col-span-2 flex gap-2">
-                                <button type="button" onclick="addSiswaFromGuru()" class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg p-2 text-xs font-black">Simpan Siswa</button>
-                                <button type="button" onclick="toggleGuruTambahSiswa(false)" class="bg-slate-700/70 text-white rounded-lg px-3 text-xs font-bold">Batal</button>
-                            </div>
-                        </div>
-                    </div>
                     <div class="flex items-center gap-4 mt-1">
                         <p class="text-emerald-100 text-sm">Kelola kegiatan presensi, penilaian mata pelajaran, penilaian ekskul, dan tabungan murid.</p>
                         <span id="txtGuruTapel" class="bg-emerald-900 px-3 py-1 rounded-full text-xs font-bold border border-emerald-400/30">TP: -</span>
@@ -837,36 +818,9 @@
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b pb-4 mb-4">
             <div>
                 <h3 class="text-xl font-extrabold text-emerald-800">👥 Daftar Nama Siswa</h3>
-                <p class="text-xs text-slate-500 mt-1">Data siswa yang dimasukkan Admin maupun Guru. Guru hanya dapat mengelola siswa pada kelas yang menjadi aksesnya.</p>
+                <p class="text-xs text-slate-500 mt-1">Data siswa diambil langsung dari akun Siswa pada data pengguna yang diinput Admin. Daftar otomatis mengikuti kelas yang menjadi akses guru.</p>
             </div>
-            <div class="flex flex-wrap gap-2">
-                <button type="button" onclick="downloadGuruSiswaTemplate()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl">
-                    <i class="fa-solid fa-download"></i> Download Template
-                </button>
-                <label class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl cursor-pointer">
-                    <i class="fa-solid fa-file-arrow-up"></i> Upload Excel
-                    <input id="guruSiswaExcelUpload" type="file" class="hidden" accept=".xlsx,.xls" onchange="uploadGuruSiswaExcel(event)">
-                </label>
-                <button type="button" onclick="toggleGuruSiswaForm()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl">
-                    <i class="fa-solid fa-user-plus"></i> Tambah Siswa
-                </button>
-            </div>
-        </div>
 
-        <div id="guruSiswaManageForm" class="hidden bg-slate-50 border rounded-2xl p-4 mb-5">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-                <input id="manageSiswaUsername" class="border rounded-xl p-2.5 text-sm" placeholder="NISN / Username">
-                <input id="manageSiswaNama" class="border rounded-xl p-2.5 text-sm lg:col-span-2" placeholder="Nama lengkap siswa">
-                <input id="manageSiswaPass" type="password" class="border rounded-xl p-2.5 text-sm" placeholder="Password">
-                <select id="manageSiswaKelas" class="border rounded-xl p-2.5 text-sm bg-white"></select>
-                <select id="manageSiswaFase" class="border rounded-xl p-2.5 text-sm bg-white">
-                    <option value="A">Fase A</option><option value="B">Fase B</option><option value="C">Fase C</option>
-                </select>
-                <div class="lg:col-span-4 flex gap-2">
-                    <button id="btnSaveManageSiswa" type="button" onclick="saveGuruManagedSiswa()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold">Simpan Siswa</button>
-                    <button type="button" onclick="cancelGuruManagedSiswa()" class="bg-slate-500 hover:bg-slate-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold">Batal</button>
-                </div>
-            </div>
         </div>
 
         <div class="flex flex-col md:flex-row gap-2 mb-4">
@@ -1260,7 +1214,7 @@
         <div id="chatPanel" class="hidden">
             <div class="bg-gradient-to-r from-blue-700 to-violet-700 text-white px-4 py-3 flex items-center justify-between gap-2">
                 <div>
-                    <div class="font-black text-sm"><i class="fa-solid fa-comments"></i> Chat Guru & Siswa</div>
+                    <div class="font-black text-sm"><i class="fa-solid fa-comments"></i> Chat Umum Admin • Guru • Siswa</div>
                     <div id="chatSubTitle" class="text-[10px] text-blue-100">Pesan pribadi</div>
                 </div>
                 <button type="button" onclick="toggleChat(false)" class="text-white/90 hover:text-white text-lg" aria-label="Tutup chat"><i class="fa-solid fa-xmark"></i></button>
@@ -2318,10 +2272,25 @@ function uploadGuruSiswaExcel(event){
         }
 
         function getSiswaSekelas() {
-            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const users = (JSON.parse(localStorage.getItem('users')) || []).map(normalizeUserRecord);
             const tapel = currentUser?.tapel || getActiveTapel();
-            const kelasAktif = getGuruKelasAktif();
-            return users.filter(u => u.role === 'Siswa' && String(u.kelas || '').toUpperCase() === String(kelasAktif || '').toUpperCase() && String(u.tapel || tapel) === String(tapel));
+            let kelasAkses = [];
+            if (currentUser?.role === 'Guru') {
+                if (currentUser.jenisGuru === 'Guru Mapel') {
+                    kelasAkses = Array.isArray(currentUser.kelasDiampu) ? currentUser.kelasDiampu : [];
+                } else {
+                    kelasAkses = [currentUser.kelas || getGuruKelasAktif() || ''];
+                }
+            }
+            const kelasSet = new Set(kelasAkses.map(k => String(k).trim().toUpperCase()).filter(Boolean));
+            return users.filter(u => {
+                if (u.role !== 'Siswa') return false;
+                if (String(u.tapel || tapel) !== String(tapel)) return false;
+                return kelasSet.has(String(u.kelas || '').trim().toUpperCase());
+            }).sort((a,b)=>{
+                const k=String(a.kelas||'').localeCompare(String(b.kelas||''),'id',{numeric:true});
+                return k || String(a.nama||'').localeCompare(String(b.nama||''),'id');
+            });
         }
 
         function populateGuruDropdowns() {
@@ -3264,34 +3233,20 @@ function getChatPartners(){
     if(!currentUser) return [];
     const users = chatUsers();
     const tapel = currentUser.tapel || getActiveTapel();
-
-    if(currentUser.role === 'Guru'){
-        // Guru dapat langsung memilih siswa dari SEMUA kelas yang menjadi akses akun guru.
-        const kelasAkses = currentUser.jenisGuru === 'Guru Mapel'
-            ? (Array.isArray(currentUser.kelasDiampu) ? currentUser.kelasDiampu : [])
-            : [currentUser.kelas || getGuruKelasAktif() || ''];
-        const kelasSet = new Set(kelasAkses.map(k=>String(k).trim().toUpperCase()).filter(Boolean));
-        return users.filter(u =>
-            u.role === 'Siswa' &&
-            sameChatTapel(u.tapel,tapel) &&
-            kelasSet.has(String(u.kelas||'').trim().toUpperCase())
-        ).sort((a,b)=>{
-            const k=String(a.kelas||'').localeCompare(String(b.kelas||''),'id',{numeric:true});
-            return k || String(a.nama||'').localeCompare(String(b.nama||''),'id');
-        });
-    }
-
-    if(currentUser.role === 'Siswa'){
-        const kelas = String(currentUser.kelas||'').trim().toUpperCase();
-        return users.filter(u=>{
-            if(u.role !== 'Guru' || !sameChatTapel(u.tapel,tapel)) return false;
-            const kelasGuru = Array.isArray(u.kelasDiampu) ? u.kelasDiampu : [];
-            return u.jenisGuru === 'Guru Mapel'
-                ? kelasGuru.some(k=>String(k).trim().toUpperCase()===kelas)
-                : String(u.kelas||'').trim().toUpperCase()===kelas;
-        }).sort((a,b)=>String(a.nama||'').localeCompare(String(b.nama||''),'id'));
-    }
-    return [];
+    return users.filter(u=>{
+        if(String(u.username)===String(currentUser.username)) return false;
+        // Chat umum: Admin, Guru, dan Siswa dapat saling menghubungi tanpa batas kelas.
+        // Tetap gunakan Tahun Pelajaran yang sama jika akun memilikinya; Admin boleh lintas TP.
+        if(currentUser.role==='Admin' || u.role==='Admin') return true;
+        return !u.tapel || !tapel || String(u.tapel)===String(tapel);
+    }).sort((a,b)=>{
+        const roleOrder={Admin:0,Guru:1,Siswa:2};
+        const r=(roleOrder[a.role]??9)-(roleOrder[b.role]??9);
+        if(r) return r;
+        const ka=a.role==='Siswa'?String(a.kelas||''):'', kb=b.role==='Siswa'?String(b.kelas||''):'';
+        const k=ka.localeCompare(kb,'id',{numeric:true});
+        return k || String(a.nama||a.username||'').localeCompare(String(b.nama||b.username||''),'id');
+    });
 }
 function chatConversationId(a,b){ return [String(a.username),String(b.username)].sort().join('__'); }
 
@@ -3301,11 +3256,11 @@ function refreshChatPartners(){
     const partners=getChatPartners();
     const old=sel.value;
     sel.innerHTML = partners.length
-      ? partners.map(u=>`<option value="${chatEsc(u.username)}">${u.role==='Siswa' ? `Kelas ${chatEsc(u.kelas||'-')} • ` : ''}${chatEsc(u.nama||u.username)}${u.role==='Guru' ? ` • ${chatEsc(u.jenisGuru||'Guru')}` : ''}</option>`).join('')
+      ? partners.map(u=>`<option value="${chatEsc(u.username)}">${u.role==='Siswa' ? `Siswa • Kelas ${chatEsc(u.kelas||'-')} • ` : u.role==='Guru' ? `Guru • ${chatEsc(u.jenisGuru||'Guru')} • ` : 'Admin • '}${chatEsc(u.nama||u.username)}</option>`).join('')
       : '<option value="">Belum ada pengguna yang dapat diajak chat</option>';
     if(old && partners.some(u=>u.username===old)) sel.value=old;
     document.getElementById('chatSubTitle').textContent =
-      currentUser.role==='Guru' ? 'Pilih siswa dari semua kelas yang dapat diakses' : 'Pilih guru yang mengajar kelas Anda';
+      'Chat umum — semua Admin, Guru, dan Siswa dari semua kelas';
     renderChatMessages();
 }
 
