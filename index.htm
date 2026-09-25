@@ -476,7 +476,7 @@
                             </div>
                             <div class="col-span-2 grid grid-cols-2 gap-2">
                                 <select id="guruFase" class="border p-2 rounded text-xs bg-white text-slate-600">
-                                    <option value="">-- Pilih Fase Kelas --</option>
+                                    <option value="Semua">Semua Fase</option>
                                     <option value="Semua Fase">Semua Fase</option>
                                     <option value="A">Fase A (Kelas 1-2)</option>
                                     <option value="B">Fase B (Kelas 3-4)</option>
@@ -532,7 +532,7 @@
                             <div class="col-span-2 grid grid-cols-2 gap-2">
                                 <input type="text" id="siswaKelas" placeholder="Kelas (Contoh: 1, 2)" class="border p-2 rounded text-xs">
                                 <select id="siswaFase" class="border p-2 rounded text-xs bg-white text-slate-600">
-                                    <option value="">-- Pilih Fase --</option>
+                                    <option value="Semua">Semua Fase</option>
                                     <option value="A">Fase A</option>
                                     <option value="B">Fase B</option>
                                     <option value="C">Fase C</option>
@@ -593,6 +593,25 @@
 <select id="guruKelasAktif" onchange="setGuruKelasAktif(this.value)" class="w-full rounded-lg border-0 p-2 text-sm text-slate-800"></select>
 <p id="guruKelasTerhubung" class="text-[10px] text-emerald-100/80 mt-1"></p>
 </div>
+                    <div class="mt-3 bg-white/10 border border-white/20 rounded-xl p-3 max-w-2xl">
+                        <div class="flex items-center justify-between gap-3 mb-2">
+                            <div>
+                                <div class="text-xs font-black uppercase text-emerald-100">Tambah Siswa dari Akun Guru</div>
+                                <div class="text-[10px] text-emerald-100/80">Siswa otomatis tersimpan ke data Admin sesuai kelas, fase, dan Tahun Pelajaran aktif.</div>
+                            </div>
+                            <button type="button" onclick="toggleGuruTambahSiswa()" class="bg-white text-emerald-700 px-3 py-1.5 rounded-lg text-xs font-black">+ Tambah</button>
+                        </div>
+                        <div id="guruTambahSiswaForm" class="hidden grid grid-cols-1 md:grid-cols-4 gap-2">
+                            <input id="guruSiswaUsername" class="border rounded-lg p-2 text-xs text-slate-800" placeholder="NISN / Username">
+                            <input id="guruSiswaNama" class="border rounded-lg p-2 text-xs text-slate-800 md:col-span-2" placeholder="Nama lengkap siswa">
+                            <input id="guruSiswaPass" type="password" class="border rounded-lg p-2 text-xs text-slate-800" placeholder="Password (opsional)">
+                            <select id="guruSiswaFase" class="border rounded-lg p-2 text-xs text-slate-800 md:col-span-2"></select>
+                            <div class="md:col-span-2 flex gap-2">
+                                <button type="button" onclick="addSiswaFromGuru()" class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-white rounded-lg p-2 text-xs font-black">Simpan Siswa</button>
+                                <button type="button" onclick="toggleGuruTambahSiswa(false)" class="bg-slate-700/70 text-white rounded-lg px-3 text-xs font-bold">Batal</button>
+                            </div>
+                        </div>
+                    </div>
                     <div class="flex items-center gap-4 mt-1">
                         <p class="text-emerald-100 text-sm">Kelola kegiatan presensi, penilaian mata pelajaran, penilaian ekskul, dan tabungan murid.</p>
                         <span id="txtGuruTapel" class="bg-emerald-900 px-3 py-1 rounded-full text-xs font-bold border border-emerald-400/30">TP: -</span>
@@ -1242,6 +1261,18 @@
         }
         loadNavSchool();
         populateLoginTapel();
+        window.addEventListener('storage', function(e){
+            if(e.key==='users' || e.key==='sipatUserSync') {
+                if(document.getElementById('secAdmin') && !document.getElementById('secAdmin').classList.contains('hidden')) loadAdminUsers();
+                if(document.getElementById('secGuru') && !document.getElementById('secGuru').classList.contains('hidden')) populateGuruDropdowns();
+            }
+        });
+        document.addEventListener('visibilitychange', function(){
+            if(!document.hidden) {
+                if(document.getElementById('secAdmin') && !document.getElementById('secAdmin').classList.contains('hidden')) loadAdminUsers();
+                if(document.getElementById('secGuru') && !document.getElementById('secGuru').classList.contains('hidden')) populateGuruDropdowns();
+            }
+        });
 
         function filterSiswaDropdown(inputId, selectId) {
             const keyword = document.getElementById(inputId).value.toLowerCase();
@@ -1961,6 +1992,53 @@
             if (tabId === 'tabLegger') renderLegger();
             if (tabId === 'tabBintang') renderBintangGuru();
             if (tabId === 'tabTabungan') renderTabunganGuru();
+        }
+
+        function inferFaseFromKelas(kelas) {
+            const n = parseInt(String(kelas || '').match(/\d+/)?.[0] || '0', 10);
+            if (n >= 1 && n <= 2) return 'A';
+            if (n >= 3 && n <= 4) return 'B';
+            if (n >= 5 && n <= 6) return 'C';
+            return '';
+        }
+
+        function toggleGuruTambahSiswa(force) {
+            const el=document.getElementById('guruTambahSiswaForm');
+            if(!el)return;
+            const show = typeof force === 'boolean' ? force : el.classList.contains('hidden');
+            el.classList.toggle('hidden', !show);
+            if(show) {
+                const kelas=getGuruKelasAktif();
+                const fase=currentUser?.fase==='Semua' ? inferFaseFromKelas(kelas) : (currentUser?.fase || inferFaseFromKelas(kelas));
+                const f=document.getElementById('guruSiswaFase');
+                if(f) f.innerHTML=`<option value="${fase}">Fase ${fase || '-'} — mengikuti kelas ${kelas || '-'}</option>`;
+                const u=document.getElementById('guruSiswaUsername'); if(u)u.focus();
+            }
+        }
+
+        function addSiswaFromGuru() {
+            if(!currentUser || currentUser.role!=='Guru') return alert('Akses hanya untuk akun Guru.');
+            const kelas=String(getGuruKelasAktif()||'').trim().toUpperCase();
+            const tapel=String(currentUser.tapel||getActiveTapel()).trim();
+            const fase=String(document.getElementById('guruSiswaFase')?.value||currentUser.fase||inferFaseFromKelas(kelas)).trim().toUpperCase();
+            const username=String(document.getElementById('guruSiswaUsername')?.value||'').trim();
+            const nama=String(document.getElementById('guruSiswaNama')?.value||'').trim();
+            const password=String(document.getElementById('guruSiswaPass')?.value||'123456').trim() || '123456';
+            if(!kelas) return alert('Kelas aktif belum ditentukan.');
+            if(!nama) return alert('Nama siswa wajib diisi.');
+            if(!username) return alert('NISN / Username siswa wajib diisi.');
+            const faseKelas=inferFaseFromKelas(kelas);
+            if(faseKelas && fase && fase!==faseKelas) return alert(`Fase tidak sesuai dengan Kelas ${kelas}. Kelas ini harus menggunakan Fase ${faseKelas}.`);
+            let users=(JSON.parse(localStorage.getItem('users'))||[]).map(normalizeUserRecord);
+            if(users.some(u=>String(u.username).toLowerCase()===username.toLowerCase())) return alert('NISN / Username sudah terdaftar.');
+            users.push({username,password,nama,kelas,kelasDiampu:[kelas],role:'Siswa',fase:fase||faseKelas,tapel});
+            saveAppData('users',JSON.stringify(users));
+            localStorage.setItem('sipatUserSync',String(Date.now()));
+            ['guruSiswaUsername','guruSiswaNama','guruSiswaPass'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+            toggleGuruTambahSiswa(false);
+            populateGuruDropdowns();
+            if(typeof loadAdminUsers==='function') loadAdminUsers();
+            showSaveToast(`Siswa ${nama} berhasil ditambahkan ke Kelas ${kelas} (Fase ${fase||faseKelas||'-'}). Data langsung tersedia di Admin.`);
         }
 
         function getSiswaSekelas() {
