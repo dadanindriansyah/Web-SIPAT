@@ -357,7 +357,22 @@
         .sky-special-btn.burn{background:linear-gradient(135deg,#ea580c,#dc2626)}
         .sky-special-btn.prank{background:linear-gradient(135deg,#9333ea,#db2777)}
         .sky-special-btn:active{transform:translateY(2px) scale(.97)}
-        @media(max-width:640px){.sky-special-controls{top:54px;max-width:70vw;flex-wrap:wrap}.sky-special-btn{font-size:9px;padding:7px 9px;border-radius:11px}}
+        .sky-kick-wrap{display:none;align-items:center;gap:6px}
+        .sky-kick-select{height:38px;max-width:190px;padding:0 9px;border:2px solid #fff;border-radius:12px!important;background:#fff;color:#0f172a;font-size:10px;font-weight:900}
+        .sky-special-btn.kick{background:linear-gradient(135deg,#be123c,#9f1239)}
+        .sky-game-chat-toggle{position:absolute;z-index:25;right:18px;bottom:118px;width:52px;height:52px;border:3px solid #fff;border-radius:50%!important;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;font-size:22px;box-shadow:0 8px 20px rgba(15,23,42,.3);cursor:pointer;pointer-events:auto}
+        .sky-game-chat{display:none;position:absolute;z-index:24;right:18px;bottom:176px;width:min(330px,calc(100% - 36px));height:300px;background:rgba(255,255,255,.97);border:2px solid #dbeafe;border-radius:18px;overflow:hidden;box-shadow:0 18px 45px rgba(15,23,42,.35);pointer-events:auto}
+        .sky-game-chat.open{display:flex;flex-direction:column}
+        .sky-game-chat-head{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;font-size:12px}
+        .sky-game-chat-head button{border:0;background:transparent;color:#fff;font-weight:900;cursor:pointer}
+        .sky-game-chat-messages{flex:1;min-height:0;overflow:auto;padding:8px;background:#eff6ff}
+        .sky-game-chat-msg{margin:5px 0;padding:6px 8px;border-radius:10px;background:#fff;border:1px solid #dbeafe;font-size:10px;line-height:1.3}
+        .sky-game-chat-msg.me{background:#2563eb;color:#fff;margin-left:18px}
+        .sky-game-chat-msg b{display:block;font-size:9px;margin-bottom:2px}
+        .sky-game-chat-form{display:flex;gap:5px;padding:7px;background:#fff;border-top:1px solid #dbeafe}
+        .sky-game-chat-form input{min-width:0;flex:1;border:1px solid #cbd5e1;padding:7px 8px;font-size:10px;border-radius:10px!important}
+        .sky-game-chat-form button{width:34px;border:0;border-radius:10px!important;background:#2563eb;color:#fff;font-weight:900}
+        @media(max-width:640px){.sky-special-controls{top:54px;max-width:94vw;flex-wrap:wrap}.sky-special-btn{font-size:9px;padding:7px 9px;border-radius:11px}.sky-kick-select{max-width:145px}.sky-game-chat{right:8px;bottom:145px;width:calc(100% - 16px);height:270px}.sky-game-chat-toggle{right:9px;bottom:82px}}
 
         /* ===== TOMBOL PANEL AKUN DI DALAM GAME PESAWAT ===== */
         .sky-role-rocket{
@@ -1539,7 +1554,25 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
         <button id="skyGuruFreezeBtn" class="sky-special-btn freeze" onclick="guruFreezePower()" title="Membekukan musuh dan seluruh pesawat siswa yang sedang login">❄️ Bekukan</button>
         <button id="skyGuruBurnBtn" class="sky-special-btn burn" onclick="guruBurnPower()" title="Membakar musuh dan seluruh pesawat siswa yang sedang login">🔥 Bakar</button>
         <button id="skyPrankBtn" class="sky-special-btn prank" onclick="usePrankPower()" title="Gunakan item prank dari kotak misteri">🎭 Prank</button>
+        <div id="skyTeacherKickWrap" class="sky-kick-wrap">
+          <select id="skyKickTarget" class="sky-kick-select" aria-label="Pilih pesawat siswa yang akan dikeluarkan">
+            <option value="">👨‍🏫 Pilih siswa...</option>
+          </select>
+          <button id="skyKickBtn" class="sky-special-btn kick" onclick="kickSelectedSkyStudent()" title="Keluarkan pesawat siswa dari arena dan paksa login ulang">🚪 Keluarkan</button>
+        </div>
       </div>
+      <div id="skyGameChat" class="sky-game-chat">
+        <div class="sky-game-chat-head">
+          <b>💬 Chat Game</b>
+          <button type="button" onclick="toggleSkyGameChat(false)" aria-label="Tutup chat">✕</button>
+        </div>
+        <div id="skyGameChatMessages" class="sky-game-chat-messages"></div>
+        <form class="sky-game-chat-form" onsubmit="sendSkyGameChat(event)">
+          <input id="skyGameChatInput" maxlength="500" autocomplete="off" placeholder="Tulis pesan untuk semua pemain...">
+          <button type="submit">➤</button>
+        </form>
+      </div>
+      <button id="skyGameChatToggle" class="sky-game-chat-toggle" onclick="toggleSkyGameChat()" title="Chat khusus di game">💬</button>
       <div class="sky-controls">
         <div id="skyJoystick" class="sky-joystick" aria-label="Analog gerak"><div id="skyKnob" class="sky-knob"></div></div>
         <div class="sky-fire-wrap">
@@ -4067,7 +4100,7 @@ dbRef.on('value', snapshot => {
     loadNavSchool();
     populateLoginTapel();
     if (typeof refreshCurrentView === 'function') refreshCurrentView();
-     if (typeof refreshChatView === 'function') refreshChatView();
+     if (typeof refreshChatView === 'function') refreshChatView(); if (typeof renderSkyGameChat === 'function') renderSkyGameChat();
 }, err => {
     console.error('Firebase listener error:', err);
     firebaseReady = false;
@@ -4220,6 +4253,27 @@ function initGuruViews() {
     },350);
     updateHud();
   }
+  function saveSkySnapshot(){
+    if(!gs||!currentUser||!gs.player)return;
+    const p=getProfile();
+    p.gameState={
+      x:Math.round(gs.player.x||0),
+      y:Math.round(gs.player.y||0),
+      hp:Math.max(0,Math.min(100,Number(gs.player.hp??100))),
+      level:Number(gs.level||1),
+      savedAt:Date.now()
+    };
+    saveProfile(p);
+  }
+  function loadSkySnapshot(){
+    const p=getProfile(), st=p.gameState||{};
+    if(gs?.player){
+      if(Number.isFinite(Number(st.x))) gs.player.x=Number(st.x);
+      if(Number.isFinite(Number(st.y))) gs.player.y=Number(st.y);
+      if(Number.isFinite(Number(st.hp))) gs.player.hp=Math.max(0,Math.min(100,Number(st.hp)));
+      gs.level=Math.max(1,Number(st.level||1));
+    }
+  }
   function roleSpecial(){
     const u=currentUser||{}; const kelas=String(u.kelas||'').replace(/\s/g,'').toLowerCase();
     if(u.role==='Admin') return 'admin';
@@ -4257,15 +4311,15 @@ function initGuruViews() {
     ensureAudio(); weaponSound('support');
     const p=gs.player;
     if(p.hp<=0||p.deadUntil){respawnPlayer('prank');p.hp=1;}
-    else p.hp=Math.min(3,(p.hp||1)+1);
+    else p.hp=Math.min(100,(p.hp||1)+20);
     p.inv=Math.max(p.inv||0,2200);
     broadcastEvent('support',{x:p.x/Math.max(1,gs.w),y:p.y/Math.max(1,gs.h),amount:1});
-    notify('🤝 Bantuan dikirim! HP dipulihkan + perisai 2,2 detik.');
+    notify('🤝 Bantuan dikirim! HP dipulihkan +20% dan perisai 2,2 detik.');
   }
   function receiveSupport(ev){
     if(!gs?.player||ev.by===profileKey())return;
     const p=gs.player;
-    if(p.hp<=0||p.deadUntil){respawnPlayer('prank');p.hp=1;} else p.hp=Math.min(3,(p.hp||1)+1);
+    if(p.hp<=0||p.deadUntil){respawnPlayer('prank');p.hp=20;} else p.hp=Math.min(100,(p.hp||1)+20);
     p.inv=Math.max(p.inv||0,2200); weaponSound('support',true);
     notify('🤝 '+(ev.nama||'Teman')+' membantu! HP +1 dan perisai aktif.');
   }
@@ -4313,7 +4367,7 @@ function initGuruViews() {
   }
   function makePlayer(){
     const pl=effectivePlane();
-    return{x:gs.camX||0,y:(gs.camY||0)+gs.h*.25,plane:pl,shots:0,inv:0,hp:3,deadUntil:0,respawnCount:0,
+    const saved=getProfile().gameState||{}; return{x:Number(saved.x)||gs.camX||0,y:Number(saved.y)||((gs.camY||0)+gs.h*.25),plane:pl,shots:0,inv:0,hp:Math.max(1,Math.min(100,Number(saved.hp ?? 100))),deadUntil:0,respawnCount:0,
       frozenUntil:0,burningUntil:0,prankCharges:(roleSpecial()==='normal'?0:0)};
   }
   function isInvulnerable(){
@@ -4323,10 +4377,10 @@ function initGuruViews() {
   function respawnPlayer(reason='respawn'){
     if(!gs)return;
     const p=gs.player;
-    p.x=gs.camX||0; p.y=(gs.camY||0)+gs.h*.25; p.hp=3; p.inv=2200; p.deadUntil=0;
+    p.x=gs.camX||0; p.y=(gs.camY||0)+gs.h*.25; p.hp=100; p.inv=2200; p.deadUntil=0;
     p.frozenUntil=0; p.burningUntil=0; p._burnTick=0; gs.gameOver=false; gs.vel={x:0,y:0};
-    setTimeout(()=>{try{if(gs&&gs.onlineRef)gs.onlineRef.child(profileFirebaseKey()).update({hp:3,alive:true,deadUntil:0,inv:p.inv||0})}catch(e){}},30);
-    gs.keys.fire=false; notify(reason==='prank'?'✨ Pesawatmu kembali ke arena!':'🚀 Pesawat siswa hidup kembali! HP 3');
+    setTimeout(()=>{try{if(gs&&gs.onlineRef)gs.onlineRef.child(profileFirebaseKey()).update({hp:100,alive:true,deadUntil:0,inv:p.inv||0})}catch(e){}},30);
+    gs.keys.fire=false; notify(reason==='prank'?'✨ Pesawatmu kembali ke arena!':'🚀 Pesawat siswa hidup kembali! HP 100%');
     updateHud();
   }
   function applyLocalStatus(type,ms=3200){
@@ -4395,15 +4449,16 @@ function initGuruViews() {
     gs.enemyBullets.push({x:e.x,y:e.y+e.size*.7,dx:dx/len*speed,dy:dy/len*speed,damage:e.damage||1,color:e.bulletColor||'#ef4444',life:0,targetId:target.id});
     weaponSound('normal',true);
   }
-  function hitPlayer(damage=1,attackerId='enemy'){
+  function hitPlayer(damage=4,attackerId='enemy'){
     if(!gs||gs.gameOver||gs.player.inv>0)return;
     if(isInvulnerable()){ gs.player.inv=350; notify('🛡️ Pesawat Admin/Guru Kelas 4 kebal!'); return; }
-    gs.player.inv=1300; gs.player.hp=Math.max(0,(gs.player.hp??3)-damage);
-    if(gs.player.hp>0){notify('💥 Pesawat terkena tembakan musuh! HP '+gs.player.hp);}
+    damage=Math.max(1,Math.min(12,Number(damage)||4));
+    gs.player.inv=420; gs.player.hp=Math.max(0,(gs.player.hp??100)-damage);
+    if(gs.player.hp>0){notify('💥 Pesawat terkena tembakan! HP '+Math.round(gs.player.hp)+'%');}
     else{
       gs.player.hp=0; gs.player.deadUntil=Date.now()+1800; gs.keys.fire=false; gs.gameOver=true;
       broadcastEvent('playerDeath',{victim:profileKey(),killer:attackerId||'enemy'});
-      notify(attackerId&&attackerId!=='enemy'?'💥 Pesawatmu ditembak pemain lain! 🚀 Hidup kembali dalam 1,8 detik...':'💥 Pesawat siswa hancur! 🚀 Hidup kembali dalam 1,8 detik...');
+      notify('💥 Pesawatmu hancur! 🚀 Hidup kembali dalam 1,8 detik...');
       setTimeout(()=>{if(gs&&currentUser&&roleSpecial()==='normal'&&gs.player.deadUntil){broadcastEvent('playerRespawn',{victim:profileKey()});respawnPlayer();}},1800);
     }
   }
@@ -4413,17 +4468,20 @@ function initGuruViews() {
     const w=weaponLabel(),x=pl.x,y=pl.y-30;
     const before=gs.bullets.length;
     if(roleSpecial()!=='normal'){
-      bullet(x,y,0,-13,'laser',3,'#f43f5e');
-      bullet(x-18,y+5,-.5,-10,'electric',2,'#38bdf8');
-      bullet(x+18,y+5,.5,-10,'electric',2,'#38bdf8');
-      bullet(x-14,y+5,0,-8,'missile',4,'#fb923c');
-      bullet(x+14,y+5,0,-8,'missile',4,'#fb923c');
+      bullet(x,y,0,-13,'laser',5,'#f43f5e');
+      bullet(x-18,y+5,-.5,-10,'electric',4,'#38bdf8');
+      bullet(x+18,y+5,.5,-10,'electric',4,'#38bdf8');
+      bullet(x-14,y+5,0,-8,'missile',7,'#fb923c');
+      bullet(x+14,y+5,0,-8,'missile',7,'#fb923c');
       weaponSound('laser');
-    } else if(w==='LASER'){bullet(x,y,0,-12,'laser',3,'#f43f5e'); weaponSound('laser');}
-    else if(w==='LISTRIK'){bullet(x-10,y,0,-10,'electric',2,'#38bdf8');bullet(x+10,y,0,-10,'electric',2,'#38bdf8'); weaponSound('electric');}
-    else if(w==='RUDAL'){bullet(x-15,y,0,-8,'missile',4,'#fb923c');bullet(x+15,y,0,-8,'missile',4,'#fb923c'); weaponSound('missile');}
+    } else if(w==='LASER'){bullet(x,y,0,-12,'laser',5,'#f43f5e'); weaponSound('laser');}
+    else if(w==='LISTRIK'){bullet(x-10,y,0,-10,'electric',4,'#38bdf8');bullet(x+10,y,0,-10,'electric',4,'#38bdf8'); weaponSound('electric');}
+    else if(w==='RUDAL'){bullet(x-15,y,0,-8,'missile',7,'#fb923c');bullet(x+15,y,0,-8,'missile',7,'#fb923c'); weaponSound('missile');}
     else {bullet(x,y,0,-10,'normal',1,'#fde047');bullet(x-13,y+12,-.4,-9,'normal',1,'#fde047');bullet(x+13,y+12,.4,-9,'normal',1,'#fde047'); weaponSound('normal');}
-    for(let i=before;i<gs.bullets.length;i++)broadcastShot(gs.bullets[i].type,gs.bullets[i]);
+    for(let i=before;i<gs.bullets.length;i++){
+      const shot=gs.bullets[i];
+      broadcastShot(shot.type,shot);
+    }
   }
   function collectBox(){
     if(!gs)return;
@@ -4476,7 +4534,7 @@ function initGuruViews() {
     // Freeze menghentikan kendali sementara; burn mengurangi HP secara berkala.
     if((p.burningUntil||0)>Date.now() && !isInvulnerable() && !p._burnTick){
       p._burnTick=Date.now()+650;
-      p.hp=Math.max(0,(p.hp??3)-1);
+      p.hp=Math.max(0,(p.hp??100)-3);
       if(p.hp>0){notify('🔥 Pesawatmu terbakar! HP '+p.hp);p.inv=Math.max(p.inv,500);}
       else {
         p.hp=0; p.deadUntil=Date.now()+1800; p.deadBy='guru'; gs.keys.fire=false; gs.gameOver=true;
@@ -4502,6 +4560,22 @@ function initGuruViews() {
     gs.bullets.forEach(b=>{b.x+=b.dx*60*dt/1000;b.y+=b.dy*60*dt/1000;b.life+=dt});
     gs.enemyBullets.forEach(b=>{b.x+=b.dx*60*dt/1000;b.y+=b.dy*60*dt/1000;b.life+=dt;});
     gs.remoteBullets.forEach(b=>{b.x+=b.dx*60*dt/1000;b.y+=b.dy*60*dt/1000;b.life+=dt;});
+
+    // Peluru pemain juga dapat mengenai pesawat pemain lain.
+    // Hanya pemilik peluru yang menghitung benturan agar damage tidak terduplikasi.
+    for(let i=gs.bullets.length-1;i>=0;i--){
+      const b=gs.bullets[i];
+      let hitRemote=false;
+      for(const r of Object.values(gs.remotePlayers||{})){
+        if(!r || r.id===profileKey() || r.role!=='Siswa' || r.alive===false || Number(r.hp)<=0) continue;
+        const rx=Number(r.x)||0, ry=Number(r.y)||0;
+        if(Math.hypot(b.x-rx,b.y-ry)<34){
+          broadcastEvent('playerHit',{victim:r.id,damage:Math.max(1,Math.min(12,Number(b.damage)||4)),weapon:b.type||'normal',killer:profileKey()});
+          hitRemote=true; break;
+        }
+      }
+      if(hitRemote) gs.bullets.splice(i,1);
+    }
     gs.remoteBullets=gs.remoteBullets.filter(b=>{
       if(b.y< -gs.arenaH*.5-120||b.y>gs.arenaH*.5+120||b.x< -gs.arenaW*.5-120||b.x>gs.arenaW*.5+120||b.life>3000)return false;
       if(Math.hypot(b.x-p.x,b.y-p.y)<28){hitPlayer(b.damage||1,b.by);return false;}
@@ -4655,7 +4729,7 @@ function initGuruViews() {
     gs.enemyBullets.forEach(b=>{c.save();c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=4;c.shadowColor=b.color;c.shadowBlur=9;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*1.8,b.y-b.dy*1.8);c.stroke();c.beginPath();c.arc(b.x,b.y,3.5,0,Math.PI*2);c.fill();c.restore();});
     gs.remoteBullets.forEach(b=>{c.save();c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=b.type==='laser'?7:4;c.shadowColor=b.color;c.shadowBlur=14;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*1.7,b.y-b.dy*1.7);c.stroke();c.restore();});
     gs.enemies.forEach(e=>drawEnemy(c,e));drawPlane(c,gs.player);
-    if(gs.player){c.save();c.fillStyle='rgba(15,23,42,.65)';c.fillRect(gs.player.x-28,gs.player.y+58,56,6);c.fillStyle='#22c55e';c.fillRect(gs.player.x-28,gs.player.y+58,56*((gs.player.hp??3)/3),6);c.font='bold 11px sans-serif';c.textAlign='center';c.fillStyle='#0f172a';c.fillText('HP '+(gs.player.hp??3),gs.player.x,gs.player.y+77);c.restore();}
+    if(gs.player){c.save();c.fillStyle='rgba(15,23,42,.65)';c.fillRect(gs.player.x-28,gs.player.y+58,56,6);c.fillStyle='#22c55e';c.fillRect(gs.player.x-28,gs.player.y+58,56*((gs.player.hp??100)/100),6);c.font='bold 11px sans-serif';c.textAlign='center';c.fillStyle='#0f172a';c.fillText('HP '+Math.round(gs.player.hp??100)+'%',gs.player.x,gs.player.y+77);c.restore();}
     if(gs.remotePlayers) Object.values(gs.remotePlayers).forEach(r=>{if(r.id!==profileKey()){
       const rx=r.renderX??r.x??50, ry=r.renderY??r.y??80; c.save();
       const dead=r.hp<=0||r.alive===false||r.deadUntil>Date.now();
@@ -4672,6 +4746,10 @@ function initGuruViews() {
       c.globalAlpha=1;c.textAlign='center';c.font='bold 12px sans-serif';c.fillStyle='#ffffff';c.strokeStyle='rgba(15,23,42,.9)';c.lineWidth=4;
       c.strokeText(String(r.nama||r.username||r.id||'Pemain'),rx,ry-78);c.fillText(String(r.nama||r.username||r.id||'Pemain'),rx,ry-78);
       if(r.role){c.font='bold 9px sans-serif';c.fillStyle='#e0f2fe';c.fillText(String(r.role),rx,ry-64);}
+      const rhp=Math.max(0,Math.min(100,Number(r.hp??100)));
+      c.fillStyle='rgba(15,23,42,.72)';c.fillRect(rx-28,ry+58,56,5);
+      c.fillStyle='#22c55e';c.fillRect(rx-28,ry+58,56*(rhp/100),5);
+      c.font='bold 8px sans-serif';c.fillStyle='#0f172a';c.fillText('HP '+Math.round(rhp)+'%',rx,ry+75);
       c.restore();
     }});
     if(gs.player){
@@ -4746,8 +4824,22 @@ function initGuruViews() {
     $('secSkyBattle')?.classList.remove('hidden');$('schoolFeatureDock')?.style.setProperty('display','flex');
     enterSkyFullscreen();
     if(gs){gs.vel=gs.vel||{x:0,y:0};resize();updateHud();return}
-    gs={canvas,ctx:canvas.getContext('2d',{alpha:false}),w:0,h:0,t:0,prev:performance.now(),acc:0,lastFire:0,lastSpawn:0,spawnDelay:900,lastBox:0,level:1,enemies:[],bullets:[],enemyBullets:[],remoteBullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{},onlineRef:null,eventsRef:null,presenceTimer:null,resizeHandler:null,vel:{x:0,y:0},camX:0,camY:0,arenaW:5200,arenaH:3800,worldSeed:Math.random()*10000};
-    resize();gs.player=makePlayer();gs.player.prankCharges=(getProfile().prankCharges||0);setupControls();updateHud();notify('🌟 Mode online ringan aktif.');gs.raf=requestAnimationFrame(loop);
+    gs={canvas,ctx:canvas.getContext('2d',{alpha:false}),w:0,h:0,t:0,prev:performance.now(),acc:0,lastFire:0,lastSpawn:0,spawnDelay:900,lastBox:0,level:1,enemies:[],bullets:[],enemyBullets:[],remoteBullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{},onlineRef:null,eventsRef:null,presenceTimer:null,persistTimer:null,resizeHandler:null,vel:{x:0,y:0},camX:0,camY:0,arenaW:5200,arenaH:3800,worldSeed:Math.random()*10000};
+    renderSkyKickTargets(); resize();gs.player=makePlayer();gs.player.prankCharges=(getProfile().prankCharges||0);setupControls();loadSkySnapshot();updateHud();notify('🌟 Mode online ringan aktif.');gs.raf=requestAnimationFrame(loop);
+    gs.persistTimer=setInterval(saveSkySnapshot,5000);
+    if(typeof dbRef!=='undefined' && typeof firebaseReady!=='undefined' && firebaseReady && currentUser){
+      dbRef.child(GAME_KEY).child(profileFirebaseKey()).once('value').then(snap=>{
+        const cloud=snap.val();
+        if(cloud && cloud.gameState){
+          const local=getProfile(), localSaved=Number(local.gameState?.savedAt||0), cloudSaved=Number(cloud.gameState?.savedAt||0);
+          if(cloudSaved>localSaved){
+            const merged={...local,...cloud,gameState:{...local.gameState,...cloud.gameState}};
+            const all=getProfiles();all[profileKey()]=merged;localStorage.setItem(GAME_KEY,JSON.stringify(all));
+            loadSkySnapshot();updateHud();
+          }
+        }
+      }).catch(()=>{});
+    }
     gs.resizeHandler=()=>resize(); window.addEventListener('resize',gs.resizeHandler,{passive:true});
 
     // Multiplayer memakai path Firebase terpisah dari data sekolah. Jadi perubahan posisi
@@ -4759,7 +4851,7 @@ function initGuruViews() {
       const publish=()=>{
         if(!gs||!currentUser)return;
         const p=gs.player;
-        const data={id:profileKey(),x:Math.round(p.x),y:Math.round(p.y),xN:p.x/Math.max(1,gs.w),yN:p.y/Math.max(1,gs.h),color:p.plane.color,role:currentUser.role,kelas:currentUser.kelas||'',specialRole:roleSpecial(),nama:currentUser.nama||currentUser.username,hp:p.hp||0,alive:!gs.gameOver,deadUntil:p.deadUntil||0,inv:p.inv||0,frozenUntil:p.frozenUntil||0,burningUntil:p.burningUntil||0,updatedAt:firebase.database.ServerValue.TIMESTAMP};
+        const data={id:profileKey(),x:Math.round(p.x),y:Math.round(p.y),xN:p.x/Math.max(1,gs.w),yN:p.y/Math.max(1,gs.h),color:p.plane.color,role:currentUser.role,kelas:currentUser.kelas||'',specialRole:roleSpecial(),nama:currentUser.nama||currentUser.username,hp:p.hp??100,maxHp:100,alive:!gs.gameOver,deadUntil:p.deadUntil||0,inv:p.inv||0,frozenUntil:p.frozenUntil||0,burningUntil:p.burningUntil||0,updatedAt:firebase.database.ServerValue.TIMESTAMP};
         me.update(data).catch(()=>{}); gs.lastNetX=p.x;gs.lastNetY=p.y;
       };
       publish(); gs.lastNetHp=gs.player.hp; gs.lastNetDead=!!gs.player.deadUntil; gs.lastNetFrozen=gs.player.frozenUntil||0; gs.lastNetBurning=gs.player.burningUntil||0;
@@ -4783,7 +4875,7 @@ function initGuruViews() {
             if(eff.type==='prank'||eff.type==='guru') notify(eff.type==='guru'?'⚡🔥 Kamu terkena kekuatan Guru Kelas 4!':'🎭🔥 Kamu terkena PRANK!');
           }
         } else delete gs.remotePlayers[snap.key];
-        if($('skyPlayers'))$('skyPlayers').textContent=String(Math.max(1,Object.keys(gs.remotePlayers).length));
+        if($('skyPlayers'))$('skyPlayers').textContent=String(Math.max(1,Object.keys(gs.remotePlayers).length)); renderSkyKickTargets();
       };
       onlineRef.on('child_added',sync); onlineRef.on('child_changed',sync);
       onlineRef.on('child_removed',sync);
@@ -4793,8 +4885,24 @@ function initGuruViews() {
         if(!currentUser)return;
         const ev=snap.val(); if(!ev||ev.by===profileKey())return; if(ev.ts && Date.now()-Number(ev.ts)>7000)return;
         if(ev.type==='shot'){const b={x:Number(ev.x)||0,y:Number(ev.y)||0,dx:ev.dx||0,dy:ev.dy||-10,type:ev.weapon||'normal',damage:ev.damage||1,color:ev.color||'#fde047',life:0,by:ev.by};gs.remoteBullets.push(b);weaponSound(ev.weapon||'normal',true);}
-        else if(ev.type==='playerDeath'){ if(ev.victim!==profileKey()){const v=gs.remotePlayers[ev.victim];if(v){v.hp=0;v.alive=false;v.deadUntil=Date.now()+1800;} notify('💥 '+(v?.nama||'Teman')+' hancur!'); if(ev.killer===profileKey()){const p=getProfile();p.points=(p.points||0)+60;p.kills=(p.kills||0)+1;saveProfile(p);notify('🏆 Kamu membantu menjatuhkan pesawat pemain! +60 poin');}}}
-        else if(ev.type==='playerRespawn'){const v=gs.remotePlayers[ev.victim];if(v){v.hp=3;v.alive=true;v.deadUntil=0;}}
+        else if(ev.type==='playerHit'){
+          if(ev.victim===profileKey() && roleSpecial()==='normal' && gs.player.alive!==false){
+            hitPlayer(Number(ev.damage)||4,ev.killer||ev.by||'player');
+          }
+          const v=gs.remotePlayers[ev.victim];
+          if(v && ev.victim!==profileKey()){
+            v.hp=Math.max(0,Number(v.hp??100)-(Number(ev.damage)||4));
+            if(v.hp<=0){v.alive=false;v.deadUntil=Date.now()+1800;}
+          }
+        }
+        else if(ev.type==='playerDeath'){ if(ev.victim!==profileKey()){const v=gs.remotePlayers[ev.victim];if(v){v.hp=0;v.alive=false;v.deadUntil=Date.now()+1800;} notify('💥 '+(v?.nama||'Teman')+' hancur!'); if(ev.killer===profileKey()){const p=getProfile();p.points=(p.points||0)+60;p.kills=(p.kills||0)+1;saveProfile(p);notify('🏆 Kamu menjatuhkan pesawat siswa! +60 poin');}}}
+        else if(ev.type==='playerRespawn'){const v=gs.remotePlayers[ev.victim];if(v){v.hp=100;v.alive=true;v.deadUntil=0;}}
+        else if(ev.type==='kick'){
+          if(ev.target===profileKey()){
+            notify('🚪 Kamu dikeluarkan Guru dari arena. Silakan login kembali.');
+            setTimeout(()=>{if(currentUser && typeof logout==='function') logout();},700);
+          }
+        }
         else if(ev.type==='support')receiveSupport(ev);
         else if(ev.type==='guruPower'||ev.type==='prankPower'){const t=ev.effect;if(t==='freeze'||t==='guru')applyLocalStatus('freeze',3200);if(t==='burn'||t==='prank'||t==='guru')applyLocalStatus('burn',3200);notify(ev.type==='guruPower'?'⚡ Guru mengaktifkan kekuatan khusus!':'🎭 PRANK menyerang!');}
       };
@@ -4804,10 +4912,64 @@ function initGuruViews() {
       gs.cleanupOnline=()=>{onlineRef.off('child_added',sync);onlineRef.off('child_changed',sync);onlineRef.off('child_removed',sync);try{gs.eventsRef.off('child_added',eventSync)}catch(e){}try{me.remove()}catch(e){}};
     }
   }
+  window.kickSelectedSkyStudent=function(){
+    if(!currentUser || currentUser.role!=='Guru' || !gs?.onlineRef)return;
+    const el=$('skyKickTarget'), target=el?.value;
+    if(!target)return notify('👨‍🏫 Pilih pesawat siswa terlebih dahulu.');
+    const v=gs.remotePlayers[target];
+    if(!v || v.role!=='Siswa')return notify('Pesawat siswa sudah tidak online.');
+    if(!confirm('Keluarkan pesawat '+(v.nama||target)+' dari game dan minta login ulang?'))return;
+    gs.eventsRef?.push({type:'kick',target,by:profileKey(),role:'Guru',nama:currentUser.nama||currentUser.username,ts:firebase.database.ServerValue.TIMESTAMP}).catch(()=>{});
+    gs.onlineRef.child(target).remove().catch(()=>{});
+    delete gs.remotePlayers[target];
+    renderSkyKickTargets();
+    notify('🚪 '+(v.nama||target)+' dikeluarkan dari arena.');
+  };
+  function renderSkyKickTargets(){
+    const wrap=$('skyTeacherKickWrap'), sel=$('skyKickTarget');
+    if(!wrap||!sel)return;
+    const isGuru=currentUser?.role==='Guru';
+    wrap.style.display=isGuru?'flex':'none';
+    if(!isGuru)return;
+    const vals=Object.values(gs?.remotePlayers||{}).filter(v=>v.role==='Siswa' && v.id!==profileKey() && v.alive!==false);
+    const keep=sel.value;
+    sel.innerHTML='<option value="">👨‍🏫 Pilih siswa...</option>'+vals.map(v=>`<option value="${String(v.id).replace(/"/g,'&quot;')}">${String(v.nama||v.id).replace(/[&<>]/g,'')}</option>`).join('');
+    if(vals.some(v=>v.id===keep))sel.value=keep;
+  }
+  window.toggleSkyGameChat=function(force){
+    const el=$('skyGameChat'); if(!el)return;
+    const open=force===undefined?!el.classList.contains('open'):!!force;
+    el.classList.toggle('open',open);
+    if(open){renderSkyGameChat();setTimeout(()=>{$('skyGameChatInput')?.focus();},50);}
+  };
+  function renderSkyGameChat(){
+    const box=$('skyGameChatMessages'); if(!box)return;
+    const msgs=Object.values(getChatStore()).filter(m=>m.conversationId===PUBLIC_CHAT_CONVERSATION_ID)
+      .sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt)).slice(-80);
+    box.innerHTML=msgs.map(m=>{
+      const mine=String(m.senderUsername)===String(currentUser?.username);
+      const t=new Date(m.createdAt); const time=isNaN(t)?'':t.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+      return `<div class="sky-game-chat-msg ${mine?'me':''}"><b>${chatEsc(m.senderName||m.senderUsername||'Pengguna')} <span>${chatEsc(m.senderRole||'')}</span></b>${m.messageType==='sticker'?chatEsc(m.text||''):chatEsc(m.text||'')}<small style="display:block;opacity:.65;margin-top:2px">${time}</small></div>`;
+    }).join('') || '<div style="text-align:center;color:#64748b;font-size:10px;padding:20px">Belum ada pesan.</div>';
+    box.scrollTop=box.scrollHeight;
+  }
+  window.sendSkyGameChat=function(ev){
+    ev?.preventDefault();
+    if(!currentUser)return;
+    const input=$('skyGameChatInput'), text=(input?.value||'').trim();
+    if(!text)return;
+    const id='m_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+    const msg={conversationId:PUBLIC_CHAT_CONVERSATION_ID,senderUsername:currentUser.username,senderName:currentUser.nama||currentUser.username,senderRole:currentUser.role||'',text:text.slice(0,500),messageType:'text',createdAt:new Date().toISOString()};
+    const store=getChatStore();store[id]=msg;saveAppData('chatMessages',JSON.stringify(store));input.value='';renderSkyGameChat();renderChatMessages();
+  };
+  window.renderSkyKickTargets=renderSkyKickTargets;
+  
   window.initSpaceGame=start;
   window.stopSpaceGame=function(){
     if(typeof exitSkyFullscreen==='function') exitSkyFullscreen();
     if(!gs)return;
+    try{saveSkySnapshot()}catch(e){}
+    try{if(gs.persistTimer)clearInterval(gs.persistTimer)}catch(e){}
     try{if(gs.raf)cancelAnimationFrame(gs.raf)}catch(e){}
     try{if(gs.presenceTimer)clearInterval(gs.presenceTimer)}catch(e){}
     try{if(gs.cleanupOnline)gs.cleanupOnline()}catch(e){}
@@ -4822,106 +4984,23 @@ function initGuruViews() {
 
 <script id="sky-game-persist">
 (function(){
-  const KEY = 'skyBattleGameState_v1';
-
-  function safeGet(){
-    try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e){ return null; }
-  }
-  function safeSet(state){
-    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){}
-  }
-
-  window.saveSkyGameState = function(){
+  // Persistensi utama sekarang disimpan per akun melalui skyBattleProfiles.gameState
+  // dan Firebase, sehingga akun A tidak pernah memakai state akun B.
+  function persist(){
     try{
-      const state = {};
-      const canvas = document.getElementById('skyCanvas');
-      const scoreEl = document.getElementById('skyScore');
-      const levelEl = document.getElementById('skyLevel');
-      const highEl = document.getElementById('skyHighScore');
-      const hpEl = document.getElementById('skyHp');
-
-      if (canvas) {
-        state.canvasWidth = canvas.width;
-        state.canvasHeight = canvas.height;
-      }
-      if (scoreEl) state.scoreText = scoreEl.textContent;
-      if (levelEl) state.levelText = levelEl.textContent;
-      if (highEl) state.highText = highEl.textContent;
-      if (hpEl) state.hpText = hpEl.textContent;
-
-      // Simpan variabel game yang umum dipakai jika tersedia.
-      [
-        'skyScore','skyLevel','skyHighScore','skyPlayerHp',
-        'skyGameRunning','skyGameOver','skyWave','skyCoins'
-      ].forEach(function(name){
-        if (typeof window[name] !== 'undefined') {
-          try { state[name] = window[name]; } catch(e){}
-        }
-      });
-
-      state.savedAt = Date.now();
-      safeSet(state);
-      return state;
-    }catch(e){ return null; }
-  };
-
-  window.restoreSkyGameState = function(){
-    const state = safeGet();
-    if (!state) return null;
-    try{
-      Object.keys(state).forEach(function(name){
-        if (name === 'savedAt' || name === 'canvasWidth' || name === 'canvasHeight' ||
-            name === 'scoreText' || name === 'levelText' || name === 'highText' || name === 'hpText') return;
-        if (name in window) {
-          try { window[name] = state[name]; } catch(e){}
-        }
-      });
-
-      const scoreEl = document.getElementById('skyScore');
-      const levelEl = document.getElementById('skyLevel');
-      const highEl = document.getElementById('skyHighScore');
-      const hpEl = document.getElementById('skyHp');
-      if (scoreEl && state.scoreText != null) scoreEl.textContent = state.scoreText;
-      if (levelEl && state.levelText != null) levelEl.textContent = state.levelText;
-      if (highEl && state.highText != null) highEl.textContent = state.highText;
-      if (hpEl && state.hpText != null) hpEl.textContent = state.hpText;
-
-      return state;
-    }catch(e){ return state; }
-  };
-
-  // Simpan otomatis saat berpindah dari game ke panel, saat logout,
-  // saat tab ditutup/di-background, dan setiap beberapa detik.
-  document.addEventListener('visibilitychange', function(){
-    if (document.hidden) window.saveSkyGameState();
-  });
-  window.addEventListener('beforeunload', window.saveSkyGameState);
-  setInterval(window.saveSkyGameState, 3000);
-
-  // Bungkus fungsi yang sudah ada tanpa mengganti perilakunya.
-  function wrap(name, before, after){
-    const original = window[name];
-    if (typeof original !== 'function') return;
-    window[name] = function(){
-      try{ before && before(); }catch(e){}
-      const result = original.apply(this, arguments);
-      try{ after && after(result); }catch(e){}
-      return result;
+      if(typeof window.saveSkySnapshot==='function') window.saveSkySnapshot();
+    }catch(e){}
+  }
+  document.addEventListener('visibilitychange',function(){if(document.hidden)persist();});
+  window.addEventListener('beforeunload',persist);
+  setInterval(persist,5000);
+  const originalLogout=window.logout;
+  if(typeof originalLogout==='function'){
+    window.logout=function(){
+      persist();
+      return originalLogout.apply(this,arguments);
     };
   }
-
-  // Jika fungsi tersedia setelah script ini dijalankan, patch dilakukan ulang.
-  function patch(){
-    wrap('openRolePanel', function(){ window.saveSkyGameState(); });
-    wrap('showGameHome', function(){}, function(){ window.restoreSkyGameState(); });
-    if (typeof window.logout === 'function') {
-      wrap('logout', function(){ window.saveSkyGameState(); });
-    }
-  }
-
-  patch();
-  setTimeout(patch, 500);
-  setTimeout(patch, 1500);
 })();
 </script>
 
