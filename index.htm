@@ -587,7 +587,11 @@
         <section id="secGuru" class="hidden space-y-8">
             <div class="bg-gradient-to-r from-emerald-800 to-emerald-600 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center flex-wrap gap-4 no-print">
                 <div>
-                    <div class="flex flex-col gap-1 flex-1"><h2 class="text-2xl font-black" id="guruTitle">Panel Kerja Guru</h2><p id="guruKelasInfo" class="text-xs text-emerald-100/80"></p></div><div id="guruMapelClassWrap" class="hidden bg-white/10 rounded-xl p-2 min-w-56"><label class="block text-[10px] font-bold uppercase text-emerald-100 mb-1">Kelas Input Guru Mata Pelajaran</label><select id="guruKelasAktif" onchange="setGuruKelasAktif(this.value)" class="w-full rounded-lg border-0 p-2 text-sm text-slate-800"></select></div>
+                    <div class="flex flex-col gap-1 flex-1"><h2 class="text-2xl font-black" id="guruTitle">Panel Kerja Guru</h2><p id="guruKelasInfo" class="text-xs text-emerald-100/80"></p></div><div id="guruMapelClassWrap" class="hidden bg-white/10 rounded-xl p-2 min-w-72">
+<label class="block text-[10px] font-bold uppercase text-emerald-100 mb-1">Kelas yang Diakses Guru Mata Pelajaran</label>
+<select id="guruKelasAktif" onchange="setGuruKelasAktif(this.value)" class="w-full rounded-lg border-0 p-2 text-sm text-slate-800"></select>
+<p id="guruKelasTerhubung" class="text-[10px] text-emerald-100/80 mt-1"></p>
+</div>
                     <div class="flex items-center gap-4 mt-1">
                         <p class="text-emerald-100 text-sm">Kelola kegiatan presensi, penilaian mata pelajaran, penilaian ekskul, dan tabungan murid.</p>
                         <span id="txtGuruTapel" class="bg-emerald-900 px-3 py-1 rounded-full text-xs font-bold border border-emerald-400/30">TP: -</span>
@@ -1296,6 +1300,15 @@
             return getGuruKelasRecord(kelas)?.username || '';
         }
 
+        function requireGuruKelasTerhubung(kelas) {
+            const guruKelas=getGuruKelasRecord(kelas);
+            if (!guruKelas) {
+                alert(`Kelas ${kelas || '-'} belum terhubung dengan Guru Kelas pada tahun pelajaran ${currentUser?.tapel || getActiveTapel()}. Silakan Admin menetapkan Guru Kelas terlebih dahulu.`);
+                return null;
+            }
+            return guruKelas;
+        }
+
         function getMapelGuruAssignments(kelas) {
             const users = (JSON.parse(localStorage.getItem('users')) || []).map(normalizeUserRecord);
             const tapel = currentUser?.tapel || getActiveTapel();
@@ -1369,22 +1382,44 @@
         }
 
         function setGuruKelasAktif(kelas) {
-            if(!isGuruMapel() || !getGuruKelasDiampu().includes(kelas)) return;
+            const assigned=getGuruKelasDiampu().map(x=>String(x).trim().toUpperCase());
+            kelas=String(kelas||'').trim().toUpperCase();
+            if(!isGuruMapel() || !assigned.includes(kelas)) return;
+            const guruKelas=getGuruKelasRecord(kelas);
             currentUser.kelas=kelas;
-            document.getElementById('guruKelasInfo').innerText=`Kelas aktif: ${kelas} • Terhubung dengan Guru Kelas kelas ${kelas}`;
+            currentUser.guruKelasUsername=guruKelas?.username||'';
+            sessionStorage.setItem(`sipatGuruMapelKelas_${currentUser.username}_${currentUser.tapel||getActiveTapel()}`, kelas);
+            currentUser.guruKelasNama=guruKelas?.nama||'';
+            document.getElementById('guruKelasInfo').innerText=`Kelas aktif: ${kelas} • Guru Kelas: ${guruKelas?.nama || 'Belum ditentukan'}`;
+            const rel=document.getElementById('guruKelasTerhubung');
+            if(rel) rel.innerText=guruKelas ? `Terhubung ke ${guruKelas.nama} (${guruKelas.username})` : 'Kelas ini belum memiliki Guru Kelas pada tahun pelajaran aktif.';
             populateGuruDropdowns(); renderNilaiGuru(); renderBintangGuru(); renderJurnalGuru(); renderKKTPGuru();
         }
 
         function populateGuruKelasAktif() {
             const wrap=document.getElementById('guruMapelClassWrap'), el=document.getElementById('guruKelasAktif');
             if(!wrap||!el)return;
-            const assigned=getGuruKelasDiampu();
+            const assigned=getGuruKelasDiampu().map(x=>String(x).trim().toUpperCase()).filter(Boolean);
             wrap.classList.toggle('hidden',!isGuruMapel());
-            el.innerHTML=assigned.length?assigned.map(k=>`<option value="${k}">Kelas ${k}</option>`).join():'<option value="">Belum ada kelas</option>';
-            const current=assigned.includes(currentUser?.kelas)?currentUser.kelas:assigned[0];
-            if(current){el.value=current; currentUser.kelas=current;}
+            if(!isGuruMapel()) return;
+            el.innerHTML=assigned.length?assigned.map(k=>{
+                const g=getGuruKelasRecord(k);
+                return `<option value="${k}">Kelas ${k} — ${g?.nama || 'Guru Kelas belum ditentukan'}</option>`;
+            }).join():'<option value="">Belum ada kelas yang ditetapkan Admin</option>';
+            const savedClass=sessionStorage.getItem(`sipatGuruMapelKelas_${currentUser.username}_${currentUser.tapel||getActiveTapel()}`);
+            const current=assigned.includes(String(savedClass||currentUser?.kelas||'').trim().toUpperCase())?String(savedClass||currentUser.kelas).trim().toUpperCase():(assigned[0]||'');
+            if(current){
+                el.value=current;
+                const g=getGuruKelasRecord(current);
+                currentUser.kelas=current;
+                currentUser.guruKelasUsername=g?.username||'';
+                currentUser.guruKelasNama=g?.nama||'';
+            }
             const info=document.getElementById('guruKelasInfo');
-            if(info) info.innerText=isGuruMapel()?`Kelas aktif: ${current||'-'} • Data akan terhubung ke Guru Kelas kelas tersebut`:`Kelas: ${currentUser?.kelas||'-'}`;
+            const rel=document.getElementById('guruKelasTerhubung');
+            const g=current?getGuruKelasRecord(current):null;
+            if(info) info.innerText=isGuruMapel()?`Kelas aktif: ${current||'-'} • Guru Kelas: ${g?.nama || 'Belum ditentukan'}`:`Kelas: ${currentUser?.kelas||'-'}`;
+            if(rel) rel.innerText=isGuruMapel()?(g?`Terhubung ke ${g.nama} (${g.username})`:'Kelas ini belum memiliki Guru Kelas pada tahun pelajaran aktif.'):'';
         }
 
         function populateAdminGuruMapel(selected=[]) {
@@ -1946,8 +1981,11 @@
             const tanggal=document.getElementById('jurnalTanggal').value, mapel=document.getElementById('jurnalMapel').value, materi=document.getElementById('jurnalMateri').value.trim(), kegiatan=document.getElementById('jurnalKegiatan').value.trim(), keterangan=document.getElementById('jurnalKeterangan').value.trim();
             if(!tanggal||!mapel||!materi||!kegiatan) return alert('Lengkapi tanggal, mata pelajaran, materi, dan kegiatan.');
             if(isGuruMapel()&&!getGuruMapelNames().includes(mapel)) return alert('Mata pelajaran tidak sesuai penugasan Admin.');
+            const kelasJurnal=getGuruKelasAktif();
+            const guruKelasJurnal=requireGuruKelasTerhubung(kelasJurnal);
+            if(isGuruMapel() && !guruKelasJurnal) return;
             const data=JSON.parse(localStorage.getItem('jurnal'))||[];
-            data.push({id:Date.now(),tanggal,mapel,materi,kegiatan,keterangan,kelas:getGuruKelasAktif(),tapel:currentUser.tapel||getActiveTapel(),inputBy:currentUser.username,inputByType:currentUser.jenisGuru||'Guru Kelas',guruKelasUsername:getGuruKelasUsername(getGuruKelasAktif())});
+            data.push({id:Date.now(),tanggal,mapel,materi,kegiatan,keterangan,kelas:kelasJurnal,tapel:currentUser.tapel||getActiveTapel(),inputBy:currentUser.username,inputByType:currentUser.jenisGuru||'Guru Kelas',guruKelasUsername:guruKelasJurnal?.username||'',guruKelasNama:guruKelasJurnal?.nama||''});
             saveAppData('jurnal',JSON.stringify(data)); renderJurnalGuru(); document.getElementById('jurnalMateri').value=''; document.getElementById('jurnalKegiatan').value=''; document.getElementById('jurnalKeterangan').value=''; showSaveToast('Jurnal harian tersimpan');
         }
         function renderJurnalGuru(){
@@ -1963,7 +2001,7 @@
             if(!bab||!mapel||!perlu||!cukup||!baik||!sangat)return alert('Lengkapi BAB, mapel, dan seluruh kriteria KKTP.');
             if(isGuruMapel()&&!getGuruMapelNames().includes(mapel))return alert('Mata pelajaran tidak sesuai penugasan Admin.');
             const data=JSON.parse(localStorage.getItem('kktp'))||[]; const tapel=currentUser.tapel||getActiveTapel();
-            data.push({id:Date.now(),bab,mapel,perlu,cukup,baik,sangat,keterangan,kelas:getGuruKelasAktif(),tapel,inputBy:currentUser.username,inputByType:currentUser.jenisGuru||'Guru Kelas',guruKelasUsername:getGuruKelasUsername(getGuruKelasAktif())});
+            data.push({id:Date.now(),bab,mapel,perlu,cukup,baik,sangat,keterangan,kelas:kelasKKTP,tapel,inputBy:currentUser.username,inputByType:currentUser.jenisGuru||'Guru Kelas',guruKelasUsername:guruKelasKKTP?.username||'',guruKelasNama:guruKelasKKTP?.nama||''});
             saveAppData('kktp',JSON.stringify(data)); renderKKTPGuru(); ['kktpBab','kktpPerlu','kktpCukup','kktpBaik','kktpSangat','kktpKeterangan'].forEach(id=>document.getElementById(id).value=''); showSaveToast('KKTP tersimpan dan terhubung dengan Guru Kelas');
         }
         function renderKKTPGuru(){
@@ -2083,6 +2121,8 @@ function submitAbsensi() {
             const kelasAktif = getGuruKelasAktif();
             if(!username || !mapel || !date || isNaN(angka)) return alert("Lengkapi data!");
             if(!kelasAktif) return alert("Kelas yang diampu belum ditentukan Admin.");
+            const guruKelasAktif= requireGuruKelasTerhubung(kelasAktif);
+            if(isGuruMapel() && !guruKelasAktif) return;
             if(!canInputNilaiMapel(mapel, kelasAktif)) {
                 if(isGuruMapel()) return alert("Anda hanya dapat menginput nilai untuk mata pelajaran dan kelas yang ditetapkan Admin pada akun Guru Mata Pelajaran ini.");
                 return alert(`Nilai mata pelajaran ${mapel} untuk Kelas ${kelasAktif} sudah ditugaskan kepada Guru Mata Pelajaran. Guru Kelas tidak dapat menginput nilai tersebut.`);
@@ -2091,9 +2131,10 @@ function submitAbsensi() {
             const sObj = getSiswaSekelas().find(s => s.username === username);
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
             const tapel = currentUser.tapel || profile.tapel || "-";
-            const guruKelasUsername = getGuruKelasUsername(kelasAktif);
+            const guruKelasUsername = guruKelasAktif?.username || getGuruKelasUsername(kelasAktif);
+            const guruKelasNama = guruKelasAktif?.nama || '';
 
-            nilai.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: kelasAktif, mapel, semester, jenis, date, angka, tapel, inputBy: currentUser.username, inputByType: currentUser.jenisGuru || "Guru Kelas", guruKelasUsername });
+            nilai.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: kelasAktif, mapel, semester, jenis, date, angka, tapel, inputBy: currentUser.username, inputByType: currentUser.jenisGuru || "Guru Kelas", guruKelasUsername, guruKelasNama });
             saveAppData('nilai', JSON.stringify(nilai));
             renderNilaiGuru();
             renderLegger();
@@ -2242,7 +2283,10 @@ function submitAbsensi() {
             const sObj = getSiswaSekelas().find(s => s.username === username);
             const date = new Date().toISOString().split('T')[0];
 
-            bintangList.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: getGuruKelasAktif(), jumlah, desc, date, tapel: currentUser.tapel || getActiveTapel(), inputBy: currentUser.username, inputByType: currentUser.jenisGuru || "Guru Kelas", guruKelasUsername: getGuruKelasUsername(getGuruKelasAktif()) });
+            const kelasBintang=getGuruKelasAktif();
+            const guruKelasBintang=requireGuruKelasTerhubung(kelasBintang);
+            if(isGuruMapel() && !guruKelasBintang) return;
+            bintangList.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: kelasBintang, jumlah, desc, date, tapel: currentUser.tapel || getActiveTapel(), inputBy: currentUser.username, inputByType: currentUser.jenisGuru || "Guru Kelas", guruKelasUsername: guruKelasBintang?.username || getGuruKelasUsername(kelasBintang), guruKelasNama: guruKelasBintang?.nama || '' });
             saveAppData('bintang', JSON.stringify(bintangList));
             document.getElementById('bintangDesc').value = '';
             renderBintangGuru();
