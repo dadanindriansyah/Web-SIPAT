@@ -166,6 +166,11 @@
         #chatWidget { position:fixed; right:22px; bottom:22px; z-index:90; }
         #chatPanel { width:min(430px, calc(100vw - 28px)); height:min(620px, calc(100vh - 110px)); background:#fff; border-radius:22px; overflow:hidden; box-shadow:0 20px 55px rgba(15,23,42,.22); border:1px solid #dbeafe; display:flex; flex-direction:column; }
         #chatPanel #chatMessages { flex:1; min-height:0; overflow-y:auto; padding:14px; background:linear-gradient(180deg,#eff6ff 0%,#f8fafc 100%); }
+        #chatPanel.chat-minimized { display:none; }
+        #chatMinimizeBtn { min-width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; }
+        #chatWidget.chat-minimized #chatToggle { display:flex; }
+        #chatToggle { transition:transform .18s ease, box-shadow .18s ease; }
+        #chatToggle:hover { transform:scale(1.04); }
         #chatToggle { width:74px; height:74px; border-radius:999px !important; display:flex; align-items:center; justify-content:center; font-size:2rem; box-shadow:0 12px 28px rgba(37,99,235,.35); border:4px solid #fff; }
         #chatToggle i { font-size:2rem; }
         .chat-bubble { max-width:82%; padding:9px 12px; border-radius:16px; margin:7px 0; font-size:12px; line-height:1.4; box-shadow:0 2px 8px rgba(15,23,42,.06); }
@@ -1239,6 +1244,7 @@
                     <button id="chatDeleteAllBtn" type="button" onclick="deleteAllPublicChat()" class="hidden bg-red-500 hover:bg-red-600 text-white text-[10px] font-black px-2.5 py-1.5 rounded-lg" title="Hapus semua chat">
                         <i class="fa-solid fa-trash-can"></i> Hapus Chat
                     </button>
+                    <button id="chatMinimizeBtn" type="button" onclick="minimizeChat()" class="text-white/90 hover:text-white text-lg rounded-lg hover:bg-white/10" title="Minimalkan chat" aria-label="Minimalkan chat"><i class="fa-solid fa-minus"></i></button>
                     <button type="button" onclick="toggleChat(false)" class="text-white/90 hover:text-white text-lg" aria-label="Tutup chat"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
@@ -2311,7 +2317,24 @@ function uploadGuruSiswaExcel(event){
             showSaveToast(`Siswa ${nama} berhasil ditambahkan ke Kelas ${kelas} (Fase ${fase||faseKelas||'-'}). Data langsung tersedia di Admin.`);
         }
 
-        function getSiswaSekelas() {
+        async function syncGuruStudentsFromFirebase(){
+    if(!currentUser || currentUser.role!=='Guru' || typeof dbRef==='undefined') return;
+    try{
+        const snap=await dbRef.child('users').once('value');
+        const cloudUsers=snap.val();
+        if(cloudUsers && typeof cloudUsers==='object'){
+            const users=Array.isArray(cloudUsers) ? cloudUsers : Object.values(cloudUsers);
+            localStorage.setItem('users',JSON.stringify(users));
+            const latest=users.find(u=>String(u.username)===String(currentUser.username)&&u.role==='Guru');
+            if(latest) currentUser=normalizeUserRecord(latest);
+            populateGuruDropdowns();
+            renderGuruSiswaList();
+            if(typeof renderRekapAbsenSiswa==='function' && !isGuruMapel()) renderRekapAbsenSiswa();
+        }
+    }catch(err){ console.warn('Gagal mengambil daftar siswa terbaru dari Firebase:',err); }
+}
+
+function getSiswaSekelas() {
             // Selalu baca ulang users dari penyimpanan bersama agar daftar guru
             // mengikuti data siswa yang terakhir dimasukkan/diedit Admin.
             const users = (JSON.parse(localStorage.getItem('users')) || []).map(normalizeUserRecord);
@@ -3294,17 +3317,27 @@ function updateChatAdminControls(){
 }
 function toggleChat(force){
     const widget=document.getElementById('chatWidget');
-    if(!widget) return;
+    const panel=document.getElementById('chatPanel');
+    if(!widget || !panel) return;
     if(!currentUser){ widget.classList.add('hidden'); return; }
     widget.classList.remove('hidden');
-    const panel=document.getElementById('chatPanel');
     const open=force===undefined ? panel.classList.contains('hidden') : !!force;
     panel.classList.toggle('hidden',!open);
-    updateChatAdminControls();
+    panel.classList.remove('chat-minimized');
+    widget.classList.remove('chat-minimized');
     if(open){
-        renderChatMessages();
+        refreshChatPartners();
         setTimeout(()=>document.getElementById('chatInput')?.focus(),50);
     }
+}
+
+function minimizeChat(){
+    const panel=document.getElementById('chatPanel');
+    const widget=document.getElementById('chatWidget');
+    if(!panel || !widget) return;
+    panel.classList.add('hidden');
+    panel.classList.add('chat-minimized');
+    widget.classList.remove('chat-minimized');
 }
 function renderChatMessages(){
     const box=document.getElementById('chatMessages');
@@ -3477,6 +3510,21 @@ dbRef.on('value', snapshot => {
     firebaseReady = false;
     showCloudStatus('offline', 'Firebase tidak tersambung');
 });
+dbRef.child('users').on('value', snapshot => {
+    const cloudUsers=snapshot.val();
+    if(!cloudUsers) return;
+    const users=Array.isArray(cloudUsers) ? cloudUsers : Object.values(cloudUsers);
+    localStorage.setItem('users', JSON.stringify(users));
+    if(currentUser && currentUser.role==='Guru'){
+        const latest=users.find(u=>String(u.username)===String(currentUser.username)&&u.role==='Guru');
+        if(latest) currentUser=normalizeUserRecord(latest);
+        populateGuruKelasAktif();
+        populateGuruDropdowns();
+        renderGuruSiswaList();
+        if(typeof renderRekapAbsenSiswa==='function' && !isGuruMapel()) renderRekapAbsenSiswa();
+    }
+    if(currentUser && currentUser.role==='Admin' && typeof loadAdminUsers==='function') loadAdminUsers();
+}, err => console.error('Firebase users listener error:',err));
 dbRef.child('chatMessages').on('value', snapshot => {
     const cloudChat = snapshot.val() || {};
     localStorage.setItem('chatMessages', JSON.stringify(cloudChat));
@@ -3555,6 +3603,7 @@ function renderRekapAbsenSiswa() {
 function initGuruViews() {
     populateGuruKelasAktif();
     populateGuruDropdowns();
+    if(currentUser && currentUser.role==='Guru') syncGuruStudentsFromFirebase();
     if(!isGuruMapel()){ renderAbsensiGuru(); renderRekapAbsenSiswa(); }
     renderNilaiGuru();
     renderLegger();
