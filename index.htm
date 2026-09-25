@@ -340,6 +340,63 @@
 .sky-buy[disabled]{background:#cbd5e1;color:#64748b;cursor:not-allowed}
 #skyLeaderMini{font-size:10px;color:#475569}
 
+
+        /* ===== TOMBOL PANEL AKUN DI DALAM GAME PESAWAT ===== */
+        .sky-role-rocket{
+            position:absolute;
+            z-index:20;
+            top:58px;
+            right:16px;
+            display:flex;
+            align-items:center;
+            gap:8px;
+            padding:9px 13px;
+            border:3px solid #fff;
+            border-radius:16px !important;
+            color:#fff;
+            font-size:11px;
+            font-weight:1000;
+            line-height:1.15;
+            cursor:pointer;
+            pointer-events:auto;
+            user-select:none;
+            box-shadow:0 8px 22px rgba(15,23,42,.35), 0 3px 0 rgba(15,23,42,.28);
+            backdrop-filter:blur(7px);
+            transition:transform .15s ease,filter .15s ease;
+        }
+        .sky-role-rocket:hover{filter:brightness(1.08);transform:translateY(-1px) scale(1.02);}
+        .sky-role-rocket:active{transform:translateY(2px);box-shadow:0 4px 12px rgba(15,23,42,.3);}
+        .sky-role-rocket .rocket-icon{
+            font-size:22px;
+            filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));
+        }
+        .sky-role-rocket .rocket-text{
+            display:flex;
+            flex-direction:column;
+            align-items:flex-start;
+        }
+        .sky-role-rocket .rocket-text small{
+            font-size:8px;
+            font-weight:800;
+            opacity:.9;
+            margin-top:2px;
+        }
+        .sky-role-rocket.role-admin{background:linear-gradient(135deg,#7c3aed,#4f46e5);}
+        .sky-role-rocket.role-guru{background:linear-gradient(135deg,#059669,#0f766e);}
+        .sky-role-rocket.role-siswa{background:linear-gradient(135deg,#f97316,#ef4444);}
+        @media(max-width:640px){
+            .sky-role-rocket{
+                top:54px;
+                right:8px;
+                padding:8px 10px;
+                border-width:2px;
+                border-radius:13px !important;
+                font-size:10px;
+            }
+            .sky-role-rocket .rocket-icon{font-size:19px;}
+            .sky-role-rocket .rocket-text small{font-size:7px;}
+        }
+
         /* ===== MODE CEPAT: GAME DULU, PANEL KERJA LAZY ===== */
         body.sky-home-mode #secAdmin, body.sky-home-mode #secGuru, body.sky-home-mode #secSiswa { display:none !important; }
         body.sky-panel-mode #secSkyBattle { display:none !important; }
@@ -1409,6 +1466,10 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
         <div class="sky-title">☁️ Misi Langit SIPAT</div>
         <div class="sky-help">Semua pemain satu arena. Pesawat siswa/guru/admin tidak dapat saling melukai. Hancurkan pesawat komputer dan kumpulkan poin!</div>
       </div>
+      <button id="skyRoleRocketBtn" class="sky-role-rocket role-siswa" onclick="openRolePanel()" title="Buka panel kerja sesuai akun" aria-label="Buka panel kerja sesuai akun">
+        <span class="rocket-icon">🚀</span>
+        <span class="rocket-text"><b id="skyRoleRocketText">Panel Siswa</b><small id="skyRoleRocketHint">Buka panel kerja</small></span>
+      </button>
       <div class="sky-controls">
         <div id="skyJoystick" class="sky-joystick" aria-label="Analog gerak"><div id="skyKnob" class="sky-knob"></div></div>
         <div class="sky-fire-wrap">
@@ -1822,6 +1883,8 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
             document.getElementById('secSiswa').classList.add('hidden');
             document.getElementById('userInfo').classList.add('hidden');
             document.getElementById('schoolFeatureDock')?.style.setProperty('display','none');
+            const gameRocket=document.getElementById('skyRoleRocketBtn');
+            if(gameRocket) gameRocket.style.display='none';
             const adminTools = document.getElementById('adminDataTools');
             if (adminTools) adminTools.classList.add('admin-only');
             document.getElementById('loginUser').value = '';
@@ -1845,6 +1908,19 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
             if(hint) hint.textContent='Klik roket untuk membuka '+c.text;
             btn.classList.add(c.cls);
             btn.setAttribute('aria-label',c.title);
+
+            // Tombol roket yang selalu terlihat di dalam area game pesawat.
+            const gameBtn=document.getElementById('skyRoleRocketBtn');
+            const gameText=document.getElementById('skyRoleRocketText');
+            const gameHint=document.getElementById('skyRoleRocketHint');
+            if(gameBtn){
+                gameBtn.classList.remove('role-admin','role-guru','role-siswa');
+                gameBtn.classList.add(c.cls);
+                gameBtn.title=c.title;
+                gameBtn.setAttribute('aria-label',c.title);
+            }
+            if(gameText) gameText.textContent=c.text;
+            if(gameHint) gameHint.textContent='Klik roket untuk masuk';
         }
 
         function showDashboard(role) {
@@ -1854,6 +1930,8 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
             if (chatWidget) chatWidget.classList.remove('hidden');
             document.getElementById('txtActiveUser').innerHTML = `<i class="fa-solid fa-circle-user"></i> ${currentUser.nama || currentUser.username} (${role})`;
             updateRoleRocketButton(role);
+            const gameRocket=document.getElementById('skyRoleRocketBtn');
+            if(gameRocket) gameRocket.style.display='flex';
             document.getElementById('schoolFeatureDock')?.style.setProperty('display','flex');
             updateChatAdminControls();
             renderChatMessages();
