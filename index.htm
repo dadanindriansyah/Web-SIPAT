@@ -342,6 +342,12 @@
 .sky-buy{margin-top:8px;width:100%;padding:8px;border-radius:11px;border:0;background:#2563eb;color:#fff;font-weight:900;cursor:pointer}
 .sky-buy[disabled]{background:#cbd5e1;color:#64748b;cursor:not-allowed}
 #skyLeaderMini{font-size:10px;color:#475569}
+.sky-shop-game-btn{width:56px;height:56px;border:0;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#4f46e5);color:#fff;font-size:25px;box-shadow:0 6px 18px rgba(79,70,229,.35);cursor:pointer}
+.sky-shop-modal{display:none;position:absolute;inset:0;z-index:80;background:rgba(2,6,23,.72);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:18px;pointer-events:auto}
+.sky-shop-modal.open{display:flex}
+.sky-shop-modal-card{width:min(960px,94%);max-height:82%;overflow:auto;background:#fff;border-radius:24px;padding:16px;box-shadow:0 20px 70px rgba(0,0,0,.45)}
+.sky-shop-modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.sky-shop-modal-head b{font-size:18px;color:#0f172a}.sky-shop-modal-head small{display:block;color:#64748b;font-size:10px;margin-top:3px}.sky-shop-modal-head button{border:0;background:#fee2e2;color:#991b1b;border-radius:10px;padding:8px 12px;font-weight:900;cursor:pointer}.sky-shop-points{margin:10px 0;padding:10px 14px;border-radius:14px;background:#fef3c7;color:#92400e;font-weight:900}
+@media(max-width:640px){.sky-shop-game-btn{width:52px;height:52px;font-size:22px}.sky-shop-modal{padding:8px}.sky-shop-modal-card{width:100%;max-height:88%;border-radius:18px}.sky-shop-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 
         /* ===== KONTROL KHUSUS GURU: BEKU & BAKAR ===== */
@@ -1537,6 +1543,7 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
       <div class="sky-controls">
         <div id="skyJoystick" class="sky-joystick" aria-label="Analog gerak"><div id="skyKnob" class="sky-knob"></div></div>
         <div class="sky-fire-wrap">
+          <button id="skyShopBtn" class="sky-shop-game-btn" title="Beli pesawat">🛒</button>
           <button id="skySupportBtn" class="sky-support" title="Bantu teman: pulihkan HP dan beri perisai">🤝</button>
           <button id="skyBoxBtn" class="sky-box" title="Kotak misteri">🎁</button>
           <button id="skyFireBtn" class="sky-fire" title="Tembak">🔥</button>
@@ -1545,6 +1552,13 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
       <div class="sky-bottom-info">
         <div id="skyWeapon" class="sky-weapon">Senjata: PELURU</div>
         <div id="skyMessage" class="sky-message">Gerakkan analog dan tekan 🔥 untuk menembak.</div>
+      </div>
+    </div>
+    <div id="skyShopModal" class="sky-shop-modal" aria-hidden="true">
+      <div class="sky-shop-modal-card">
+        <div class="sky-shop-modal-head"><div><b>🛒 TOKO PESAWAT</b><small>Beli dengan poin hasil menghancurkan musuh</small></div><button onclick="closeSkyShop()">✕</button></div>
+        <div class="sky-shop-points">💰 Poin kamu: <b id="skyShopPoints">0</b></div>
+        <div id="skyShopGridGame" class="sky-shop-grid"></div>
       </div>
     </div>
     <div class="sky-shop">
@@ -4170,20 +4184,21 @@ function initGuruViews() {
 (function(){
   const GAME_KEY='skyBattleProfiles';
   const PLANES=[
-    {id:'starter',name:'Pesawat Pemula',icon:'🛩️',price:0,speed:4.0,fire:330,color:'#2563eb',desc:'Ringan dan mudah dikendalikan.'},
-    {id:'falcon',name:'Falcon Biru',icon:'✈️',price:180,speed:5.0,fire:270,color:'#0ea5e9',desc:'Cepat dengan tembakan rapat.'},
-    {id:'thunder',name:'Thunder Jet',icon:'🚀',price:450,speed:5.6,fire:230,color:'#7c3aed',desc:'Tembakan listrik menyebar.'},
-    {id:'phoenix',name:'Phoenix',icon:'🔥',price:800,speed:6.1,fire:190,color:'#ef4444',desc:'Rudal dan peluru berdaya tinggi.'},
-    {id:'guardian',name:'Guardian Colossus',icon:'🛡️',price:1400,speed:4.3,fire:155,color:'#f59e0b',desc:'Pesawat besar untuk misi berat.'},
-    {id:'galaxy',name:'Galaxy Titan',icon:'🌌',price:2600,speed:4.7,fire:120,color:'#ec4899',desc:'Kapal tempur raksasa dengan arsenal lengkap.'}
+    {id:'starter',name:'Pesawat Pemula',icon:'🛩️',price:0,speed:4.0,fire:330,color:'#2563eb',desc:'Ringan dan mudah dikendalikan.',shape:'starter'},
+    {id:'falcon',name:'Falcon Biru',icon:'✈️',price:180,speed:5.0,fire:270,color:'#0ea5e9',desc:'Jet ringan dengan sayap menyapu.',shape:'falcon'},
+    {id:'thunder',name:'Thunder Jet',icon:'🚀',price:450,speed:5.6,fire:230,color:'#7c3aed',desc:'Jet tempur cepat dan agresif.',shape:'thunder'},
+    {id:'phoenix',name:'Phoenix',icon:'🔥',price:800,speed:6.1,fire:190,color:'#ef4444',desc:'Jet tempur dengan mesin api ganda.',shape:'phoenix'},
+    {id:'guardian',name:'Guardian Colossus',icon:'🛡️',price:1400,speed:4.3,fire:155,color:'#f59e0b',desc:'Jet berat besar dengan sayap lebar.',shape:'guardian',big:1.18},
+    {id:'galaxy',name:'Galaxy Titan',icon:'🌌',price:2600,speed:4.7,fire:120,color:'#ec4899',desc:'Pesawat tempur raksasa kelas tertinggi.',shape:'galaxy',big:1.38}
   ];
   const ENEMIES=[
-    {type:'scout',name:'Pesawat Mini',hp:1,speed:1.5,points:25,color:'#64748b',size:18,rate:0.018},
-    {type:'fighter',name:'Pesawat Tempur',hp:2,speed:1.9,points:45,color:'#334155',size:24,rate:0.012},
-    {type:'elite',name:'Pesawat Elite',hp:4,speed:2.2,points:85,color:'#7c3aed',size:31,rate:0.006},
-    {type:'boss',name:'Boss Udara',hp:8,speed:1.4,points:180,color:'#be123c',size:46,rate:0.0017}
-  ];
-  let gs=null;
+    {type:'fighterJet',name:'F-Scout Jet',hp:2,speed:1.9,points:35,color:'#475569',size:22,rate:0.012,shape:'jet'},
+    {type:'fighterJet2',name:'Thunder Fighter',hp:3,speed:2.15,points:55,color:'#1e293b',size:27,rate:0.009,shape:'jet2'},
+    {type:'duck',name:'Bebek Terbang',hp:1,speed:1.45,points:20,color:'#facc15',size:20,rate:0.018,shape:'duck'},
+    {type:'bird',name:'Burung Terbang',hp:1,speed:2.5,points:30,color:'#0f172a',size:18,rate:0.02,shape:'bird'},
+    {type:'elite',name:'Jet Elite',hp:5,speed:2.35,points:90,color:'#7c3aed',size:31,rate:0.006,shape:'jetElite'},
+    {type:'boss',name:'Jet Boss',hp:10,speed:1.55,points:200,color:'#be123c',size:46,rate:0.0017,shape:'boss'}
+  ];  let gs=null;
   window.skyGame=window.skyGame||{};
   const $=id=>document.getElementById(id);
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -4235,7 +4250,7 @@ function initGuruViews() {
     gs.eventsRef.push(ev).catch(()=>{});
   }
   function broadcastShot(type,b){
-    broadcastEvent('shot',{weapon:type,x:(b.x/Math.max(1,gs.w)),y:(b.y/Math.max(1,gs.h)),dx:b.dx,dy:b.dy,damage:b.damage,color:b.color});
+    broadcastEvent('shot',{weapon:type,x:b.x,y:b.y,dx:b.dx,dy:b.dy,damage:b.damage,color:b.color});
   }
   function applySupport(){
     if(!gs?.player||gs.gameOver)return;
@@ -4270,10 +4285,11 @@ function initGuruViews() {
   function renderShop(){
     const wrap=$('skyShopGrid'); if(!wrap)return;
     const p=getProfile(), special=roleSpecial();
-    wrap.innerHTML=PLANES.map(x=>{
+    const html=PLANES.map(x=>{
       const owned=(p.owned||[]).includes(x.id), active=p.plane===x.id;
-      return `<div class="sky-plane-card ${active?'active':''}"><div class="sky-plane-icon">${x.icon}</div><div class="sky-plane-name">${x.name}</div><div class="sky-plane-meta">${x.desc}<br>Kecepatan ${x.speed.toFixed(1)} • Harga ${x.price===0?'GRATIS':x.price+' poin'}</div><button class="sky-buy" ${owned?'':(p.points<x.price?'disabled':'')} onclick="skyBuyPlane('${x.id}')">${active?'✅ Dipakai':owned?'Pakai':'🪙 Beli'}</button></div>`
-    }).join('') + ((special!=='normal')?`<div class="sky-plane-card active"><div class="sky-plane-icon">${special==='admin'?'🛸':'🚁'}</div><div class="sky-plane-name">${special==='admin'?'Admin Colossus':'Guru Kelas 4 Titan'}</div><div class="sky-plane-meta">Pesawat khusus besar dengan <b>laser, listrik, dan rudal</b>. Tidak bisa melukai pemain lain.</div><button class="sky-buy" disabled>⭐ Pesawat Khusus Aktif</button></div>`:'');
+      return `<div class="sky-plane-card ${active?'active':''}"><div class="sky-plane-icon">${x.icon}</div><div class="sky-plane-name">${x.name}</div><div class="sky-plane-meta">${x.desc}<br>Kecepatan ${x.speed.toFixed(1)} • Harga ${x.price===0?'GRATIS':x.price.toLocaleString('id-ID')+' poin'}</div><button class="sky-buy" ${owned?'':(p.points<x.price?'disabled':'')} onclick="skyBuyPlane('${x.id}')">${active?'✅ Dipakai':owned?'Pakai':'🪙 Beli'}</button></div>`
+    }).join('') + ((special!=='normal')?`<div class="sky-plane-card active"><div class="sky-plane-icon">${special==='admin'?'🛸':'🚁'}</div><div class="sky-plane-name">${special==='admin'?'Admin Colossus':'Guru Kelas 4 Titan'}</div><div class="sky-plane-meta">Pesawat khusus besar dengan <b>laser, listrik, dan rudal</b>.</div><button class="sky-buy" disabled>⭐ Pesawat Khusus Aktif</button></div>`:'');
+    wrap.innerHTML=html; const gameWrap=$('skyShopGridGame'); if(gameWrap)gameWrap.innerHTML=html; if($('skyShopPoints'))$('skyShopPoints').textContent=(p.points||0).toLocaleString('id-ID');
   }
   window.skyBuyPlane=function(id){
     if(!currentUser)return;
@@ -4283,6 +4299,8 @@ function initGuruViews() {
     p.points-=x.price;p.owned=(p.owned||[]).concat(id);p.plane=id;saveProfile(p);notify('🎉 '+x.name+' berhasil dibeli!');
     if(gs) gs.player=makePlayer();
   };
+  window.openSkyShop=function(){const m=$('skyShopModal');if(m){m.classList.add('open');m.setAttribute('aria-hidden','false');renderShop();}};
+  window.closeSkyShop=function(){const m=$('skyShopModal');if(m){m.classList.remove('open');m.setAttribute('aria-hidden','true');}};
   function resize(){
     if(!gs||!gs.canvas)return;
     const r=gs.canvas.getBoundingClientRect();
@@ -4295,7 +4313,7 @@ function initGuruViews() {
   }
   function makePlayer(){
     const pl=effectivePlane();
-    return{x:gs.w/2,y:gs.h-100,plane:pl,shots:0,inv:0,hp:3,deadUntil:0,respawnCount:0,
+    return{x:gs.camX||0,y:(gs.camY||0)+gs.h*.25,plane:pl,shots:0,inv:0,hp:3,deadUntil:0,respawnCount:0,
       frozenUntil:0,burningUntil:0,prankCharges:(roleSpecial()==='normal'?0:0)};
   }
   function isInvulnerable(){
@@ -4305,7 +4323,7 @@ function initGuruViews() {
   function respawnPlayer(reason='respawn'){
     if(!gs)return;
     const p=gs.player;
-    p.x=gs.w/2; p.y=gs.h-100; p.hp=3; p.inv=2200; p.deadUntil=0;
+    p.x=gs.camX||0; p.y=(gs.camY||0)+gs.h*.25; p.hp=3; p.inv=2200; p.deadUntil=0;
     p.frozenUntil=0; p.burningUntil=0; gs.gameOver=false; gs.vel={x:0,y:0};
     setTimeout(()=>{try{if(gs&&gs.onlineRef)gs.onlineRef.child(profileFirebaseKey()).update({hp:3,alive:true,deadUntil:0,inv:p.inv||0})}catch(e){}},30);
     gs.keys.fire=false; notify(reason==='prank'?'✨ Pesawatmu kembali ke arena!':'🚀 Pesawat siswa hidup kembali! HP 3');
@@ -4359,7 +4377,7 @@ function initGuruViews() {
     const now=Date.now();if(!force && now-gs.lastSpawn<gs.spawnDelay)return;
     gs.lastSpawn=now;gs.spawnDelay=Math.max(300,1250-gs.level*60);
     const r=Math.random(), pool=r<.58?ENEMIES[0]:r<.87?ENEMIES[1]:r<.98?ENEMIES[2]:ENEMIES[3];
-    const e={...pool,x:25+Math.random()*(gs.w-50),y:-60,ang:0,hp:pool.hp,maxHp:pool.hp,phase:Math.random()*6.28,lastFire:Date.now()+500+Math.random()*1200,fire:pool.fire||1500,bulletSpeed:pool.bulletSpeed||4.8,damage:pool.damage||1,bulletColor:pool.bulletColor||'#ef4444'};
+    const e={...pool,x:(gs.camX||0)-gs.w*.55+Math.random()*(gs.w*1.1),y:(gs.camY||0)-gs.h*.75,ang:0,hp:pool.hp,maxHp:pool.hp,phase:Math.random()*6.28,lastFire:Date.now()+500+Math.random()*1200,fire:pool.fire||1500,bulletSpeed:pool.bulletSpeed||4.8,damage:pool.damage||1,bulletColor:pool.bulletColor||'#ef4444'};
     gs.enemies.push(e);
   }
   function bullet(x,y,dx,dy,type,damage=1,color='#fef08a'){gs.bullets.push({x,y,dx,dy,type,damage,color,life:0})}
@@ -4436,11 +4454,13 @@ function initGuruViews() {
     const accel=Math.min(1,dt/150), friction=Math.pow(0.82,dt/16.67);
     gs.vel.x += (targetX-gs.vel.x)*accel; gs.vel.y += (targetY-gs.vel.y)*accel;
     if(mag<0.04){gs.vel.x*=friction;gs.vel.y*=friction;}
-    p.x=clamp(p.x+gs.vel.x*dt/1000,30,gs.w-30);p.y=clamp(p.y+gs.vel.y*dt/1000,55,gs.h-55);
+    p.x+=gs.vel.x*dt/1000; p.y+=gs.vel.y*dt/1000;
+    // Kamera mengikuti pesawat sehingga arena dapat dijelajahi bebas ke semua arah.
+    const camEase=Math.min(1,dt/110); gs.camX+=(p.x-gs.w*.5-gs.camX)*camEase; gs.camY+=(p.y-gs.h*.55-gs.camY)*camEase;
     if(gs.keys.fire&&!frozen)fire();
     if(p.inv>0)p.inv-=dt;
     gs.enemies.forEach(e=>enemyFire(e));
-    if(Date.now()-gs.lastBox>12000 && Math.random()<0.0015*dt){gs.boxes.push({x:35+Math.random()*(gs.w-70),y:-30,vy:1.4});gs.lastBox=Date.now();}
+    if(Date.now()-gs.lastBox>12000 && Math.random()<0.0015*dt){gs.boxes.push({x:(gs.camX||0)-gs.w*.5+Math.random()*gs.w,y:(gs.camY||0)-gs.h*.65,vy:1.4});gs.lastBox=Date.now();}
     spawnEnemy();
     gs.enemies.forEach(e=>{
       const frozen=(e.frozenUntil||0)>Date.now();
@@ -4480,7 +4500,7 @@ function initGuruViews() {
   function drawPlane(ctx,p){
     const x=p.x,y=p.y,pl=p.plane,scale=pl.big||1;
     ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);ctx.globalAlpha=p.inv>0?0.55:1;
-    // Siluet jet tempur: badan tengah, sayap lebar, ekor, kokpit dan mesin.
+    // Siluet berbeda sesuai harga pesawat: semakin mahal semakin besar dan kompleks.
     ctx.shadowColor='rgba(15,23,42,.28)';ctx.shadowBlur=8;
     ctx.fillStyle=pl.color;ctx.strokeStyle='#0b1f33';ctx.lineWidth=2.5;
     ctx.beginPath();
@@ -4503,6 +4523,8 @@ function initGuruViews() {
     const flame=5+Math.sin(Date.now()/55)*2;
     ctx.fillStyle='#1e293b';ctx.beginPath();ctx.arc(-10,39,6,0,Math.PI*2);ctx.arc(10,39,6,0,Math.PI*2);ctx.fill();
     ctx.fillStyle='#fb923c';ctx.beginPath();ctx.moveTo(-10,43);ctx.lineTo(-5,43);ctx.lineTo(-8,43+flame);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(5,43);ctx.lineTo(10,43);ctx.lineTo(8,43+flame);ctx.closePath();ctx.fill();
+    if(pl.shape==='galaxy'||pl.id==='galaxy'){ctx.strokeStyle='#f9a8d4';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-65,8);ctx.lineTo(-95,25);ctx.moveTo(65,8);ctx.lineTo(95,25);ctx.stroke();}
+    if(pl.shape==='guardian'||pl.id==='guardian'){ctx.strokeStyle='#fef3c7';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-58,18);ctx.lineTo(-78,40);ctx.moveTo(58,18);ctx.lineTo(78,40);ctx.stroke();}
     if(pl.guru4Jet){
       ctx.fillStyle='rgba(14,165,233,.18)';ctx.beginPath();ctx.ellipse(0,2,72,28,0,0,Math.PI*2);ctx.fill();
       ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillStyle='#082f49';ctx.fillText('GURU KELAS 4',0,70);
@@ -4525,14 +4547,30 @@ function initGuruViews() {
     }
   }
   function drawEnemy(ctx,e){
-    ctx.save();ctx.translate(e.x,e.y);ctx.fillStyle=e.color;ctx.strokeStyle='#0f172a';ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(0,e.size*-1.25);ctx.lineTo(e.size,0);ctx.lineTo(0,e.size*.55);ctx.lineTo(-e.size,0);ctx.closePath();ctx.fill();ctx.stroke();
-    ctx.fillStyle='#f8fafc';ctx.beginPath();ctx.ellipse(0,-2,e.size*.25,e.size*.45,0,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='rgba(15,23,42,.55)';ctx.fillRect(-e.size,e.size*.8,e.size*2,4);ctx.fillStyle='#22c55e';ctx.fillRect(-e.size,e.size*.8,e.size*2*(e.hp/e.maxHp),4);ctx.restore();
-    drawStatusEffects(ctx,e.x,e.y,{frozenUntil:e.frozenUntil,burningUntil:e.burningUntil},Math.max(.72,Math.min(1.05,e.size/34)));
+    const s=e.size; ctx.save();ctx.translate(e.x,e.y);ctx.fillStyle=e.color;ctx.strokeStyle='#0f172a';ctx.lineWidth=2;
+    if(e.shape==='duck'){
+      ctx.fillStyle='#facc15';ctx.beginPath();ctx.ellipse(0,4,s*.85,s*.62,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#fde68a';ctx.beginPath();ctx.arc(0,-s*.48,s*.48,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#f97316';ctx.beginPath();ctx.moveTo(s*.38,-s*.48);ctx.lineTo(s*.85,-s*.34);ctx.lineTo(s*.38,-s*.2);ctx.closePath();ctx.fill();
+      ctx.fillStyle='#111827';ctx.beginPath();ctx.arc(-s*.16,-s*.58,2.5,0,Math.PI*2);ctx.arc(s*.16,-s*.58,2.5,0,Math.PI*2);ctx.fill();
+      ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillStyle='#78350f';ctx.fillText('BEBEK',0,s*1.15);
+    } else if(e.shape==='bird'){
+      ctx.fillStyle='#334155';ctx.beginPath();ctx.ellipse(0,0,s*.55,s*.75,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#0f172a';ctx.beginPath();ctx.moveTo(-s*.3,-2);ctx.quadraticCurveTo(-s*1.2,-s*.8,-s*1.35,s*.2);ctx.quadraticCurveTo(-s*.7,s*.15,-s*.3,s*.35);ctx.fill();ctx.beginPath();ctx.moveTo(s*.3,-2);ctx.quadraticCurveTo(s*1.2,-s*.8,s*1.35,s*.2);ctx.quadraticCurveTo(s*.7,s*.15,s*.3,s*.35);ctx.fill();
+      ctx.fillStyle='#f59e0b';ctx.beginPath();ctx.moveTo(s*.5,-2);ctx.lineTo(s*1.0,2);ctx.lineTo(s*.5,6);ctx.closePath();ctx.fill();
+    } else {
+      // Jet tempur: hidung tajam, sayap menyapu, ekor ganda dan mesin.
+      ctx.beginPath();ctx.moveTo(0,-s*1.45);ctx.lineTo(s*.32,-s*.5);ctx.lineTo(s*1.65,s*.25);ctx.lineTo(s*1.35,s*.55);ctx.lineTo(s*.38,s*.45);ctx.lineTo(s*.72,s*1.05);ctx.lineTo(0,s*.7);ctx.lineTo(-s*.72,s*1.05);ctx.lineTo(-s*.38,s*.45);ctx.lineTo(-s*1.35,s*.55);ctx.lineTo(-s*1.65,s*.25);ctx.lineTo(-s*.32,-s*.5);ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.fillStyle='#cbd5e1';ctx.beginPath();ctx.moveTo(0,-s*1.25);ctx.quadraticCurveTo(s*.35,-s*.55,0,s*.15);ctx.quadraticCurveTo(-s*.35,-s*.55,0,-s*1.25);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#0f172a';ctx.beginPath();ctx.ellipse(0,-s*.55,s*.12,s*.28,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#fb923c';ctx.beginPath();ctx.arc(-s*.28,s*.72,s*.13,0,Math.PI*2);ctx.arc(s*.28,s*.72,s*.13,0,Math.PI*2);ctx.fill();
+    }
+    ctx.fillStyle='rgba(15,23,42,.65)';ctx.fillRect(-s,s*1.18,s*2,4);ctx.fillStyle='#22c55e';ctx.fillRect(-s,s*1.18,s*2*Math.max(0,e.hp/e.maxHp),4);
+    ctx.restore(); drawStatusEffects(ctx,e.x,e.y,{frozenUntil:e.frozenUntil,burningUntil:e.burningUntil},Math.max(.72,Math.min(1.05,e.size/34)));
   }
   function draw(){
     if(!gs)return;const c=gs.ctx,w=gs.w,h=gs.h;c.clearRect(0,0,w,h);
+    // Semua objek berada di dunia besar; kamera mengikuti pesawat utama.
     // Langit cerah agar arena tidak tampak gelap/kosong.
     const g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,'#0284c7');g.addColorStop(.42,'#38bdf8');g.addColorStop(1,'#e0f2fe');c.fillStyle=g;c.fillRect(0,0,w,h);
     // Matahari lembut
@@ -4541,6 +4579,7 @@ function initGuruViews() {
     for(let i=0;i<6;i++)drawCloud(c,(i*241+gs.t*.018)%(w+220)-110,70+(i%3)*135,48+(i%2)*14);
     c.fillStyle='rgba(14,116,144,.16)';c.beginPath();c.moveTo(0,h*.78);for(let i=0;i<=w;i+=70)c.lineTo(i,h*.72+Math.sin(i*.015)*28);c.lineTo(w,h);c.lineTo(0,h);c.closePath();c.fill();
     for(let i=0;i<28;i++){const xx=(i*97)%w,yy=(i*53+gs.t*.08)%h;c.fillStyle='rgba(255,255,255,.48)';c.fillRect(xx,yy,2,5)}
+    c.save(); c.translate(-gs.camX+w*.5,-gs.camY+h*.55);
     gs.boxes.forEach(b=>{c.save();c.translate(b.x,b.y);c.rotate(Math.sin(gs.t/250)*.1);c.shadowColor='rgba(15,23,42,.25)';c.shadowBlur=8;c.fillStyle='#f59e0b';c.strokeStyle='#fff';c.lineWidth=3;c.fillRect(-17,-17,34,34);c.strokeRect(-17,-17,34,34);c.shadowBlur=0;c.fillStyle='#fff';c.font='20px sans-serif';c.textAlign='center';c.fillText('?',0,7);c.restore()});
     gs.bullets.forEach(b=>{c.save();c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=b.type==='laser'?8:4;c.shadowColor=b.color;c.shadowBlur=b.type==='laser'?14:6;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*.25,b.y-b.dy*.25);c.stroke();c.restore();});
     gs.enemyBullets.forEach(b=>{c.save();c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=4;c.shadowColor=b.color;c.shadowBlur=9;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*1.8,b.y-b.dy*1.8);c.stroke();c.beginPath();c.arc(b.x,b.y,3.5,0,Math.PI*2);c.fill();c.restore();});
@@ -4569,6 +4608,7 @@ function initGuruViews() {
       c.strokeText(String(currentUser?.nama||currentUser?.username||'Pemain'),gs.player.x,gs.player.y-80);c.fillText(String(currentUser?.nama||currentUser?.username||'Pemain'),gs.player.x,gs.player.y-80);
       c.restore();
     }
+    c.restore();
   }
   function loop(ts){
     if(!gs)return;
@@ -4585,6 +4625,7 @@ function initGuruViews() {
     const end=()=>{if(!gs)return;gs.joy={x:0,y:0};knob.style.transform='translate(-50%,-50%)'};
     joy.addEventListener('pointerdown',e=>{joy.setPointerCapture(e.pointerId);setJoy(e)});joy.addEventListener('pointermove',e=>{if(e.buttons)setJoy(e)});joy.addEventListener('pointerup',end);joy.addEventListener('pointercancel',end);
     $('skyFireBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();ensureAudio();gs.keys.fire=true;fire()});['pointerup','pointercancel','pointerleave'].forEach(ev=>$('skyFireBtn')?.addEventListener(ev,()=>{if(gs)gs.keys.fire=false}));
+    $('skyShopBtn')?.addEventListener('click',e=>{e.preventDefault();openSkyShop()});
     $('skySupportBtn')?.addEventListener('click',e=>{e.preventDefault();applySupport()});
     $('skyBoxBtn')?.addEventListener('click',()=>{if(gs){const near=gs.boxes.findIndex(b=>Math.hypot(b.x-gs.player.x,b.y-gs.player.y)<85);if(near>=0){gs.boxes.splice(near,1);collectBox()}else notify('🎁 Dekati kotak misteri yang jatuh dari langit!')}})
     window.addEventListener('keydown',e=>{if(!gs)return;const k=e.key.toLowerCase();if(['arrowleft','a'].includes(k))gs.keys.left=true;if(['arrowright','d'].includes(k))gs.keys.right=true;if(['arrowup','w'].includes(k))gs.keys.up=true;if(['arrowdown','s'].includes(k))gs.keys.down=true;if(k===' ')gs.keys.fire=true});
@@ -4618,7 +4659,7 @@ function initGuruViews() {
     $('secSkyBattle')?.classList.remove('hidden');$('schoolFeatureDock')?.style.setProperty('display','flex');
     enterSkyFullscreen();
     if(gs){gs.vel=gs.vel||{x:0,y:0};resize();updateHud();return}
-    gs={canvas,ctx:canvas.getContext('2d',{alpha:false}),w:0,h:0,t:0,prev:performance.now(),acc:0,lastFire:0,lastSpawn:0,spawnDelay:900,lastBox:0,level:1,enemies:[],bullets:[],enemyBullets:[],remoteBullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{},onlineRef:null,eventsRef:null,presenceTimer:null,resizeHandler:null,vel:{x:0,y:0}};
+    gs={canvas,ctx:canvas.getContext('2d',{alpha:false}),w:0,h:0,t:0,prev:performance.now(),acc:0,lastFire:0,lastSpawn:0,spawnDelay:900,lastBox:0,level:1,enemies:[],bullets:[],enemyBullets:[],remoteBullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{},onlineRef:null,eventsRef:null,presenceTimer:null,resizeHandler:null,vel:{x:0,y:0},camX:0,camY:0,worldSeed:Math.random()*10000};
     resize();gs.player=makePlayer();gs.player.prankCharges=(getProfile().prankCharges||0);setupControls();updateHud();notify('🌟 Mode online ringan aktif.');gs.raf=requestAnimationFrame(loop);
     gs.resizeHandler=()=>resize(); window.addEventListener('resize',gs.resizeHandler,{passive:true});
 
@@ -4646,7 +4687,7 @@ function initGuruViews() {
         if(!gs)return;
         const v=snap.val();
         if(v){
-          if(v.xN!=null){v.x=v.xN*gs.w;v.y=v.yN*gs.h;}
+          if(v.xN!=null && v.x==null){v.x=v.xN*gs.w;v.y=v.yN*gs.h;}
           gs.remotePlayers[v.id]=v;
           const eff=v.battleEffect;
           if(v.id!==profileKey() && eff && eff.until>Date.now()){
@@ -4663,7 +4704,7 @@ function initGuruViews() {
       gs.eventsRef=onlineRef.child('_events');
       const eventSync=snap=>{
         const ev=snap.val(); if(!ev||ev.by===profileKey())return; if(ev.ts && Date.now()-Number(ev.ts)>7000)return;
-        if(ev.type==='shot'){const b={x:(ev.x||0)*gs.w,y:(ev.y||0)*gs.h,dx:ev.dx||0,dy:ev.dy||-10,type:ev.weapon||'normal',damage:ev.damage||1,color:ev.color||'#fde047',life:0,by:ev.by};gs.remoteBullets.push(b);weaponSound(ev.weapon||'normal',true);}
+        if(ev.type==='shot'){const b={x:Number(ev.x)||0,y:Number(ev.y)||0,dx:ev.dx||0,dy:ev.dy||-10,type:ev.weapon||'normal',damage:ev.damage||1,color:ev.color||'#fde047',life:0,by:ev.by};gs.remoteBullets.push(b);weaponSound(ev.weapon||'normal',true);}
         else if(ev.type==='playerDeath'){ if(ev.victim!==profileKey()){const v=gs.remotePlayers[ev.victim];if(v){v.hp=0;v.alive=false;v.deadUntil=Date.now()+1800;} notify('💥 '+(v?.nama||'Teman')+' hancur!'); if(ev.killer===profileKey()){const p=getProfile();p.points=(p.points||0)+60;p.kills=(p.kills||0)+1;saveProfile(p);notify('🏆 Kamu membantu menjatuhkan pesawat pemain! +60 poin');}}}
         else if(ev.type==='playerRespawn'){const v=gs.remotePlayers[ev.victim];if(v){v.hp=3;v.alive=true;v.deadUntil=0;}}
         else if(ev.type==='support')receiveSupport(ev);
