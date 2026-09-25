@@ -4433,27 +4433,51 @@ function initGuruViews() {
     notify('🎭 PRANK aktif! Pesawat siswa lain & musuh membeku dan terbakar.');
     updateHud();
   }
+  // Musuh datang bertahap: sedikit musuh aktif per pemain agar CPU/GPU tetap ringan.
   function spawnEnemy(force=false){
-    if(!gs)return;
-    const now=Date.now();if(!force && now-gs.lastSpawn<gs.spawnDelay)return;
-    gs.lastSpawn=now;gs.spawnDelay=Math.max(300,1250-gs.level*60);
-    const r=Math.random(), pool=r<.58?ENEMIES[0]:r<.87?ENEMIES[1]:r<.98?ENEMIES[2]:ENEMIES[3];
-    const ex=Math.max(-gs.arenaW*.5+100,Math.min(gs.arenaW*.5-100,(gs.camX||0)-gs.w*.55+Math.random()*(gs.w*1.1)));
-    const ey=Math.max(-gs.arenaH*.5+100,Math.min(gs.arenaH*.5-100,(gs.camY||0)-gs.h*.75));
-    const e={...pool,x:ex,y:ey,ang:0,hp:pool.hp,maxHp:pool.hp,phase:Math.random()*6.28,lastFire:Date.now()+500+Math.random()*1200,fire:pool.fire||1500,bulletSpeed:pool.bulletSpeed||4.8,damage:pool.damage||1,bulletColor:pool.bulletColor||'#ef4444'};
-    if(gs.enemies.length>=8)return; gs.enemies.push(e);
+    if(!gs||gs.gameOver)return;
+    const now=Date.now();
+    const maxEnemies=Math.min(4,2+Math.floor((gs.level||1)/4));
+    if(gs.enemies.length>=maxEnemies)return;
+    if(!force && now-gs.lastSpawn<gs.spawnDelay)return;
+    gs.lastSpawn=now;
+    // Jarak antar kemunculan dibuat bertahap, tidak membanjiri arena.
+    gs.spawnDelay=Math.max(2200,3600-(Math.min(10,gs.level||1)-1)*120);
+    const r=Math.random(), pool=r<.65?ENEMIES[0]:r<.9?ENEMIES[1]:r<.985?ENEMIES[2]:ENEMIES[3];
+    const side=Math.random()<.5?-1:1;
+    const ex=Math.max(-gs.arenaW*.5+120,Math.min(gs.arenaW*.5-120,(gs.camX||0)+side*(gs.w*.55+80)+Math.random()*180-90));
+    const ey=Math.max(-gs.arenaH*.5+120,Math.min(gs.arenaH*.5-120,(gs.camY||0)-gs.h*.75-Math.random()*180));
+    const e={...pool,x:ex,y:ey,ang:0,hp:pool.hp,maxHp:pool.hp,phase:Math.random()*6.28,
+      lastFire:Date.now()+900+Math.random()*1400,fire:pool.fire||1700,
+      bulletSpeed:Math.min(4.2,pool.bulletSpeed||4.2),damage:Math.min(5,pool.damage||1),
+      bulletColor:pool.bulletColor||'#ef4444',targetId:null};
+    gs.enemies.push(e);
   }
-  function bullet(x,y,dx,dy,type,damage=1,color='#fef08a'){gs.bullets.push({x,y,dx,dy,type,damage,color,life:0})}
+  function bullet(x,y,dx,dy,type,damage=1,color='#fef08a'){
+    if(!gs)return;
+    if(gs.bullets.length>=36)gs.bullets.splice(0,6);
+    gs.bullets.push({x,y,dx,dy,type,damage,color,life:0});
+  }
   function enemyFire(e){
     if(!gs||gs.gameOver||!gs.player)return;
-    const now=Date.now(), interval=Math.max(850,(e.fire||1500)-gs.level*25);
+    const now=Date.now(), interval=Math.max(1100,(e.fire||1700)-(gs.level||1)*15);
     if(!e.lastFire)e.lastFire=now+Math.random()*900;
-    if(now-e.lastFire<interval)return; e.lastFire=now;
-    const candidates=[{id:profileKey(),x:gs.player.x,y:gs.player.y,role:currentUser?.role||'Siswa'}].concat(Object.values(gs.remotePlayers||{}).map(v=>({id:v.id,x:(v.x||0),y:(v.y||0),role:v.role}))).filter(v=>v.role==='Siswa');
-    const target=candidates.length?candidates[Math.floor(Math.random()*candidates.length)]:{x:gs.player.x,y:gs.player.y,id:profileKey()};
-    const dx=target.x-e.x,dy=target.y-e.y,len=Math.hypot(dx,dy)||1,speed=e.bulletSpeed||4.8;
-    gs.enemyBullets.push({x:e.x,y:e.y+e.size*.7,dx:dx/len*speed,dy:dy/len*speed,damage:e.damage||1,color:e.bulletColor||'#ef4444',life:0,targetId:target.id});
-    weaponSound('normal',true);
+    if(now-e.lastFire<interval)return;
+
+    // Musuh memilih pesawat siswa yang paling dekat. Jadi pemain yang login
+    // benar-benar menjadi sasaran tanpa membuat semua musuh menembak sekaligus.
+    const candidates=[{id:profileKey(),x:gs.player.x,y:gs.player.y,role:currentUser?.role||'Siswa'}]
+      .concat(Object.values(gs.remotePlayers||{}).map(v=>({id:v.id,x:Number(v.x)||0,y:Number(v.y)||0,role:v.role,alive:v.alive!==false})))
+      .filter(v=>v.role==='Siswa' && v.alive!==false);
+    if(!candidates.length)return;
+    candidates.sort((a,b)=>Math.hypot(a.x-e.x,a.y-e.y)-Math.hypot(b.x-e.x,b.y-e.y));
+    const target=candidates[0];
+    e.targetId=target.id;
+    const dx=target.x-e.x,dy=target.y-e.y,len=Math.hypot(dx,dy)||1,speed=e.bulletSpeed||4.2;
+    if(gs.enemyBullets.length>=24)gs.enemyBullets.splice(0,gs.enemyBullets.length-24+1);
+    gs.enemyBullets.push({x:e.x,y:e.y+e.size*.7,dx:dx/len*speed,dy:dy/len*speed,
+      damage:e.damage||1,color:e.bulletColor||'#ef4444',life:0,targetId:target.id});
+    e.lastFire=now;
   }
   function hitPlayer(damage=4,attackerId='enemy'){
     if(!gs||gs.gameOver||gs.player.inv>0)return;
@@ -4680,12 +4704,12 @@ function initGuruViews() {
       ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
       // Kubus/kristal es mengelilingi pesawat saat BEKU.
       ctx.globalAlpha=.95;ctx.strokeStyle='#dff8ff';ctx.fillStyle='rgba(125,211,252,.38)';ctx.lineWidth=3;ctx.shadowColor='#67e8f9';ctx.shadowBlur=14;
-      for(let i=0;i<8;i++){const a=i*Math.PI/4+now*.00025,rx=54+Math.sin(i)*5,ry=38+Math.cos(i)*4;const cx=Math.cos(a)*rx,cy=Math.sin(a)*ry;ctx.save();ctx.translate(cx,cy);ctx.rotate(a);ctx.beginPath();ctx.moveTo(0,-10);ctx.lineTo(7,0);ctx.lineTo(0,12);ctx.lineTo(-7,0);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}
+      for(let i=0;i<5;i++){const a=i*Math.PI*2/5+now*.00025,rx=54+Math.sin(i)*5,ry=38+Math.cos(i)*4;const cx=Math.cos(a)*rx,cy=Math.sin(a)*ry;ctx.save();ctx.translate(cx,cy);ctx.rotate(a);ctx.beginPath();ctx.moveTo(0,-10);ctx.lineTo(7,0);ctx.lineTo(0,12);ctx.lineTo(-7,0);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}
       ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.fillStyle='#e0f2fe';ctx.shadowBlur=5;ctx.fillText('❄ BEKU',0,-62);ctx.restore();
     }
     if(status.burningUntil&&status.burningUntil>now){
       ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);ctx.textAlign='center';
-      for(let i=0;i<7;i++){const a=(i-3)*.45,yy=34+Math.sin(now*.012+i)*5,xx=a*22;ctx.font=(16+(i%3)*3)+'px sans-serif';ctx.globalAlpha=.82;ctx.fillText('🔥',xx,yy);}
+      for(let i=0;i<4;i++){const a=(i-1.5)*.55,yy=34+Math.sin(now*.012+i)*5,xx=a*22;ctx.font=(16+(i%3)*3)+'px sans-serif';ctx.globalAlpha=.82;ctx.fillText('🔥',xx,yy);}
       ctx.font='bold 12px sans-serif';ctx.fillStyle='#fff7ed';ctx.shadowColor='#fb923c';ctx.shadowBlur=8;ctx.fillText('🔥 BAKAR',0,-62);ctx.restore();
     }
   }
@@ -4719,9 +4743,9 @@ function initGuruViews() {
     // Matahari lembut
     const sun=c.createRadialGradient(w*.82,h*.15,5,w*.82,h*.15,90);sun.addColorStop(0,'rgba(255,255,210,.95)');sun.addColorStop(1,'rgba(255,255,210,0)');c.fillStyle=sun;c.fillRect(0,0,w,h);
     // Awan dan horizon pegunungan
-    for(let i=0;i<3;i++)drawCloud(c,(i*241+gs.t*.018)%(w+220)-110,70+(i%3)*135,48+(i%2)*14);
+    for(let i=0;i<2;i++)drawCloud(c,(i*241+gs.t*.018)%(w+220)-110,70+(i%3)*135,48+(i%2)*14);
     c.fillStyle='rgba(14,116,144,.16)';c.beginPath();c.moveTo(0,h*.78);for(let i=0;i<=w;i+=70)c.lineTo(i,h*.72+Math.sin(i*.015)*28);c.lineTo(w,h);c.lineTo(0,h);c.closePath();c.fill();
-    for(let i=0;i<12;i++){const xx=(i*97)%w,yy=(i*53+gs.t*.08)%h;c.fillStyle='rgba(255,255,255,.48)';c.fillRect(xx,yy,2,5)}
+    for(let i=0;i<7;i++){const xx=(i*97)%w,yy=(i*53+gs.t*.08)%h;c.fillStyle='rgba(255,255,255,.48)';c.fillRect(xx,yy,2,5)}
     c.save(); c.translate(-gs.camX+w*.5,-gs.camY+h*.55);
     // Lantai/grid arena membuat arah dan luas perang terlihat saat kamera bergerak.
     c.save(); c.strokeStyle='rgba(15,23,42,.12)';c.lineWidth=1;
@@ -4736,7 +4760,19 @@ function initGuruViews() {
     gs.remoteBullets.forEach(b=>{c.save();c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=b.type==='laser'?7:4;c.shadowColor=b.color;c.shadowBlur=14;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*1.7,b.y-b.dy*1.7);c.stroke();c.restore();});
     gs.enemies.forEach(e=>drawEnemy(c,e));drawPlane(c,gs.player);
     if(gs.player){c.save();c.fillStyle='rgba(15,23,42,.65)';c.fillRect(gs.player.x-28,gs.player.y+58,56,6);c.fillStyle='#22c55e';c.fillRect(gs.player.x-28,gs.player.y+58,56*((gs.player.hp??100)/100),6);c.font='bold 11px sans-serif';c.textAlign='center';c.fillStyle='#0f172a';c.fillText('HP '+Math.round(gs.player.hp??100)+'%',gs.player.x,gs.player.y+77);c.restore();}
-    if(gs.remotePlayers) Object.values(gs.remotePlayers).forEach(r=>{if(r.id!==profileKey()){
+    if(gs.remotePlayers) {
+      const remoteList=Object.values(gs.remotePlayers)
+        // Jangan tampilkan pesawat hijau/default yang bukan milik akun yang benar-benar login.
+        // Pesawat siswa hanya muncul bila data akun memiliki role Siswa + nama akun.
+        .filter(r=>{
+          if(!r || r.id===profileKey() || r.x==null || r.y==null) return false;
+          if(r.specialRole==='guru4' || r.specialRole==='admin') return true;
+          const nm=String(r.nama||r.username||'').trim();
+          return r.role==='Siswa' && nm && nm.toLowerCase()!=='pemain';
+        })
+        .sort((a,b)=>Math.hypot((a.x||0)-gs.player.x,(a.y||0)-gs.player.y)-Math.hypot((b.x||0)-gs.player.x,(b.y||0)-gs.player.y))
+        .slice(0,10);
+      remoteList.forEach(r=>{
       const rx=r.renderX??r.x??50, ry=r.renderY??r.y??80; c.save();
       const dead=r.hp<=0||r.alive===false||r.deadUntil>Date.now();
       if(dead){
@@ -4744,7 +4780,7 @@ function initGuruViews() {
         c.font='bold 11px sans-serif';c.fillStyle='#fff';c.shadowColor='#0f172a';c.shadowBlur=5;c.fillText('HANCUR',rx,ry+30);
       }else{
         c.globalAlpha=.9;
-        const remotePlane = r.specialRole==='guru4' ? {id:'guru4',color:'#111827',big:1.55,special:true,guru4Jet:true,dragon:true} : r.specialRole==='admin' ? {id:'admin',color:'#fde047',big:1.35,special:true} : {color:r.color||'#22c55e',big:1};
+        const remotePlane = r.specialRole==='guru4' ? {id:'guru4',color:'#111827',big:1.55,special:true,guru4Jet:true,dragon:true} : r.specialRole==='admin' ? {id:'admin',color:'#fde047',big:1.35,special:true} : {color:r.color||'#2563eb',big:1};
         drawPlane(c,{x:rx,y:ry,plane:remotePlane,inv:r.inv||0});
         drawStatusEffects(c,rx,ry,{frozenUntil:r.frozenUntil,burningUntil:r.burningUntil},1);
       }
@@ -4760,7 +4796,8 @@ function initGuruViews() {
       c.fillStyle='#22c55e';c.fillRect(rx-28,ry+58,56*(rhp/100),5);
       c.font='bold 8px sans-serif';c.fillStyle='#0f172a';c.fillText('HP '+Math.round(rhp)+'%',rx,ry+75);
       c.restore();
-    }});
+      });
+    }
     if(gs.player){
       drawStatusEffects(c,gs.player.x,gs.player.y,{frozenUntil:gs.player.frozenUntil,burningUntil:gs.player.burningUntil},1);
       // Tidak lagi menggambar label "Pemain" di atas pesawat sendiri agar arena tidak ramai.
@@ -4772,7 +4809,12 @@ function initGuruViews() {
     c.strokeStyle='rgba(255,255,255,.75)';c.lineWidth=2;c.strokeRect(mx,my,mw,mh);
     const mapX=x=>mx+(x+gs.arenaW*.5)/gs.arenaW*mw, mapY=y=>my+(y+gs.arenaH*.5)/gs.arenaH*mh;
     c.fillStyle='#fff';c.beginPath();c.arc(mapX(gs.player.x),mapY(gs.player.y),4,0,Math.PI*2);c.fill();
-    Object.values(gs.remotePlayers||{}).forEach(r=>{if(r.x==null||r.y==null)return;c.fillStyle=r.role==='admin'?'#fbbf24':r.role==='guru4'?'#22d3ee':'#a7f3d0';c.beginPath();c.arc(mapX(r.x),mapY(r.y),3,0,Math.PI*2);c.fill();});
+    Object.values(gs.remotePlayers||{}).forEach(r=>{
+      if(r.x==null||r.y==null)return;
+      const nm=String(r.nama||r.username||'').trim();
+      if(r.specialRole!=='admin' && r.specialRole!=='guru4' && !(r.role==='Siswa' && nm && nm.toLowerCase()!=='pemain')) return;
+      c.fillStyle=r.role==='admin'?'#fbbf24':r.role==='guru4'?'#22d3ee':'#a7f3d0';c.beginPath();c.arc(mapX(r.x),mapY(r.y),3,0,Math.PI*2);c.fill();
+    });
     c.fillStyle='#fff';c.font='bold 9px sans-serif';c.textAlign='left';c.fillText('ARENA 5200 × 3800',mx+6,my+12);c.restore();
     c.restore();
   }
@@ -4831,7 +4873,7 @@ function initGuruViews() {
     $('secSkyBattle')?.classList.remove('hidden');$('schoolFeatureDock')?.style.setProperty('display','flex');
     enterSkyFullscreen();
     if(gs){gs.vel=gs.vel||{x:0,y:0};resize();updateHud();return}
-    gs={canvas,ctx:canvas.getContext('2d',{alpha:false}),w:0,h:0,t:0,prev:performance.now(),acc:0,lastFire:0,lastSpawn:0,spawnDelay:900,lastBox:0,level:1,enemies:[],bullets:[],enemyBullets:[],remoteBullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{},onlineRef:null,eventsRef:null,presenceTimer:null,persistTimer:null,resizeHandler:null,vel:{x:0,y:0},camX:0,camY:0,arenaW:5200,arenaH:3800,worldSeed:Math.random()*10000};
+    gs={canvas,ctx:canvas.getContext('2d',{alpha:false}),w:0,h:0,t:0,prev:performance.now(),acc:0,lastFire:0,lastSpawn:0,spawnDelay:3200,lastBox:0,level:1,enemies:[],bullets:[],enemyBullets:[],remoteBullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{},onlineRef:null,eventsRef:null,presenceTimer:null,persistTimer:null,resizeHandler:null,vel:{x:0,y:0},camX:0,camY:0,arenaW:5200,arenaH:3800,worldSeed:Math.random()*10000};
     renderSkyKickTargets();renderSkyTeleportTargets(); resize();gs.player=makePlayer();gs.player.prankCharges=(getProfile().prankCharges||0);setupControls();loadSkySnapshot();updateHud();notify('🌟 Mode online ringan aktif.');gs.raf=requestAnimationFrame(loop);
     gs.persistTimer=setInterval(saveSkySnapshot,5000);
     if(typeof dbRef!=='undefined' && typeof firebaseReady!=='undefined' && firebaseReady && currentUser){
@@ -4865,10 +4907,10 @@ function initGuruViews() {
       gs.presenceTimer=setInterval(()=>{
         if(!gs||!currentUser)return;
         const p=gs.player;
-        if(Math.hypot(p.x-(gs.lastNetX||-9999),p.y-(gs.lastNetY||-9999))>10 || p.hp!==gs.lastNetHp || !!p.deadUntil!==!!gs.lastNetDead || Math.abs((p.frozenUntil||0)-(gs.lastNetFrozen||0))>300 || Math.abs((p.burningUntil||0)-(gs.lastNetBurning||0))>300){
+        if(Math.hypot(p.x-(gs.lastNetX||-9999),p.y-(gs.lastNetY||-9999))>28 || p.hp!==gs.lastNetHp || !!p.deadUntil!==!!gs.lastNetDead || Math.abs((p.frozenUntil||0)-(gs.lastNetFrozen||0))>300 || Math.abs((p.burningUntil||0)-(gs.lastNetBurning||0))>300){
           publish();gs.lastNetHp=p.hp;gs.lastNetDead=!!p.deadUntil;gs.lastNetFrozen=p.frozenUntil||0;gs.lastNetBurning=p.burningUntil||0;
         }
-      },250);
+      },500);
       const sync=(snap)=>{
         if(!gs)return;
         const v=snap.val();
@@ -4891,7 +4933,7 @@ function initGuruViews() {
       const eventSync=snap=>{
         if(!currentUser)return;
         const ev=snap.val(); if(!ev||ev.by===profileKey())return; if(ev.ts && Date.now()-Number(ev.ts)>7000)return;
-        if(ev.type==='shot'){const b={x:Number(ev.x)||0,y:Number(ev.y)||0,dx:ev.dx||0,dy:ev.dy||-10,type:ev.weapon||'normal',damage:ev.damage||1,color:ev.color||'#fde047',life:0,by:ev.by};if(gs.remoteBullets.length<80)gs.remoteBullets.push(b);weaponSound(ev.weapon||'normal',true);}
+        if(ev.type==='shot'){const b={x:Number(ev.x)||0,y:Number(ev.y)||0,dx:ev.dx||0,dy:ev.dy||-10,type:ev.weapon||'normal',damage:ev.damage||1,color:ev.color||'#fde047',life:0,by:ev.by};if(gs.remoteBullets.length<24)gs.remoteBullets.push(b);weaponSound(ev.weapon||'normal',true);}
         else if(ev.type==='playerHit'){
           if(ev.victim===profileKey() && roleSpecial()==='normal' && gs.player.alive!==false){
             hitPlayer(Number(ev.damage)||4,ev.killer||ev.by||'player');
