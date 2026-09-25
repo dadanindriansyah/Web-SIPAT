@@ -305,6 +305,51 @@
             .overflow-x-auto table { min-width: max-content; }
         }
 
+
+/* ===== SIPAT SKY BATTLE : MULTIPLAYER SCHOOL GAME ===== */
+#secSkyBattle{margin-top:2rem}
+.sky-game-shell{position:relative;overflow:hidden;border-radius:28px;background:linear-gradient(#38bdf8 0%,#7dd3fc 38%,#e0f2fe 100%);border:4px solid #fff;box-shadow:0 20px 55px rgba(14,116,144,.2)}
+.sky-topbar{position:relative;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 16px;background:rgba(15,23,42,.78);color:#fff;backdrop-filter:blur(8px)}
+.sky-stat{display:flex;align-items:center;gap:7px;font-weight:900;font-size:12px}
+.sky-chip{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2)}
+#skyCanvas{display:block;width:100%;height:min(70vh,700px);min-height:460px;touch-action:none;cursor:crosshair}
+.sky-overlay{position:absolute;inset:0;z-index:4;pointer-events:none}
+.sky-title{position:absolute;left:18px;top:16px;color:#fff;text-shadow:0 2px 5px #0f172a;font-weight:1000;font-size:clamp(16px,2.2vw,27px)}
+.sky-help{position:absolute;right:18px;top:16px;max-width:280px;color:#fff;text-align:right;font-size:11px;font-weight:800;text-shadow:0 1px 4px #0f172a}
+.sky-controls{position:absolute;z-index:8;left:14px;bottom:16px;display:flex;align-items:flex-end;gap:14px;pointer-events:none}
+.sky-joystick{width:126px;height:126px;border-radius:50%;background:rgba(15,23,42,.26);border:3px solid rgba(255,255,255,.72);box-shadow:inset 0 0 20px rgba(0,0,0,.18);position:relative;pointer-events:auto;touch-action:none}
+.sky-knob{width:54px;height:54px;border-radius:50%;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:linear-gradient(145deg,#f8fafc,#93c5fd);border:3px solid #fff;box-shadow:0 7px 15px rgba(15,23,42,.25)}
+.sky-fire-wrap{display:flex;gap:8px;align-items:flex-end;pointer-events:auto}
+.sky-fire,.sky-box{border:3px solid #fff;color:#fff;font-weight:1000;border-radius:22px;box-shadow:0 8px 20px rgba(15,23,42,.3);cursor:pointer;user-select:none;touch-action:none}
+.sky-fire{width:78px;height:78px;background:linear-gradient(145deg,#ef4444,#b91c1c);font-size:29px}
+.sky-box{width:62px;height:62px;background:linear-gradient(145deg,#facc15,#f97316);font-size:23px}
+.sky-fire:active,.sky-box:active{transform:scale(.94)}
+.sky-bottom-info{position:absolute;z-index:6;right:16px;bottom:16px;display:flex;flex-direction:column;gap:7px;align-items:flex-end;pointer-events:none}
+.sky-weapon{padding:7px 11px;border-radius:12px;background:rgba(15,23,42,.72);color:#fff;font-size:11px;font-weight:1000}
+.sky-message{padding:7px 11px;border-radius:12px;background:rgba(255,255,255,.9);color:#0f172a;font-size:10px;font-weight:900;max-width:250px;text-align:right}
+.sky-mobile-note{display:none}
+.sky-shop{background:#fff;padding:16px;border-top:1px solid #dbeafe}
+.sky-shop-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.sky-shop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.sky-plane-card{border:2px solid #e2e8f0;border-radius:18px;padding:12px;background:linear-gradient(180deg,#fff,#f8fafc)}
+.sky-plane-card.active{border-color:#f59e0b;box-shadow:0 0 0 3px #fef3c7}
+.sky-plane-icon{font-size:36px}
+.sky-plane-name{font-weight:1000;color:#0f172a}
+.sky-plane-meta{font-size:10px;color:#64748b;min-height:30px}
+.sky-buy{margin-top:8px;width:100%;padding:8px;border-radius:11px;border:0;background:#2563eb;color:#fff;font-weight:900;cursor:pointer}
+.sky-buy[disabled]{background:#cbd5e1;color:#64748b;cursor:not-allowed}
+#skyLeaderMini{font-size:10px;color:#475569}
+#schoolFeatureDock{position:fixed;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:80;display:none;gap:6px;padding:7px;background:rgba(15,23,42,.92);border:2px solid rgba(255,255,255,.2);border-radius:20px;box-shadow:0 14px 40px rgba(15,23,42,.28);backdrop-filter:blur(12px);max-width:calc(100vw - 16px);overflow-x:auto}
+#schoolFeatureDock button{white-space:nowrap;border:0;border-radius:13px!important;padding:9px 12px;color:#fff;background:rgba(255,255,255,.1);font-size:11px;font-weight:900;cursor:pointer}
+#schoolFeatureDock button:hover{background:rgba(59,130,246,.75)}
+@media(max-width:640px){
+ #skyCanvas{min-height:410px;height:64vh}
+ .sky-help{display:none}.sky-mobile-note{display:block;font-size:10px;color:#64748b;margin-top:6px}
+ .sky-controls{left:9px;bottom:9px}.sky-joystick{width:108px;height:108px}.sky-knob{width:48px;height:48px}.sky-fire{width:70px;height:70px}.sky-box{width:56px;height:56px}
+ .sky-bottom-info{right:9px;bottom:9px}.sky-message{max-width:180px}
+ #schoolFeatureDock{width:max-content;max-width:calc(100vw - 12px)}
+ body{padding-bottom:74px}
+}
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -1316,7 +1361,50 @@
     </main>
 
 
-    <!-- CHAT UMUM: TERBACA OLEH SEMUA PENGGUNA -->
+    
+<!-- ===== MULTIPLAYER SKY BATTLE ===== -->
+<section id="secSkyBattle" class="hidden no-print">
+  <div class="sky-game-shell">
+    <div class="sky-topbar">
+      <div class="sky-stat"><span>✈️ SKY BATTLE</span><span id="skyRoleBadge" class="sky-chip">Memuat...</span></div>
+      <div class="sky-stat"><span>💰 <b id="skyPoints">0</b> Poin</span><span class="sky-chip">☠️ <b id="skyKills">0</b> Musuh</span><span class="sky-chip">🌐 <b id="skyPlayers">1</b> Pemain</span></div>
+    </div>
+    <div style="position:relative">
+      <canvas id="skyCanvas"></canvas>
+      <div class="sky-overlay">
+        <div class="sky-title">☁️ Misi Langit SIPAT</div>
+        <div class="sky-help">Semua pemain satu arena. Pesawat siswa/guru/admin tidak dapat saling melukai. Hancurkan pesawat komputer dan kumpulkan poin!</div>
+      </div>
+      <div class="sky-controls">
+        <div id="skyJoystick" class="sky-joystick" aria-label="Analog gerak"><div id="skyKnob" class="sky-knob"></div></div>
+        <div class="sky-fire-wrap">
+          <button id="skyBoxBtn" class="sky-box" title="Kotak misteri">🎁</button>
+          <button id="skyFireBtn" class="sky-fire" title="Tembak">🔥</button>
+        </div>
+      </div>
+      <div class="sky-bottom-info">
+        <div id="skyWeapon" class="sky-weapon">Senjata: PELURU</div>
+        <div id="skyMessage" class="sky-message">Gerakkan analog dan tekan 🔥 untuk menembak.</div>
+      </div>
+    </div>
+    <div class="sky-shop">
+      <div class="sky-shop-head">
+        <div><h3 class="font-black text-slate-800">🚀 Hanggar Pesawat</h3><p class="text-xs text-slate-500">Pesawat baru dibeli dengan poin hasil mengalahkan pesawat komputer.</p><div class="sky-mobile-note">HP: gunakan analog + tombol 🔥. Laptop: WASD / panah + Spasi.</div></div>
+        <div id="skyLeaderMini">Poin tersimpan otomatis di cloud.</div>
+      </div>
+      <div id="skyShopGrid" class="sky-shop-grid"></div>
+    </div>
+  </div>
+</section>
+
+<div id="schoolFeatureDock" class="no-print">
+  <button onclick="scrollToRoleDashboard()">🏫 Fitur <span id="dockRole">Saya</span></button>
+  <button onclick="scrollToSkyBattle()">✈️ Game</button>
+  <button onclick="toggleChat(true)">💬 Chat</button>
+  <button onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆️ Atas</button>
+</div>
+
+<!-- CHAT UMUM: TERBACA OLEH SEMUA PENGGUNA -->
     <div id="chatWidget" class="hidden no-print">
         <div id="chatPanel" class="hidden">
             <div class="bg-gradient-to-r from-blue-700 to-violet-700 text-white px-4 py-3 flex items-center justify-between gap-2">
@@ -1679,6 +1767,7 @@
         }
 
         function logout() {
+            if (typeof stopSpaceGame === 'function') stopSpaceGame();
             currentUser = null;
             toggleChat(false);
             const chatWidget = document.getElementById('chatWidget');
@@ -1696,6 +1785,7 @@
 
         function showDashboard(role) {
             document.getElementById('secLogin').classList.add('hidden');
+            if (typeof initSpaceGame === 'function') initSpaceGame();
             document.getElementById('userInfo').classList.remove('hidden');
             const chatWidget = document.getElementById('chatWidget');
             if (chatWidget) chatWidget.classList.remove('hidden');
@@ -3626,7 +3716,7 @@ const dbRef = firebase.database().ref('sipat_data');
 
 // Semua perubahan aplikasi ditulis langsung ke LocalStorage (cache) DAN Firebase.
 // Tidak ada lagi tombol Sinkron ke Cloud / Ambil dari Cloud.
-const CLOUD_KEYS = ['schoolProfile','adminPassword','users','mapel','ekskul','absensi','nilai','nilai_ekskul','tabungan','bintang','jurnal','kktp','chatMessages'];
+const CLOUD_KEYS = ['schoolProfile','adminPassword','users','mapel','ekskul','absensi','nilai','nilai_ekskul','tabungan','bintang','jurnal','kktp','chatMessages','skyBattleProfiles'];
 let firebaseReady = false;
 let applyingFirebaseData = false;
 
@@ -3811,5 +3901,196 @@ function initGuruViews() {
     applyGuruAccess();
 }
     </script>
+
+<script>
+/* ===== SKY BATTLE ENGINE ===== */
+(function(){
+  const GAME_KEY='skyBattleProfiles';
+  const PLANES=[
+    {id:'starter',name:'Pesawat Pemula',icon:'🛩️',price:0,speed:4.0,fire:330,color:'#2563eb',desc:'Ringan dan mudah dikendalikan.'},
+    {id:'falcon',name:'Falcon Biru',icon:'✈️',price:180,speed:5.0,fire:270,color:'#0ea5e9',desc:'Cepat dengan tembakan rapat.'},
+    {id:'thunder',name:'Thunder Jet',icon:'🚀',price:450,speed:5.6,fire:230,color:'#7c3aed',desc:'Tembakan listrik menyebar.'},
+    {id:'phoenix',name:'Phoenix',icon:'🔥',price:800,speed:6.1,fire:190,color:'#ef4444',desc:'Rudal dan peluru berdaya tinggi.'},
+    {id:'guardian',name:'Guardian Colossus',icon:'🛡️',price:1400,speed:4.3,fire:155,color:'#f59e0b',desc:'Pesawat besar untuk misi berat.'},
+    {id:'galaxy',name:'Galaxy Titan',icon:'🌌',price:2600,speed:4.7,fire:120,color:'#ec4899',desc:'Kapal tempur raksasa dengan arsenal lengkap.'}
+  ];
+  const ENEMIES=[
+    {type:'scout',name:'Pesawat Mini',hp:1,speed:1.5,points:25,color:'#64748b',size:18,rate:0.018},
+    {type:'fighter',name:'Pesawat Tempur',hp:2,speed:1.9,points:45,color:'#334155',size:24,rate:0.012},
+    {type:'elite',name:'Pesawat Elite',hp:4,speed:2.2,points:85,color:'#7c3aed',size:31,rate:0.006},
+    {type:'boss',name:'Boss Udara',hp:8,speed:1.4,points:180,color:'#be123c',size:46,rate:0.0017}
+  ];
+  let gs=null;
+  window.skyGame=window.skyGame||{};
+  const $=id=>document.getElementById(id);
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  function profileKey(){return currentUser ? String(currentUser.username||'guest')+'_'+String(currentUser.tapel||getActiveTapel()) : 'guest';}
+  function getProfiles(){try{return JSON.parse(localStorage.getItem(GAME_KEY)||'{}')}catch(e){return {}}}
+  function getProfile(){const all=getProfiles(),k=profileKey();let p=all[k];if(!p)p={points:0,kills:0,plane:'starter',owned:['starter'],weapon:'peluru',weaponUntil:0};return p}
+  function saveProfile(p){
+    const all=getProfiles(); all[profileKey()]=p; localStorage.setItem(GAME_KEY,JSON.stringify(all));
+    if(typeof saveAppData==='function') saveAppData(GAME_KEY,JSON.stringify(all));
+    updateHud();
+  }
+  function roleSpecial(){
+    const u=currentUser||{}; const kelas=String(u.kelas||'').replace(/\s/g,'').toLowerCase();
+    if(u.role==='Admin') return 'admin';
+    if(u.role==='Guru' && (kelas==='4'||kelas==='kelas4'||String(u.kelas||'').includes('4'))) return 'guru4';
+    return 'normal';
+  }
+  function effectivePlane(){
+    const p=getProfile(), special=roleSpecial();
+    if(special==='admin') return {id:'admin',name:'Admin Colossus',icon:'🛸',speed:3.7,fire:105,color:'#fde047',big:true,special:true};
+    if(special==='guru4') return {id:'guru4',name:'Guru Kelas 4 Titan',icon:'🚁',speed:3.9,fire:115,color:'#22d3ee',big:true,special:true};
+    return PLANES.find(x=>x.id===p.plane)||PLANES[0];
+  }
+  function weaponLabel(){const p=getProfile(); if(p.weaponUntil && p.weaponUntil>Date.now()) return p.weapon.toUpperCase(); return 'PELURU'}
+  function notify(msg){const e=$('skyMessage');if(e)e.textContent=msg}
+  function updateHud(){
+    const p=getProfile(), plane=effectivePlane();
+    if($('skyPoints'))$('skyPoints').textContent=p.points||0;
+    if($('skyKills'))$('skyKills').textContent=p.kills||0;
+    if($('skyRoleBadge'))$('skyRoleBadge').textContent=(currentUser?.role||'Pemain')+' • '+plane.name;
+    if($('skyWeapon'))$('skyWeapon').textContent='Senjata: '+weaponLabel();
+    renderShop();
+  }
+  function renderShop(){
+    const wrap=$('skyShopGrid'); if(!wrap)return;
+    const p=getProfile(), special=roleSpecial();
+    wrap.innerHTML=PLANES.map(x=>{
+      const owned=(p.owned||[]).includes(x.id), active=p.plane===x.id;
+      return `<div class="sky-plane-card ${active?'active':''}"><div class="sky-plane-icon">${x.icon}</div><div class="sky-plane-name">${x.name}</div><div class="sky-plane-meta">${x.desc}<br>Kecepatan ${x.speed.toFixed(1)} • Harga ${x.price===0?'GRATIS':x.price+' poin'}</div><button class="sky-buy" ${owned?'':(p.points<x.price?'disabled':'')} onclick="skyBuyPlane('${x.id}')">${active?'✅ Dipakai':owned?'Pakai':'🪙 Beli'}</button></div>`
+    }).join('') + ((special!=='normal')?`<div class="sky-plane-card active"><div class="sky-plane-icon">${special==='admin'?'🛸':'🚁'}</div><div class="sky-plane-name">${special==='admin'?'Admin Colossus':'Guru Kelas 4 Titan'}</div><div class="sky-plane-meta">Pesawat khusus besar dengan <b>laser, listrik, dan rudal</b>. Tidak bisa melukai pemain lain.</div><button class="sky-buy" disabled>⭐ Pesawat Khusus Aktif</button></div>`:'');
+  }
+  window.skyBuyPlane=function(id){
+    if(!currentUser)return;
+    const p=getProfile(), x=PLANES.find(z=>z.id===id); if(!x)return;
+    if((p.owned||[]).includes(id)){p.plane=id;saveProfile(p);notify('Pesawat '+x.name+' dipakai!');return}
+    if(p.points<x.price)return notify('Poin belum cukup untuk membeli '+x.name+'.');
+    p.points-=x.price;p.owned=(p.owned||[]).concat(id);p.plane=id;saveProfile(p);notify('🎉 '+x.name+' berhasil dibeli!');
+    if(gs) gs.player=makePlayer();
+  };
+  function resize(){
+    if(!gs||!gs.canvas)return;const r=gs.canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);
+    gs.canvas.width=Math.floor(r.width*d);gs.canvas.height=Math.floor(r.height*d);gs.ctx.setTransform(d,0,0,d,0,0);gs.w=r.width;gs.h=r.height;
+  }
+  function makePlayer(){
+    const pl=effectivePlane();return{x:gs.w/2,y:gs.h-100,plane:pl,shots:0,inv:0};
+  }
+  function spawnEnemy(force=false){
+    if(!gs)return;
+    const now=Date.now();if(!force && now-gs.lastSpawn<gs.spawnDelay)return;
+    gs.lastSpawn=now;gs.spawnDelay=Math.max(300,1250-gs.level*60);
+    const r=Math.random(), pool=r<.58?ENEMIES[0]:r<.87?ENEMIES[1]:r<.98?ENEMIES[2]:ENEMIES[3];
+    const e={...pool,x:25+Math.random()*(gs.w-50),y:-60,ang:0,hp:pool.hp,maxHp:pool.hp,phase:Math.random()*6.28};
+    gs.enemies.push(e);
+  }
+  function bullet(x,y,dx,dy,type,damage=1,color='#fef08a'){gs.bullets.push({x,y,dx,dy,type,damage,color,life:0})}
+  function fire(){
+    if(!gs||gs.gameOver)return; const now=Date.now(),pl=gs.player, cd=pl.plane.fire;
+    if(now-gs.lastFire<cd)return;gs.lastFire=now;
+    const w=weaponLabel(),x=pl.x,y=pl.y-30;
+    if(roleSpecial()!=='normal'){
+      // Admin dan Guru Kelas 4 selalu membawa tiga jenis senjata sekaligus.
+      bullet(x,y,0,-13,'laser',3,'#f43f5e');
+      bullet(x-18,y+5,-.5,-10,'electric',2,'#38bdf8');
+      bullet(x+18,y+5,.5,-10,'electric',2,'#38bdf8');
+      bullet(x-14,y+5,0,-8,'missile',4,'#fb923c');
+      bullet(x+14,y+5,0,-8,'missile',4,'#fb923c');
+    } else if(w==='LASER'){bullet(x,y,0,-12,'laser',3,'#f43f5e');}
+    else if(w==='LISTRIK'){bullet(x-10,y,0,-10,'electric',2,'#38bdf8');bullet(x+10,y,0,-10,'electric',2,'#38bdf8');}
+    else if(w==='RUDAL'){bullet(x-15,y,0,-8,'missile',4,'#fb923c');bullet(x+15,y,0,-8,'missile',4,'#fb923c');}
+    else {bullet(x,y,0,-10,'normal',1,'#fde047');bullet(x-13,y+12,-.4,-9,'normal',1,'#fde047');bullet(x+13,y+12,.4,-9,'normal',1,'#fde047');}
+  }
+  function collectBox(){
+    if(!gs)return;
+    if(roleSpecial()!=='normal'){ notify('🎁 Kotak misteri! Arsenal khusus tetap: LASER + LISTRIK + RUDAL.'); return; }
+    const p=getProfile(), weapons=['peluru','laser','listrik','rudal'];
+    const w=weapons[Math.floor(Math.random()*weapons.length)];p.weapon=w;p.weaponUntil=Date.now()+12000;saveProfile(p);
+    notify('🎁 Kotak misteri! Senjata '+w.toUpperCase()+' aktif 12 detik.');
+  }
+  function hitEnemy(e,b){
+    e.hp-=b.damage;
+    if(e.hp<=0){const p=getProfile();p.points+=(e.points||20);p.kills=(p.kills||0)+1;saveProfile(p);gs.level=1+Math.floor((p.kills||0)/5);notify('💥 Musuh hancur! +'+e.points+' poin');return true}
+    return false;
+  }
+  function update(dt){
+    if(!gs||gs.paused)return; const p=gs.player, pl=p.plane, speed=pl.speed*dt*.06;
+    let ax=gs.keys.left?-1:gs.keys.right?1:gs.joy.x, ay=gs.keys.up?-1:gs.keys.down?1:gs.joy.y;
+    p.x=clamp(p.x+ax*speed*dt,30,gs.w-30);p.y=clamp(p.y+ay*speed*dt,55,gs.h-55);
+    if(gs.keys.fire)fire();
+    if(p.inv>0)p.inv-=dt;
+    if(Date.now()-gs.lastBox>12000 && Math.random()<0.0015*dt){gs.boxes.push({x:35+Math.random()*(gs.w-70),y:-30,vy:1.4});gs.lastBox=Date.now();}
+    spawnEnemy();
+    gs.enemies.forEach(e=>{e.y+=e.speed*dt*.055;e.x+=Math.sin(e.phase+e.y/60)*.35;});
+    gs.boxes.forEach(b=>b.y+=b.vy*dt*.05);
+    gs.bullets.forEach(b=>{b.x+=b.dx*dt;b.y+=b.dy*dt;b.life+=dt});
+    gs.enemies=gs.enemies.filter(e=>{
+      if(e.y>gs.h+70)return false;
+      for(let i=gs.bullets.length-1;i>=0;i--){const b=gs.bullets[i],dist=Math.hypot(e.x-b.x,e.y-b.y);if(dist<e.size+(b.type==='laser'?10:5)){const dead=hitEnemy(e,b);gs.bullets.splice(i,1);if(dead)return false;}}
+      return true;
+    });
+    gs.boxes=gs.boxes.filter(b=>{if(Math.hypot(b.x-p.x,b.y-p.y)<42){collectBox();return false}return b.y<gs.h+50});
+    gs.bullets=gs.bullets.filter(b=>b.y>-30&&b.life<2200);
+  }
+  function drawCloud(ctx,x,y,s){ctx.fillStyle='rgba(255,255,255,.82)';ctx.beginPath();ctx.arc(x,y,s*.5,0,Math.PI*2);ctx.arc(x+s*.35,y-s*.15,s*.38,0,Math.PI*2);ctx.arc(x-s*.35,y-s*.1,s*.42,0,Math.PI*2);ctx.fill();}
+  function drawPlane(ctx,p){
+    const x=p.x,y=p.y,pl=p.plane,scale=pl.big?1.45:1;
+    ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);ctx.globalAlpha=p.inv>0?0.55:1;
+    ctx.fillStyle=pl.color;ctx.strokeStyle='#0f172a';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(0,-36);ctx.lineTo(11,-8);ctx.lineTo(42,7);ctx.lineTo(13,12);ctx.lineTo(8,35);ctx.lineTo(0,28);ctx.lineTo(-8,35);ctx.lineTo(-13,12);ctx.lineTo(-42,7);ctx.lineTo(-11,-8);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle='#dbeafe';ctx.beginPath();ctx.ellipse(0,-10,7,14,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+    if(pl.special){ctx.strokeStyle='#67e8f9';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-33,6);ctx.lineTo(-55,16);ctx.moveTo(33,6);ctx.lineTo(55,16);ctx.stroke();}
+    ctx.fillStyle='#fb923c';ctx.beginPath();ctx.arc(-10,31,5,0,Math.PI*2);ctx.arc(10,31,5,0,Math.PI*2);ctx.fill();ctx.restore();
+  }
+  function drawEnemy(ctx,e){
+    ctx.save();ctx.translate(e.x,e.y);ctx.fillStyle=e.color;ctx.strokeStyle='#0f172a';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(0,e.size*-1.25);ctx.lineTo(e.size,0);ctx.lineTo(0,e.size*.55);ctx.lineTo(-e.size,0);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle='#f8fafc';ctx.beginPath();ctx.ellipse(0,-2,e.size*.25,e.size*.45,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(15,23,42,.55)';ctx.fillRect(-e.size,e.size*.8,e.size*2,4);ctx.fillStyle='#22c55e';ctx.fillRect(-e.size,e.size*.8,e.size*2*(e.hp/e.maxHp),4);ctx.restore();
+  }
+  function draw(){
+    if(!gs)return;const c=gs.ctx,w=gs.w,h=gs.h;c.clearRect(0,0,w,h);
+    const g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,'#38bdf8');g.addColorStop(1,'#e0f2fe');c.fillStyle=g;c.fillRect(0,0,w,h);
+    for(let i=0;i<9;i++)drawCloud(c,(i*173+gs.t*.015)% (w+180)-90,80+(i%4)*130,55+(i%3)*15);
+    for(let i=0;i<55;i++){const x=(i*97)%w,y=(i*53+gs.t*.08)%h;c.fillStyle='rgba(255,255,255,.55)';c.fillRect(x,y,2,5)}
+    gs.boxes.forEach(b=>{c.save();c.translate(b.x,b.y);c.rotate(Math.sin(gs.t/250)*.1);c.fillStyle='#f59e0b';c.strokeStyle='#fff';c.lineWidth=3;c.fillRect(-17,-17,34,34);c.strokeRect(-17,-17,34,34);c.fillStyle='#fff';c.font='20px sans-serif';c.textAlign='center';c.fillText('?',0,7);c.restore()});
+    gs.bullets.forEach(b=>{c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=b.type==='laser'?8:4;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*2,b.y-b.dy*2);c.stroke();});
+    gs.enemies.forEach(e=>drawEnemy(c,e));drawPlane(c,gs.player);
+    if(gs.remotePlayers) Object.values(gs.remotePlayers).forEach(r=>{if(r.id!==profileKey()){c.save();c.globalAlpha=.55;drawPlane(c,{x:r.x||50,y:r.y||80,plane:{color:r.color||'#22c55e',big:false},inv:0});c.restore();}});
+  }
+  function loop(ts){if(!gs)return;const dt=Math.min(32,ts-gs.prev||16);gs.prev=ts;gs.t+=dt;update(dt);draw();requestAnimationFrame(loop)}
+  function setupControls(){
+    const joy=$('skyJoystick'),knob=$('skyKnob');if(!joy)return;
+    const setJoy=e=>{const r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let x=(e.clientX-cx)/(r.width*.38),y=(e.clientY-cy)/(r.height*.38);const l=Math.hypot(x,y);if(l>1){x/=l;y/=l}gs.joy={x,y};knob.style.transform=`translate(calc(-50% + ${x*35}px),calc(-50% + ${y*35}px))`};
+    const end=()=>{if(!gs)return;gs.joy={x:0,y:0};knob.style.transform='translate(-50%,-50%)'};
+    joy.addEventListener('pointerdown',e=>{joy.setPointerCapture(e.pointerId);setJoy(e)});joy.addEventListener('pointermove',e=>{if(e.buttons)setJoy(e)});joy.addEventListener('pointerup',end);joy.addEventListener('pointercancel',end);
+    $('skyFireBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();gs.keys.fire=true;fire()});['pointerup','pointercancel','pointerleave'].forEach(ev=>$('skyFireBtn')?.addEventListener(ev,()=>{if(gs)gs.keys.fire=false}));
+    $('skyBoxBtn')?.addEventListener('click',()=>{if(gs){const near=gs.boxes.findIndex(b=>Math.hypot(b.x-gs.player.x,b.y-gs.player.y)<85);if(near>=0){gs.boxes.splice(near,1);collectBox()}else notify('🎁 Dekati kotak misteri yang jatuh dari langit!')}})
+    window.addEventListener('keydown',e=>{if(!gs)return;const k=e.key.toLowerCase();if(['arrowleft','a'].includes(k))gs.keys.left=true;if(['arrowright','d'].includes(k))gs.keys.right=true;if(['arrowup','w'].includes(k))gs.keys.up=true;if(['arrowdown','s'].includes(k))gs.keys.down=true;if(k===' ')gs.keys.fire=true});
+    window.addEventListener('keyup',e=>{if(!gs)return;const k=e.key.toLowerCase();if(['arrowleft','a'].includes(k))gs.keys.left=false;if(['arrowright','d'].includes(k))gs.keys.right=false;if(['arrowup','w'].includes(k))gs.keys.up=false;if(['arrowdown','s'].includes(k))gs.keys.down=false;if(k===' ')gs.keys.fire=false});
+  }
+  function start(){
+    const canvas=$('skyCanvas');if(!canvas||!currentUser)return;
+    $('secSkyBattle')?.classList.remove('hidden');$('schoolFeatureDock')?.style.setProperty('display','flex');
+    if(gs){resize();updateHud();return}
+    gs={canvas,ctx:canvas.getContext('2d'),w:0,h:0,t:0,prev:performance.now(),lastFire:0,lastSpawn:0,spawnDelay:800,lastBox:0,level:1,enemies:[],bullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{}};
+    resize();gs.player=makePlayer();setupControls();updateHud();notify('🌟 Selamat bermain! Musuh komputer memiliki beberapa tingkat kesulitan.');requestAnimationFrame(loop);
+    window.addEventListener('resize',resize);
+    if(typeof dbRef!=='undefined'){
+      dbRef.child('skyBattleOnline').on('value',snap=>{gs.remotePlayers=snap.val()||{};if($('skyPlayers'))$('skyPlayers').textContent=String(Math.max(1,Object.keys(gs.remotePlayers).length));if(currentUser){const p=gs.player;dbRef.child('skyBattleOnline').child(profileKey()).set({id:profileKey(),x:p.x,y:p.y,color:p.plane.color,role:currentUser.role,nama:currentUser.nama||currentUser.username,updatedAt:firebase.database.ServerValue.TIMESTAMP})}});
+      setInterval(()=>{if(gs&&currentUser)dbRef.child('skyBattleOnline').child(profileKey()).update({x:gs.player.x,y:gs.player.y,color:gs.player.plane.color,updatedAt:firebase.database.ServerValue.TIMESTAMP})},500);
+    }
+  }
+  window.initSpaceGame=start;
+  window.stopSpaceGame=function(){
+    if(typeof dbRef!=='undefined'&&currentUser){try{dbRef.child('skyBattleOnline').child(profileKey()).remove()}catch(e){}}
+    gs=null;$('secSkyBattle')?.classList.add('hidden');$('schoolFeatureDock')?.style.setProperty('display','none');
+  };
+  window.scrollToSkyBattle=function(){$('secSkyBattle')?.scrollIntoView({behavior:'smooth',block:'start'})};
+  window.scrollToRoleDashboard=function(){const id=currentUser?.role==='Admin'?'secAdmin':currentUser?.role==='Guru'?'secGuru':'secSiswa';$(id)?.scrollIntoView({behavior:'smooth',block:'start'})};
+})();
+</script>
+
 </body>
 </html>
