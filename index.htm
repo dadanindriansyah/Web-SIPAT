@@ -444,6 +444,38 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+<style id="role-game-return-style">
+.role-game-return{
+  position:sticky;
+  top:8px;
+  z-index:100;
+  display:flex;
+  justify-content:flex-end;
+  padding:8px 12px;
+  margin:0 auto 8px;
+  max-width:1200px;
+  pointer-events:none;
+}
+.role-game-return button{
+  pointer-events:auto;
+  border:0;
+  border-radius:999px;
+  padding:10px 18px;
+  font-weight:800;
+  font-size:14px;
+  color:#fff;
+  background:linear-gradient(135deg,#0ea5e9,#2563eb);
+  box-shadow:0 5px 16px rgba(0,0,0,.22);
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.role-game-return button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 7px 20px rgba(0,0,0,.28);
+}
+</style>
+
 </head>
 <body class="bg-slate-100 font-sans min-h-screen text-slate-800">
 
@@ -520,6 +552,11 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
 
         <!-- SECTION 2: DASHBOARD ADMIN -->
         <section id="secAdmin" class="hidden space-y-8 no-print">
+    <div class="role-game-return no-print" id="backToSkyGame_secAdmin">
+      <button type="button" onclick="returnToSkyGame()" title="Kembali ke Game Roket">
+        🚀 Kembali ke Game
+      </button>
+    </div>
             <div class="bg-gradient-to-r from-indigo-800 to-indigo-600 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center flex-wrap gap-4">
                 <div class="min-w-0">
                     <h2 class="text-2xl font-black">Panel Utama Administrator</h2>
@@ -828,6 +865,11 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
 
         <!-- SECTION 3: DASHBOARD GURU -->
         <section id="secGuru" class="hidden space-y-8">
+    <div class="role-game-return no-print" id="backToSkyGame_secGuru">
+      <button type="button" onclick="returnToSkyGame()" title="Kembali ke Game Roket">
+        🚀 Kembali ke Game
+      </button>
+    </div>
             <div class="bg-gradient-to-r from-emerald-800 to-emerald-600 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center flex-wrap gap-4 no-print">
                 <div>
                     <div class="flex flex-col gap-1 flex-1"><h2 class="text-2xl font-black" id="guruTitle">Panel Kerja Guru</h2><p id="guruKelasInfo" class="text-xs text-emerald-100/80"></p></div><div id="guruMapelClassWrap" class="hidden bg-white/10 rounded-xl p-2 min-w-72">
@@ -1422,6 +1464,11 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
 
         <!-- SECTION 4: DASHBOARD SISWA -->
         <section id="secSiswa" class="hidden space-y-6 no-print">
+    <div class="role-game-return no-print" id="backToSkyGame_secSiswa">
+      <button type="button" onclick="returnToSkyGame()" title="Kembali ke Game Roket">
+        🚀 Kembali ke Game
+      </button>
+    </div>
             <div class="bg-gradient-to-r from-violet-800 to-indigo-700 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center flex-wrap">
                 <div><h2 class="text-2xl font-black" id="siswaTitle">Hallo, Selamat Datang!</h2><p class="text-indigo-200 text-sm">Lihat hasil belajar yang sudah diinput guru dan unduh dokumen Anda dalam bentuk PDF.</p></div>
                 <div class="flex items-center gap-2 mt-3 sm:mt-0 flex-wrap"><span id="txtSiswaTapel" class="bg-indigo-900 px-4 py-1.5 rounded-full text-xs font-black">TP: -</span><span id="txtSiswaRankSem1" class="bg-amber-500 text-white px-4 py-1.5 rounded-full text-xs font-black hidden">🏆 Rank Sem 1: -</span><span id="txtSiswaRankSem2" class="bg-amber-500 text-white px-4 py-1.5 rounded-full text-xs font-black hidden">🏆 Rank Sem 2: -</span></div>
@@ -4419,6 +4466,130 @@ function initGuruViews() {
   };
   window.scrollToSkyBattle=function(){$('secSkyBattle')?.scrollIntoView({behavior:'smooth',block:'start'})};
   window.scrollToRoleDashboard=function(){const id=currentUser?.role==='Admin'?'secAdmin':currentUser?.role==='Guru'?'secGuru':'secSiswa';$(id)?.scrollIntoView({behavior:'smooth',block:'start'})};
+})();
+</script>
+
+
+<script id="sky-game-persist">
+(function(){
+  const KEY = 'skyBattleGameState_v1';
+
+  function safeGet(){
+    try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch(e){ return null; }
+  }
+  function safeSet(state){
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){}
+  }
+
+  window.saveSkyGameState = function(){
+    try{
+      const state = {};
+      const canvas = document.getElementById('skyCanvas');
+      const scoreEl = document.getElementById('skyScore');
+      const levelEl = document.getElementById('skyLevel');
+      const highEl = document.getElementById('skyHighScore');
+      const hpEl = document.getElementById('skyHp');
+
+      if (canvas) {
+        state.canvasWidth = canvas.width;
+        state.canvasHeight = canvas.height;
+      }
+      if (scoreEl) state.scoreText = scoreEl.textContent;
+      if (levelEl) state.levelText = levelEl.textContent;
+      if (highEl) state.highText = highEl.textContent;
+      if (hpEl) state.hpText = hpEl.textContent;
+
+      // Simpan variabel game yang umum dipakai jika tersedia.
+      [
+        'skyScore','skyLevel','skyHighScore','skyPlayerHp',
+        'skyGameRunning','skyGameOver','skyWave','skyCoins'
+      ].forEach(function(name){
+        if (typeof window[name] !== 'undefined') {
+          try { state[name] = window[name]; } catch(e){}
+        }
+      });
+
+      state.savedAt = Date.now();
+      safeSet(state);
+      return state;
+    }catch(e){ return null; }
+  };
+
+  window.restoreSkyGameState = function(){
+    const state = safeGet();
+    if (!state) return null;
+    try{
+      Object.keys(state).forEach(function(name){
+        if (name === 'savedAt' || name === 'canvasWidth' || name === 'canvasHeight' ||
+            name === 'scoreText' || name === 'levelText' || name === 'highText' || name === 'hpText') return;
+        if (name in window) {
+          try { window[name] = state[name]; } catch(e){}
+        }
+      });
+
+      const scoreEl = document.getElementById('skyScore');
+      const levelEl = document.getElementById('skyLevel');
+      const highEl = document.getElementById('skyHighScore');
+      const hpEl = document.getElementById('skyHp');
+      if (scoreEl && state.scoreText != null) scoreEl.textContent = state.scoreText;
+      if (levelEl && state.levelText != null) levelEl.textContent = state.levelText;
+      if (highEl && state.highText != null) highEl.textContent = state.highText;
+      if (hpEl && state.hpText != null) hpEl.textContent = state.hpText;
+
+      return state;
+    }catch(e){ return state; }
+  };
+
+  // Simpan otomatis saat berpindah dari game ke panel, saat logout,
+  // saat tab ditutup/di-background, dan setiap beberapa detik.
+  document.addEventListener('visibilitychange', function(){
+    if (document.hidden) window.saveSkyGameState();
+  });
+  window.addEventListener('beforeunload', window.saveSkyGameState);
+  setInterval(window.saveSkyGameState, 3000);
+
+  // Bungkus fungsi yang sudah ada tanpa mengganti perilakunya.
+  function wrap(name, before, after){
+    const original = window[name];
+    if (typeof original !== 'function') return;
+    window[name] = function(){
+      try{ before && before(); }catch(e){}
+      const result = original.apply(this, arguments);
+      try{ after && after(result); }catch(e){}
+      return result;
+    };
+  }
+
+  // Jika fungsi tersedia setelah script ini dijalankan, patch dilakukan ulang.
+  function patch(){
+    wrap('openRolePanel', function(){ window.saveSkyGameState(); });
+    wrap('showGameHome', function(){}, function(){ window.restoreSkyGameState(); });
+    if (typeof window.logout === 'function') {
+      wrap('logout', function(){ window.saveSkyGameState(); });
+    }
+  }
+
+  patch();
+  setTimeout(patch, 500);
+  setTimeout(patch, 1500);
+})();
+</script>
+
+
+<script id="sky-game-return-fallback">
+(function(){
+  window.returnToSkyGame = function(){
+    if (typeof window.showGameHome === 'function') {
+      window.showGameHome();
+      return;
+    }
+    ['secAdmin','secGuru','secSiswa'].forEach(function(id){
+      document.getElementById(id)?.classList.add('hidden');
+    });
+    document.getElementById('secSkyBattle')?.classList.remove('hidden');
+    document.getElementById('secSkyBattle')?.scrollIntoView({behavior:'auto',block:'start'});
+    try{ window.restoreSkyGameState?.(); }catch(e){}
+  };
 })();
 </script>
 
