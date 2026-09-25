@@ -172,8 +172,9 @@
         }
         #chatPanel {
             width:min(440px, calc(100vw - 28px));
-            height:min(680px, calc(100dvh - 92px));
-            max-height:calc(100dvh - 28px);
+            height:min(620px, 72dvh);
+            min-height:420px;
+            max-height:calc(100dvh - 90px);
             background:#fff;
             border-radius:22px;
             overflow:hidden;
@@ -197,12 +198,12 @@
         #chatToggle { transition:transform .18s ease, box-shadow .18s ease; }
         #chatToggle:hover { transform:scale(1.04); }
         #chatToggle {
-            width:74px; height:74px; border-radius:999px !important;
+            width:68px; height:68px; border-radius:999px !important;
             display:flex; align-items:center; justify-content:center;
-            font-size:2rem; box-shadow:0 12px 28px rgba(37,99,235,.35);
+            font-size:1.9rem; box-shadow:0 12px 28px rgba(37,99,235,.35);
             border:4px solid #fff;
         }
-        #chatToggle i { font-size:2rem; }
+        #chatToggle i { font-size:1.9rem; }
         .chat-bubble {
             max-width:min(82%, 360px); padding:9px 12px; border-radius:16px;
             margin:7px 0; font-size:12px; line-height:1.4;
@@ -217,18 +218,14 @@
             display:flex; align-items:center; gap:6px; flex-wrap:wrap;
             padding:7px 8px 4px; border-top:1px solid #eef2ff; background:#fff;
         }
-        .chat-tool-btn {
+        .chat-tool-btn, .chat-sticker-btn {
             width:34px; height:34px; border:1px solid #dbeafe; background:#f8fafc;
             border-radius:10px !important; display:inline-flex; align-items:center;
             justify-content:center; cursor:pointer; font-size:18px; line-height:1;
+            flex:0 0 auto;
         }
-        .chat-tool-btn:hover { background:#eff6ff; transform:translateY(-1px); }
-        .chat-sticker-btn {
-            width:auto; min-width:40px; height:34px; padding:0 8px;
-            border:1px solid #fbcfe8; background:#fff1f2; border-radius:10px !important;
-            display:inline-flex; align-items:center; justify-content:center; cursor:pointer;
-            font-size:18px; line-height:1;
-        }
+        .chat-tool-btn:hover, .chat-sticker-btn:hover { background:#eff6ff; transform:translateY(-1px); }
+        .chat-sticker-btn { border-color:#fbcfe8; background:#fff1f2; }
         #chatEmojiPicker {
             display:none; grid-template-columns:repeat(8,1fr); gap:5px;
             padding:8px; max-height:150px; overflow-y:auto; background:#fff;
@@ -240,35 +237,34 @@
             min-height:32px; font-size:20px; cursor:pointer;
         }
         .chat-emoji-option:hover { background:#e0f2fe; }
-        .chat-sticker {
-            font-size:38px; line-height:1.1; margin:2px 0;
-            filter:drop-shadow(0 2px 1px rgba(15,23,42,.08));
-        }
+        .chat-sticker-image { max-width:180px; max-height:180px; width:auto; height:auto; display:block; border-radius:14px; object-fit:contain; background:#fff; }
+        .chat-native-hint { font-size:9px; color:#94a3b8; padding:2px 4px 0; }
+        .chat-sticker { font-size:38px; line-height:1.1; margin:2px 0; filter:drop-shadow(0 2px 1px rgba(15,23,42,.08)); }
         #chatInput { min-width:0; }
-        @media (max-width:900px){
-            #chatPanel { width:min(430px, calc(100vw - 24px)); }
-        }
         @media (max-width:640px){
             #chatWidget { right:10px; bottom:10px; }
-            #chatToggle { width:64px; height:64px; font-size:1.7rem; }
+            #chatToggle { width:60px; height:60px; font-size:1.6rem; }
+            #chatToggle i { font-size:1.6rem; }
             #chatPanel {
-                width:calc(100vw - 12px);
-                height:calc(100dvh - 20px);
-                max-height:calc(100dvh - 20px);
+                width:calc(100vw - 24px);
+                height:min(560px, 68dvh);
+                min-height:380px;
+                max-height:calc(100dvh - 70px);
                 border-radius:18px;
             }
             #chatPanel #chatMessages { padding:10px; }
             .chat-bubble { max-width:88%; font-size:13px; }
             #chatEmojiPicker { grid-template-columns:repeat(7,1fr); max-height:125px; }
+            .chat-native-hint { display:none; }
         }
         @media (max-width:380px){
-            #chatPanel { width:calc(100vw - 6px); }
-            #chatWidget { right:3px; bottom:3px; }
+            #chatWidget { right:8px; bottom:8px; }
+            #chatPanel { width:calc(100vw - 16px); height:min(520px, 66dvh); min-height:360px; }
             .chat-toolbar { gap:4px; }
-            .chat-tool-btn,.chat-sticker-btn { height:32px; }
+            .chat-tool-btn,.chat-sticker-btn { width:32px; height:32px; font-size:17px; }
         }
         @media (max-height:600px) and (orientation:landscape){
-            #chatPanel { height:calc(100dvh - 12px); max-height:calc(100dvh - 12px); }
+            #chatPanel { height:min(430px, 76dvh); min-height:300px; max-height:calc(100dvh - 50px); }
             #chatEmojiPicker { max-height:90px; }
         }
 
@@ -1340,20 +1336,21 @@
                 <div class="text-center text-xs text-slate-400 py-10">Belum ada pesan.</div>
             </div>
             <div class="p-2 border-t bg-white">
-                <div id="chatEmojiPicker" aria-label="Pilihan emoji"></div>
+                <div id="chatEmojiPicker" aria-label="Pilihan emoji" class="hidden"></div>
+                <input id="chatStickerFile" type="file" accept="image/*" class="hidden" onchange="sendPhoneSticker(event)">
                 <div class="chat-toolbar">
-                    <button type="button" class="chat-tool-btn" onclick="toggleChatEmojiPicker()" title="Pilih emoticon" aria-label="Pilih emoticon">😊</button>
-                    <button type="button" class="chat-sticker-btn" onclick="sendChatSticker('😂')" title="Kirim stiker ketawa">😂</button>
-                    <button type="button" class="chat-sticker-btn" onclick="sendChatSticker('🥳')" title="Kirim stiker pesta">🥳</button>
-                    <button type="button" class="chat-sticker-btn" onclick="sendChatSticker('🤩')" title="Kirim stiker keren">🤩</button>
-                    <button type="button" class="chat-sticker-btn" onclick="sendChatSticker('🫶')" title="Kirim stiker semangat">🫶</button>
-                    <button type="button" class="chat-sticker-btn" onclick="sendChatSticker('👍')" title="Kirim stiker oke">👍</button>
+                    <button type="button" class="chat-tool-btn" onclick="openNativeEmojiKeyboard()" title="Buka emoji dari keyboard HP" aria-label="Buka emoji keyboard HP">😊</button>
+                    <button type="button" class="chat-sticker-btn" onclick="document.getElementById('chatStickerFile')?.click()" title="Pilih stiker/gambar dari HP" aria-label="Pilih stiker atau gambar dari HP">🖼️</button>
+                    <button type="button" class="chat-sticker-btn" onclick="sendChatSticker('😂')" title="Kirim emoji sebagai stiker">😂</button>
+                    <button type="button" class="chat-sticker-btn" onclick="sendChatSticker('🥳')" title="Kirim emoji sebagai stiker">🥳</button>
+                    <button type="button" class="chat-sticker-btn" onclick="sendChatSticker('🤩')" title="Kirim emoji sebagai stiker">🤩</button>
+                    <button type="button" class="chat-sticker-btn" onclick="sendChatSticker('🫶')" title="Kirim emoji sebagai stiker">🫶</button>
                 </div>
                 <div class="flex gap-2">
-                    <input id="chatInput" type="text" maxlength="500" onkeydown="if(event.key==='Enter'){event.preventDefault();sendChatMessage();}" class="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-200" placeholder="Tulis pesan atau pilih emoji...">
+                    <input id="chatInput" type="text" inputmode="text" autocomplete="on" autocapitalize="sentences" maxlength="500" onkeydown="if(event.key==='Enter'){event.preventDefault();sendChatMessage();}" class="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-200" placeholder="Ketik pesan • gunakan emoji/stiker dari HP">
                     <button type="button" onclick="sendChatMessage()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl font-bold shrink-0" title="Kirim"><i class="fa-solid fa-paper-plane"></i></button>
                 </div>
-                <div class="text-[9px] text-slate-400 mt-1 px-1">Pesan, emoji, dan stiker langsung terlihat oleh semua pengguna yang sedang login.</div>
+                <div class="chat-native-hint">😊 Emoji mengikuti keyboard HP/perangkat. 🖼️ bisa memilih stiker/gambar dari galeri HP.</div>
             </div>
         </div>
         <button id="chatToggle" type="button" onclick="toggleChat()" class="bg-blue-600 hover:bg-blue-700 text-white" title="Buka Chat Umum" aria-label="Buka Chat Umum">
@@ -3425,7 +3422,6 @@ function toggleChat(force){
     if(open){
         initChatEmojiPicker();
         refreshChatPartners();
-        setTimeout(()=>document.getElementById('chatInput')?.focus(),50);
     }
 }
 
@@ -3434,8 +3430,13 @@ function adjustChatForKeyboard(){
     if(!panel || !window.visualViewport || window.innerWidth>640) return;
     const vv=window.visualViewport;
     const keyboardGap=Math.max(0, window.innerHeight-vv.height-vv.offsetTop);
-    panel.style.bottom=(keyboardGap+6)+'px';
-    panel.style.height=Math.max(300, vv.height-12)+'px';
+    if(keyboardGap>120){
+        panel.style.bottom=(keyboardGap+6)+'px';
+        panel.style.height=Math.max(300, Math.min(560, vv.height-16))+'px';
+    }else{
+        panel.style.bottom='';
+        panel.style.height='';
+    }
 }
 if(window.visualViewport){
     window.visualViewport.addEventListener('resize',adjustChatForKeyboard);
@@ -3453,6 +3454,42 @@ function minimizeChat(){
 }
 const CHAT_EMOJIS = ['😀','😄','😁','😂','🤣','😊','🥰','😍','🤩','😘','😎','🤗','🥳','😇','🙂','🙃','😉','😋','😜','🤪','😝','🫶','💖','💙','💚','💛','❤️','⭐','🌈','🎉','🎊','🎈','📚','✏️','🎒','🏆','⚽','🍕','🍩','🍭','🐱','🐶','🦄','🐼','🐸','🌻','☀️','🔥','👍','👏','🙏','💪','✨','🙌','💯'];
 const CHAT_STICKERS = ['😂','🥳','🤩','🫶','👍','👏','💯','🌈','⭐','🎉','🐼','🦄'];
+
+function openNativeEmojiKeyboard(){
+    const input=document.getElementById('chatInput');
+    if(!input) return;
+    input.focus();
+    try{ input.setSelectionRange(input.value.length,input.value.length); }catch(e){}
+}
+
+function sendPhoneSticker(event){
+    const file=event?.target?.files?.[0];
+    if(!file || !currentUser) return;
+    if(!file.type.startsWith('image/')) return alert('Pilih gambar/stiker dari HP.');
+    if(file.size>5*1024*1024) return alert('Ukuran stiker/gambar maksimal 5 MB.');
+    const reader=new FileReader();
+    reader.onload=()=>{
+        const img=new Image();
+        img.onload=()=>{
+            const max=512, scale=Math.min(1,max/Math.max(img.width,img.height));
+            const canvas=document.createElement('canvas');
+            canvas.width=Math.max(1,Math.round(img.width*scale));
+            canvas.height=Math.max(1,Math.round(img.height*scale));
+            const ctx=canvas.getContext('2d');
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.drawImage(img,0,0,canvas.width,canvas.height);
+            const dataUrl=canvas.toDataURL('image/webp',0.82);
+            const id='m_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+            const msg={conversationId:PUBLIC_CHAT_CONVERSATION_ID,senderUsername:currentUser.username,senderName:currentUser.nama||currentUser.username,senderRole:currentUser.role||'',text:'Stiker dari HP',messageType:'image',imageData:dataUrl,createdAt:new Date().toISOString()};
+            const store=getChatStore(); store[id]=msg; saveAppData('chatMessages',JSON.stringify(store));
+            event.target.value=''; renderChatMessages();
+        };
+        img.onerror=()=>{event.target.value=''; alert('Stiker/gambar tidak dapat dibaca.');};
+        img.src=reader.result;
+    };
+    reader.onerror=()=>{event.target.value=''; alert('Gagal membaca stiker/gambar.');};
+    reader.readAsDataURL(file);
+}
 
 function initChatEmojiPicker(){
     const picker=document.getElementById('chatEmojiPicker');
@@ -3507,9 +3544,11 @@ function renderChatMessages(){
         const del=currentUser.role==='Admin'
             ? `<button type="button" class="chat-admin-delete ml-2 bg-red-50 text-red-600 hover:bg-red-100" onclick="deletePublicChatMessage('${chatEsc(m.id)}')" title="Hapus pesan"><i class="fa-solid fa-trash-can"></i></button>`
             : '';
-        const body=m.messageType==='sticker'
-            ? `<div class="chat-sticker" role="img" aria-label="Stiker">${chatEsc(m.text)}</div>`
-            : `<div>${chatEsc(m.text)}</div>`;
+        const body=m.messageType==='image' && m.imageData
+            ? `<img class="chat-sticker-image" src="${chatEsc(m.imageData)}" alt="Stiker dari HP" loading="lazy">`
+            : m.messageType==='sticker'
+                ? `<div class="chat-sticker" role="img" aria-label="Stiker">${chatEsc(m.text)}</div>`
+                : `<div>${chatEsc(m.text)}</div>`;
         return `<div class="flex ${mine?'justify-end':'justify-start'}">
             <div class="chat-bubble ${mine?'chat-me':'chat-other'}">
                 <div class="chat-sender">${chatEsc(m.senderName||m.senderUsername||'Pengguna')} ${role?`<span class="opacity-70">(${chatEsc(role)})</span>`:''}</div>
