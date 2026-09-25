@@ -477,6 +477,7 @@
                             <div class="col-span-2 grid grid-cols-2 gap-2">
                                 <select id="guruFase" class="border p-2 rounded text-xs bg-white text-slate-600">
                                     <option value="">-- Pilih Fase Kelas --</option>
+                                    <option value="Semua Fase">Semua Fase</option>
                                     <option value="A">Fase A (Kelas 1-2)</option>
                                     <option value="B">Fase B (Kelas 3-4)</option>
                                     <option value="C">Fase C (Kelas 5-6)</option>
@@ -1386,23 +1387,17 @@
         function populateAdminGuruKelas(selected=[]) {
             const el=document.getElementById('guruKelasMapel'); if(!el)return;
             const users=(JSON.parse(localStorage.getItem('users'))||[]).map(normalizeUserRecord);
-            const tapel=getActiveTapel();
-
-            // Hanya tampilkan kelas yang memang mempunyai siswa pada TP aktif.
-            // Ini mencegah kelas dari tahun pelajaran lama ikut muncul.
+            const tapel=document.getElementById('guruTapel')?.value?.trim() || getActiveTapel();
+            // Daftar kelas Guru Mapel mengikuti kelas yang sudah ditetapkan kepada akun Guru Kelas.
             const classes=[...new Set(users
-                .filter(u=>u.role==='Siswa' && u.kelas && String(u.tapel||tapel)===String(tapel))
+                .filter(u=>u.role==='Guru' && u.jenisGuru!=='Guru Mapel' && u.kelas && String(u.tapel||tapel)===String(tapel))
                 .map(u=>String(u.kelas).trim().toUpperCase())
                 .filter(Boolean))]
                 .sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
-
             const old=[...(Array.isArray(selected)?selected:String(selected||'').split(','))]
                 .map(x=>String(x).trim().toUpperCase()).filter(Boolean);
-
-            el.innerHTML=classes.map(k=>`<option value="${k}" ${old.includes(k)?'selected':''}>Kelas ${k}</option>`).join('')
-                || '<option value="" disabled>Belum ada kelas siswa pada TP aktif</option>';
+            el.innerHTML=classes.map(k=>`<option value="${k}" ${old.includes(k)?'selected':''}>Kelas ${k}</option>`).join('') || '<option value="">Belum ada kelas yang memiliki akun Guru Kelas</option>';
         }
-
         function getGuruKelasDiampu() {
             if(!isGuruMapel()) return currentUser?.kelas ? [String(currentUser.kelas).trim().toUpperCase()] : [];
             const arr=Array.isArray(currentUser?.kelasDiampu)?currentUser.kelasDiampu:[];
