@@ -222,70 +222,34 @@
         }
 
 
-/* ===== SIPAT DINO ADVENTURE ===== */
+/* ===== SIPAT DINO RPG 3D ADVENTURE ===== */
 html,body{overflow-x:hidden}
 #dinoGame{display:none;position:relative;min-height:calc(100svh - 88px);margin:0 auto;padding:12px;max-width:1500px}
 #dinoGame.game-active{display:block}
-.dino-shell{position:relative;min-height:calc(100svh - 112px);overflow:hidden;border-radius:28px;background:
- radial-gradient(circle at 20% 20%,rgba(255,255,255,.16) 0 2px,transparent 3px),
- linear-gradient(180deg,#75c86b 0%,#2f7d42 52%,#173d29 100%);box-shadow:0 18px 50px rgba(15,55,35,.3);border:3px solid rgba(255,255,255,.55)}
-.dino-shell:before,.dino-shell:after{content:"";position:absolute;inset:auto 0 0;height:32%;pointer-events:none;background:
- radial-gradient(ellipse at 15% 100%,#143b28 0 20%,transparent 21%),
- radial-gradient(ellipse at 45% 100%,#1c5130 0 25%,transparent 26%),
- radial-gradient(ellipse at 80% 100%,#123724 0 22%,transparent 23%);opacity:.75}
-.jungle-hud{position:absolute;z-index:30;left:12px;right:12px;top:12px;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.dino-shell{position:relative;min-height:calc(100svh - 112px);overflow:hidden;border-radius:28px;background:linear-gradient(180deg,#78d36d 0%,#3c8f4d 38%,#235936 62%,#122f22 100%);box-shadow:0 22px 70px rgba(7,35,20,.42);border:3px solid rgba(255,255,255,.45);perspective:1100px;isolation:isolate}
+.dino-shell:before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at 50% 36%,rgba(240,255,205,.22),transparent 28%),linear-gradient(180deg,rgba(255,255,255,.08),transparent 34%)}
+.dino-shell:after{content:"";position:absolute;left:-10%;right:-10%;bottom:-8%;height:58%;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 0%,rgba(117,184,79,.45),transparent 50%),repeating-radial-gradient(ellipse at 50% 100%,#173e2a 0 8%,#1d5132 9% 16%);transform:rotateX(58deg);transform-origin:center bottom;opacity:.92}
+.jungle-hud{position:absolute;z-index:80;left:12px;right:12px;top:12px;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .dino-statbar,.dino-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-.dino-pill{background:rgba(8,35,22,.82);backdrop-filter:blur(7px);color:#fff;border:1px solid rgba(255,255,255,.22);padding:7px 11px;border-radius:999px;font-size:12px;font-weight:900;box-shadow:0 5px 18px rgba(0,0,0,.18)}
-.dino-pill small{opacity:.7;font-weight:700}
-.dino-btn{border:0;cursor:pointer;color:#17351f;background:#f7d447;padding:9px 13px;border-radius:12px;font-weight:1000;box-shadow:0 4px 0 #a87512;transition:.15s;touch-action:manipulation}
-.dino-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #a87512}
-.dino-btn.dark{background:#e8f5e9;box-shadow:0 4px 0 #88a98d}
-#dinoWorld{position:absolute;inset:0;overflow:hidden;touch-action:none}
-.dino-entity{position:absolute;transform:translate(-50%,-50%);user-select:none;pointer-events:none;text-align:center;z-index:10}
-.dino-entity .sprite{font-size:44px;line-height:1;filter:drop-shadow(0 5px 3px rgba(0,0,0,.28))}
-.dino-entity .name{margin-top:3px;color:#fff;font-size:9px;font-weight:1000;text-shadow:0 2px 4px #17351f;white-space:nowrap}
-.dino-player .sprite{font-size:54px}
-.dino-player{z-index:20}
-.dino-animal{z-index:11}
-.dino-board{position:absolute;z-index:15;left:50%;top:50%;transform:translate(-50%,-50%);width:min(280px,72vw);min-height:190px;padding:16px;border-radius:20px;background:linear-gradient(145deg,#8b5a2b,#c58b49);border:8px solid #5b371b;box-shadow:0 18px 30px rgba(0,0,0,.35),inset 0 0 0 3px rgba(255,220,150,.4);text-align:center;color:#fff}
-.dino-board h3{margin:0 0 5px;font-size:22px;font-weight:1000;text-shadow:0 2px 2px #4b2c14}
-.dino-board p{font-size:10px;margin:0 0 10px;color:#ffe9c7}
-.dino-board button{width:100%;margin-top:6px}
-.dino-tree{position:absolute;z-index:2;font-size:70px;opacity:.9;pointer-events:none}
-.dino-tree.t1{left:3%;top:20%}.dino-tree.t2{right:5%;top:17%}.dino-tree.t3{left:12%;bottom:7%}.dino-tree.t4{right:15%;bottom:9%}
-.dino-hint{position:absolute;z-index:28;left:50%;bottom:12px;transform:translateX(-50%);background:rgba(7,29,18,.75);color:#fff;padding:7px 11px;border-radius:999px;font-size:10px;font-weight:800;white-space:nowrap}
-#dinoTouchControls{display:none;position:absolute;z-index:35;left:12px;right:12px;bottom:35px;justify-content:space-between;pointer-events:none}
-.dino-pad{display:grid;grid-template-columns:42px 42px 42px;grid-template-rows:42px 42px 42px;gap:3px;pointer-events:auto}
-.dino-pad button,.dino-attack{width:42px;height:42px;border-radius:12px;border:1px solid rgba(255,255,255,.5);background:rgba(10,35,20,.7);color:#fff;font-weight:1000;font-size:18px;touch-action:none}
-.dino-pad .up{grid-column:2}.dino-pad .left{grid-column:1;grid-row:2}.dino-pad .down{grid-column:2;grid-row:2}.dino-pad .right{grid-column:3;grid-row:2}
-.dino-attack{align-self:end;width:74px;height:74px;border-radius:50%;background:#ef4444;font-size:12px;box-shadow:0 5px 0 #991b1b}
-#dinoBoardModal{position:fixed;z-index:120;inset:0;background:rgba(3,15,9,.72);display:none;align-items:center;justify-content:center;padding:14px}
-#dinoBoardModal.open{display:flex}
-.dino-modal{width:min(760px,96vw);max-height:90svh;overflow:auto;background:#fff;border-radius:24px;padding:18px;box-shadow:0 25px 80px rgba(0,0,0,.4)}
-.dino-modal h2{font-size:22px;font-weight:1000;color:#166534;margin:0 0 5px}
-.dino-modal .board-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
-.dino-modal .board-card{padding:13px;border:2px solid #dcfce7;border-radius:16px;background:#f0fdf4}
-.dino-modal .board-card h4{font-weight:1000;margin-bottom:3px}
-.dino-modal .board-card p{font-size:11px;color:#64748b}
-#dinoShopModal{position:fixed;z-index:121;inset:0;background:rgba(3,15,9,.72);display:none;align-items:center;justify-content:center;padding:14px}
-#dinoShopModal.open{display:flex}
-.dino-shop{width:min(700px,96vw);max-height:90svh;overflow:auto;background:#fff;border-radius:24px;padding:18px}
-.dino-shop-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
-.dino-skin{border:2px solid #e2e8f0;border-radius:16px;padding:12px;text-align:center}
-.dino-skin .emoji{font-size:42px}.dino-skin button{width:100%;margin-top:7px}
-.dino-progress{width:150px;height:9px;background:#17351f;border-radius:99px;overflow:hidden;border:1px solid rgba(255,255,255,.3)}
-.dino-progress i{display:block;height:100%;background:#f7d447;width:0%}
-.dino-hit{animation:dinoHit .18s linear}
-@keyframes dinoHit{50%{transform:translate(-50%,-50%) scale(1.35);filter:brightness(2)}}
-@media(max-width:700px){
- #dinoGame{padding:0;min-height:calc(100svh - 72px)}
- .dino-shell{min-height:calc(100svh - 72px);border-radius:0;border-left:0;border-right:0}
- .jungle-hud{top:7px;left:7px;right:7px}.dino-pill{font-size:10px;padding:6px 8px}.dino-btn{padding:8px 10px;font-size:11px}
- .dino-board{top:52%;width:min(250px,76vw)}.dino-hint{bottom:6px;font-size:9px}
- #dinoTouchControls{display:flex}.dino-tree{font-size:50px}
- .dino-shop-grid,.dino-modal .board-grid{grid-template-columns:1fr 1fr}
-}
-@media(max-width:430px){.dino-shop-grid,.dino-modal .board-grid{grid-template-columns:1fr}.dino-progress{width:100px}}
+.dino-pill{background:rgba(6,30,19,.84);backdrop-filter:blur(9px);color:#fff;border:1px solid rgba(255,255,255,.24);padding:7px 11px;border-radius:999px;font-size:12px;font-weight:900;box-shadow:0 7px 20px rgba(0,0,0,.22)}
+.dino-pill small{opacity:.7;font-weight:700}.dino-btn{border:0;cursor:pointer;color:#17351f;background:#f7d447;padding:9px 13px;border-radius:12px;font-weight:1000;box-shadow:0 4px 0 #a87512;transition:.15s;touch-action:manipulation}.dino-btn:active{transform:translateY(3px);box-shadow:0 1px 0 #a87512}.dino-btn.dark{background:#e8f5e9;box-shadow:0 4px 0 #88a98d}
+#dinoWorld{position:absolute;inset:0;overflow:hidden;touch-action:none;z-index:4}
+.dino-entity{position:absolute;transform:translate(-50%,-50%);user-select:none;pointer-events:none;text-align:center;z-index:20;transform-style:preserve-3d}
+.dino-entity .sprite{font-size:50px;line-height:1;filter:drop-shadow(0 12px 5px rgba(0,0,0,.38));text-shadow:0 2px 0 rgba(255,255,255,.18);transform:rotateX(5deg) rotateY(-7deg);transition:transform .12s}
+.dino-entity .name{margin-top:5px;color:#fff;font-size:9px;font-weight:1000;text-shadow:0 2px 5px #071e12;white-space:nowrap;background:rgba(5,26,16,.35);padding:2px 5px;border-radius:99px}
+.dino-player{z-index:45}.dino-player .sprite{font-size:60px}.dino-animal{z-index:25}
+/* 3D-style world props */
+.dino-board{position:absolute;z-index:10;left:50%;top:45%;transform:translate(-50%,-50%) translateZ(-30px);width:min(210px,48vw);min-height:122px;padding:13px;border-radius:18px;background:linear-gradient(145deg,#70431f,#bb7b3d 52%,#633719);border:6px solid #4a2b15;box-shadow:0 25px 30px rgba(0,0,0,.38),inset 0 0 0 2px rgba(255,220,150,.38);text-align:center;color:#fff;opacity:.96}
+.dino-board:before{content:"";position:absolute;left:24%;right:24%;bottom:-66px;height:72px;background:linear-gradient(90deg,#4b2c15,#8b5a2b,#4b2c15);border-radius:8px;transform:perspective(100px) rotateX(8deg);box-shadow:0 15px 18px rgba(0,0,0,.35);z-index:-1}
+.dino-board h3{margin:0 0 4px;font-size:17px;font-weight:1000;text-shadow:0 2px 2px #4b2c14}.dino-board p{font-size:9px;margin:0 0 7px;color:#ffe9c7}.dino-board button{width:100%;margin-top:5px;font-size:10px}
+.dino-tree{position:absolute;z-index:7;font-size:78px;opacity:.92;pointer-events:none;filter:drop-shadow(0 15px 8px rgba(0,0,0,.32));transform:perspective(300px) rotateX(5deg) rotateY(-5deg)}
+.dino-tree.t1{left:3%;top:18%}.dino-tree.t2{right:5%;top:14%}.dino-tree.t3{left:11%;bottom:8%}.dino-tree.t4{right:14%;bottom:10%}
+.dino-hint{position:absolute;z-index:75;left:50%;bottom:12px;transform:translateX(-50%);background:rgba(7,29,18,.75);color:#fff;padding:7px 11px;border-radius:999px;font-size:10px;font-weight:800;white-space:nowrap}
+#dinoTouchControls{display:none;position:absolute;z-index:85;left:12px;right:12px;bottom:35px;justify-content:space-between;pointer-events:none}.dino-pad{display:grid;grid-template-columns:42px 42px 42px;grid-template-rows:42px 42px 42px;gap:3px;pointer-events:auto}.dino-pad button,.dino-attack{width:42px;height:42px;border-radius:12px;border:1px solid rgba(255,255,255,.5);background:rgba(10,35,20,.7);color:#fff;font-weight:1000;font-size:18px;touch-action:none}.dino-pad .up{grid-column:2}.dino-pad .left{grid-column:1;grid-row:2}.dino-pad .down{grid-column:2;grid-row:2}.dino-pad .right{grid-column:3;grid-row:2}.dino-attack{align-self:end;width:74px;height:74px;border-radius:50%;background:#ef4444;font-size:12px;box-shadow:0 5px 0 #991b1b}
+#dinoBoardModal{position:fixed;z-index:120;inset:0;background:rgba(3,15,9,.72);display:none;align-items:center;justify-content:center;padding:14px}#dinoBoardModal.open{display:flex}.dino-modal{width:min(760px,96vw);max-height:90svh;overflow:auto;background:#fff;border-radius:24px;padding:18px;box-shadow:0 25px 80px rgba(0,0,0,.4)}.dino-modal h2{font-size:22px;font-weight:1000;color:#166534;margin:0 0 5px}.dino-modal .board-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}.dino-modal .board-card{padding:13px;border:2px solid #dcfce7;border-radius:16px;background:#f0fdf4}.dino-modal .board-card h4{font-weight:1000;margin-bottom:3px}.dino-modal .board-card p{font-size:11px;color:#64748b}
+#dinoShopModal{position:fixed;z-index:121;inset:0;background:rgba(3,15,9,.72);display:none;align-items:center;justify-content:center;padding:14px}#dinoShopModal.open{display:flex}.dino-shop{width:min(700px,96vw);max-height:90svh;overflow:auto;background:#fff;border-radius:24px;padding:18px}.dino-shop-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.dino-skin{border:2px solid #e2e8f0;border-radius:16px;padding:12px;text-align:center}.dino-skin .emoji{font-size:42px}.dino-skin button{width:100%;margin-top:7px}.dino-progress{width:150px;height:9px;background:#17351f;border-radius:99px;overflow:hidden;border:1px solid rgba(255,255,255,.3)}.dino-progress i{display:block;height:100%;background:#f7d447;width:0%}.dino-hit{animation:dinoHit .18s linear}@keyframes dinoHit{50%{transform:translate(-50%,-50%) scale(1.35);filter:brightness(2)}}
+@media(max-width:700px){#dinoGame{padding:0;min-height:calc(100svh - 72px)}.dino-shell{min-height:calc(100svh - 72px);border-radius:0;border-left:0;border-right:0}.jungle-hud{top:7px;left:7px;right:7px}.dino-pill{font-size:10px;padding:6px 8px}.dino-btn{padding:8px 10px;font-size:11px}.dino-board{top:46%;width:min(190px,52vw);min-height:110px}.dino-board h3{font-size:15px}.dino-hint{bottom:6px;font-size:9px}.dino-tree{font-size:50px}#dinoTouchControls{display:flex}.dino-shop-grid,.dino-modal .board-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:430px){.dino-shop-grid,.dino-modal .board-grid{grid-template-columns:1fr}.dino-progress{width:100px}.dino-board{width:170px;top:45%}.dino-entity .sprite{font-size:42px}.dino-player .sprite{font-size:52px}}
 /* Chat uses visual viewport units so it fits phones with browser bars/keyboard. */
 @supports(height:100dvh){
  #chatPanel{height:min(620px,calc(100dvh - 96px))}
@@ -397,10 +361,10 @@ html,body{overflow-x:hidden}
     <div id="dinoWorld">
       <div class="dino-tree t1">🌳</div><div class="dino-tree t2">🌴</div>
       <div class="dino-tree t3">🌲</div><div class="dino-tree t4">🌳</div>
-      <div class="dino-board">
+      <div class="dino-board" style="pointer-events:none">
         <h3>🪵 PAPAN BESAR</h3>
         <p>Tempat berkumpul sebelum menjelajah hutan.</p>
-        <button class="dino-btn" onclick="openDinoBoard()">📋 Buka Papan</button>
+        <button class="dino-btn" style="pointer-events:auto" onclick="openDinoBoard()">📋 Buka Papan</button>
       </div>
     </div>
     <div id="dinoTouchControls">
@@ -3808,7 +3772,8 @@ function closeDinoShop(){document.getElementById('dinoShopModal')?.classList.rem
 function renderDinoShop(){
   const box=document.getElementById('dinoShopGrid');if(!box)return;
   box.innerHTML=DINO_SKINS.map(s=>{
-    const owned=s.price===0 || (dinoStorage()[dinoMyId()]?.ownedSkins||[]).includes(s.id);
+    const adminFree=currentUser?.role==='Admin';
+    const owned=adminFree || s.price===0 || (dinoStorage()[dinoMyId()]?.ownedSkins||[]).includes(s.id);
     const active=dinoState.skin===s.id;
     return `<div class="dino-skin"><div class="emoji">${s.emoji}</div><b>${s.name}</b><div class="text-xs text-slate-500 mt-1">${s.price?`💰 ${s.price}`:'Gratis'}</div>
       <button class="dino-btn ${active?'dark':''}" onclick="buyOrEquipDino('${s.id}')">${active?'Dipakai':owned?'Pakai':`Beli ${s.price}`}</button></div>`;
@@ -3817,10 +3782,11 @@ function renderDinoShop(){
 function buyOrEquipDino(id){
   const s=DINO_SKINS.find(x=>x.id===id);if(!s||!currentUser)return;
   const store=dinoStorage(),me=store[dinoMyId()]||{},owned=me.ownedSkins||[];
-  if(!owned.includes(id) && s.price>0){
+  if(!owned.includes(id) && s.price>0 && currentUser.role!=='Admin'){
     if(dinoState.money<s.price)return alert('Uang berburu belum cukup.');
     dinoState.money-=s.price;owned.push(id);
   }
+  if(currentUser.role==='Admin' && !owned.includes(id)) owned.push(id);
   dinoState.skin=id;me.ownedSkins=owned;store[dinoMyId()]={...me,skin:id,money:dinoState.money,points:dinoState.points,level:dinoState.level};
   localStorage.setItem('dinoPlayers',JSON.stringify(store));saveAppData('dinoPlayers',JSON.stringify(store));
   renderDinoShop();updateDinoHud();renderDinoPlayer(parseFloat(document.getElementById('dinoMe')?.style.left||50),parseFloat(document.getElementById('dinoMe')?.style.top||57));
