@@ -146,6 +146,11 @@
         .rekap-saldo-summary{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}.rekap-saldo-badge{padding:.5rem .75rem;border-radius:.75rem;font-size:.7rem;font-weight:800;white-space:nowrap;border:1px solid #e2e8f0;background:#f8fafc}#mutasiTableWrap.mutasi-hidden,#btnDownloadMutasi.mutasi-hidden{display:none!important}
         @media screen {
             .pdf-export-root { box-shadow: 0 0 0 1px #e2e8f0; }
+
+.download-hasil-belajar{padding:24px !important; box-sizing:border-box;}
+.download-hasil-belajar *{word-wrap:break-word;}
+#allMutasiContainer{display:none;}
+
         }
         .pdf-export-root .dok-table th:nth-child(1),
         .pdf-export-root .dok-table td:nth-child(1) { width: 8%; }
@@ -584,6 +589,10 @@
                         <button onclick="switchGuruTab('tabBintang')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">⭐ Bintang Perilaku</button>
                         <button onclick="switchGuruTab('tabTabungan')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">💰 Tabungan</button>
                         <button onclick="switchGuruTab('tabCetakDoc')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">🖨️ Cetak Raport / Buku Induk</button>
+<button onclick="switchGuruTab('tabJurnal')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100">📔 Jurnal Harian</button>
+<button onclick="switchGuruTab('tabJadwal')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100">🗓️ Jadwal Pelajaran</button>
+<button onclick="switchGuruTab('tabKKTP')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100">🎯 KKTP</button>
+
                     </div>
                 </div>
             </div>
@@ -759,7 +768,38 @@
                 </div>
             </div>
 
-            <!-- GURU: TAB LEGGER NILAI & RANKING -->
+            
+<div id="tabJurnal" class="guru-content hidden no-print bg-white p-6 rounded-2xl shadow">
+<h3 class="font-bold text-lg">📔 Jurnal Harian Guru</h3>
+<div class="grid grid-cols-3 gap-3 mt-3">
+<input type="date" placeholder="Tanggal" class="border p-2 rounded">
+<input type="text" placeholder="Mata Pelajaran" class="border p-2 rounded">
+<input type="text" placeholder="Keterangan Kegiatan Pembelajaran" class="border p-2 rounded">
+</div></div>
+
+<div id="tabJadwal" class="guru-content hidden no-print bg-white p-6 rounded-2xl shadow">
+<h3 class="font-bold text-lg">🗓️ Jadwal Pelajaran</h3>
+<div class="grid grid-cols-4 gap-3 mt-3">
+<input type="text" placeholder="Hari" class="border p-2 rounded">
+<input type="text" placeholder="Jam" class="border p-2 rounded">
+<input type="text" placeholder="Mata Pelajaran" class="border p-2 rounded">
+<button class="bg-emerald-600 text-white rounded p-2">Simpan</button>
+</div></div>
+
+<div id="tabKKTP" class="guru-content hidden no-print bg-white p-6 rounded-2xl shadow">
+<h3 class="font-bold text-lg">🎯 Kriteria Ketuntasan Tujuan Pembelajaran (KKTP)</h3>
+<table class="w-full text-xs mt-3 border">
+<tr><th>Mapel</th><th>Perlu Bimbingan</th><th>Cukup</th><th>Baik</th><th>Sangat Baik</th><th>Keterangan</th></tr>
+<tr>
+<td><input class="border p-1 w-full"></td>
+<td><input class="border p-1 w-full"></td>
+<td><input class="border p-1 w-full"></td>
+<td><input class="border p-1 w-full"></td>
+<td><input class="border p-1 w-full"></td>
+<td><input class="border p-1 w-full"></td>
+</tr></table></div>
+
+<!-- GURU: TAB LEGGER NILAI & RANKING -->
             <div id="tabLegger" class="guru-content space-y-6 hidden no-print">
                 <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
                     <div class="flex justify-between items-center mb-6 pb-3 border-b flex-wrap gap-4">
@@ -1009,6 +1049,8 @@
                                         <i class="fa-solid fa-xmark"></i>
                                     </button>
                                 </div>
+<button id="btnShowAllMutasi" onclick="document.getElementById('allMutasiContainer').style.display='block'" class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs">Tampilkan Semua Riwayat</button>
+
                             </div>
                             <button id="btnDownloadMutasi" onclick="exportTableToExcel('tblLogTabungan', 'Rekap_Keuangan_Tabungan')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm shadow-indigo-200 flex items-center gap-2">
                                 <i class="fa-solid fa-download"></i> Download Mutasi
