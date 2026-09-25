@@ -346,6 +346,12 @@
         #secSkyBattle.sky-full-home { margin-top:0 !important; }
         .rocket-panel-btn { background:linear-gradient(135deg,#f97316,#ef4444) !important; color:#fff !important; font-weight:1000 !important; box-shadow:0 5px 0 #9a3412,0 10px 25px rgba(239,68,68,.25); }
         .rocket-panel-btn:active { transform:translateY(2px); box-shadow:0 3px 0 #9a3412; }
+        .rocket-panel-btn.role-admin { background:linear-gradient(135deg,#7c3aed,#4f46e5) !important; box-shadow:0 5px 0 #312e81,0 10px 25px rgba(79,70,229,.28); }
+        .rocket-panel-btn.role-guru { background:linear-gradient(135deg,#059669,#0f766e) !important; box-shadow:0 5px 0 #064e3b,0 10px 25px rgba(5,150,105,.28); }
+        .rocket-panel-btn.role-siswa { background:linear-gradient(135deg,#f97316,#ef4444) !important; box-shadow:0 5px 0 #9a3412,0 10px 25px rgba(239,68,68,.25); }
+        .rocket-panel-btn.role-admin:hover { background:linear-gradient(135deg,#8b5cf6,#6366f1) !important; }
+        .rocket-panel-btn.role-guru:hover { background:linear-gradient(135deg,#10b981,#0d9488) !important; }
+        .rocket-panel-btn.role-siswa:hover { background:linear-gradient(135deg,#fb923c,#f43f5e) !important; }
         #skyBackToGame { display:none; }
         body.sky-panel-mode #skyBackToGame { display:inline-flex; }
         @media (max-width:640px){ #schoolFeatureDock{gap:5px!important;padding:7px!important;} #schoolFeatureDock button{font-size:10px!important;padding:9px 10px!important;} }
@@ -1420,8 +1426,8 @@
   </div>
 </section>
 
-<div id="schoolFeatureDock" class="no-print">
-  <button class="rocket-panel-btn" onclick="openRolePanel()">🚀 Panel <span id="dockRole">Saya</span></button>
+<div id="schoolFeatureDock" class="no-print" aria-label="Menu cepat akun">
+  <button id="roleRocketBtn" class="rocket-panel-btn" onclick="openRolePanel()" title="Buka panel kerja sesuai akun">🚀 <span id="dockRole">Panel</span></button>
   <button id="skyBackToGame" onclick="showGameHome()">✈️ Kembali Game</button>
   <button onclick="toggleChat(true)">💬 Chat</button>
   <button onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆️ Atas</button>
@@ -1805,10 +1811,28 @@
             document.getElementById('secGuru').classList.add('hidden');
             document.getElementById('secSiswa').classList.add('hidden');
             document.getElementById('userInfo').classList.add('hidden');
+            document.getElementById('schoolFeatureDock')?.style.setProperty('display','none');
             const adminTools = document.getElementById('adminDataTools');
             if (adminTools) adminTools.classList.add('admin-only');
             document.getElementById('loginUser').value = '';
             document.getElementById('loginPass').value = '';
+        }
+
+        function updateRoleRocketButton(role){
+            const btn=document.getElementById('roleRocketBtn');
+            const label=document.getElementById('dockRole');
+            if(!btn || !label) return;
+            btn.classList.remove('role-admin','role-guru','role-siswa');
+            const config={
+                Admin:{text:'Panel Admin',title:'Buka Panel Kerja Administrator',cls:'role-admin'},
+                Guru:{text:'Panel Guru',title:'Buka Panel Kerja Guru',cls:'role-guru'},
+                Siswa:{text:'Panel Siswa',title:'Buka Dashboard Siswa',cls:'role-siswa'}
+            };
+            const c=config[role] || config.Siswa;
+            label.textContent=c.text;
+            btn.title=c.title;
+            btn.classList.add(c.cls);
+            btn.setAttribute('aria-label',c.title);
         }
 
         function showDashboard(role) {
@@ -1817,6 +1841,8 @@
             const chatWidget = document.getElementById('chatWidget');
             if (chatWidget) chatWidget.classList.remove('hidden');
             document.getElementById('txtActiveUser').innerHTML = `<i class="fa-solid fa-circle-user"></i> ${currentUser.nama || currentUser.username} (${role})`;
+            updateRoleRocketButton(role);
+            document.getElementById('schoolFeatureDock')?.style.setProperty('display','flex');
             updateChatAdminControls();
             renderChatMessages();
 
@@ -1861,7 +1887,7 @@
             ['secAdmin','secGuru','secSiswa'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));
             document.getElementById(target)?.classList.remove('hidden');
             document.getElementById(target)?.scrollIntoView({behavior:'auto',block:'start'});
-            document.getElementById('dockRole') && (document.getElementById('dockRole').textContent='Kembali');
+            document.getElementById('dockRole') && (document.getElementById('dockRole').textContent='Panel '+(role==='Admin'?'Admin':role==='Guru'?'Guru':'Siswa'));
 
             // Beri browser kesempatan menggambar panel dulu sebelum pekerjaan berat berjalan.
             setTimeout(()=>{
@@ -1896,7 +1922,7 @@
             document.body.classList.remove('sky-panel-mode');
             ['secAdmin','secGuru','secSiswa'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));
             document.getElementById('secSkyBattle')?.classList.remove('hidden');
-            document.getElementById('dockRole') && (document.getElementById('dockRole').textContent='Saya');
+            if(currentUser) updateRoleRocketButton(currentUser.role);
             if(typeof initSpaceGame==='function') initSpaceGame();
             requestAnimationFrame(()=>document.getElementById('secSkyBattle')?.scrollIntoView({behavior:'smooth',block:'start'}));
         }
