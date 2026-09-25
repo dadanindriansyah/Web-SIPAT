@@ -323,6 +323,9 @@
 .sky-fire,.sky-box{border:3px solid #fff;color:#fff;font-weight:1000;border-radius:22px;box-shadow:0 8px 20px rgba(15,23,42,.3);cursor:pointer;user-select:none;touch-action:none}
 .sky-fire{width:78px;height:78px;background:linear-gradient(145deg,#ef4444,#b91c1c);font-size:29px}
 .sky-box{width:62px;height:62px;background:linear-gradient(145deg,#facc15,#f97316);font-size:23px}
+.sky-support{width:62px;height:62px;border:3px solid #fff;color:#fff;font-weight:1000;border-radius:22px;background:linear-gradient(145deg,#10b981,#047857);font-size:23px;box-shadow:0 8px 20px rgba(15,23,42,.3);cursor:pointer;user-select:none;touch-action:none}
+.sky-support:active{transform:scale(.94)}
+@media (orientation:landscape){.sky-fire-wrap{right:22px;bottom:18px;gap:12px}.sky-fire{width:86px;height:86px}.sky-box,.sky-support{width:64px;height:64px}.sky-joystick{left:18px;bottom:18px}}
 .sky-fire:active,.sky-box:active{transform:scale(.94)}
 .sky-bottom-info{position:absolute;z-index:6;right:16px;bottom:16px;display:flex;flex-direction:column;gap:7px;align-items:flex-end;pointer-events:none}
 .sky-weapon{padding:7px 11px;border-radius:12px;background:rgba(15,23,42,.72);color:#fff;font-size:11px;font-weight:1000}
@@ -432,7 +435,7 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
 @media(max-width:640px){
  #skyCanvas{min-height:410px;height:64vh}
  .sky-help{display:none}.sky-mobile-note{display:block;font-size:10px;color:#64748b;margin-top:6px}
- .sky-controls{inset:0}.sky-joystick{left:9px;bottom:9px;width:108px;height:108px}.sky-knob{width:48px;height:48px}.sky-fire-wrap{right:9px;bottom:9px;gap:7px}.sky-fire{width:70px;height:70px}.sky-box{width:56px;height:56px}
+ .sky-controls{inset:0}.sky-joystick{left:9px;bottom:9px;width:108px;height:108px}.sky-knob{width:48px;height:48px}.sky-fire-wrap{right:9px;bottom:9px;gap:7px}.sky-fire{width:70px;height:70px}.sky-box,.sky-support{width:56px;height:56px}
  .sky-bottom-info{right:9px;bottom:9px}.sky-message{max-width:180px}
  #schoolFeatureDock{width:max-content;max-width:calc(100vw - 12px)}
  body{padding-bottom:74px}
@@ -1520,7 +1523,7 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
       <canvas id="skyCanvas"></canvas>
       <div class="sky-overlay">
         <div class="sky-title">☁️ Misi Langit SIPAT</div>
-        <div class="sky-help">Semua pemain satu arena. Admin & Guru Kelas 4 kebal. Siswa bisa hidup kembali setelah hancur. Guru punya tombol bekukan+bakar, siswa bisa mendapat Prank dari kotak misteri.</div>
+        <div class="sky-help">Semua pemain satu arena. Tembakan, efek, dan kehancuran terlihat realtime. Musuh membidik siswa secara acak. 🤝 Gunakan Bantuan untuk memulihkan teman.</div>
       </div>
       <button id="skyRoleRocketBtn" class="sky-role-rocket role-siswa" onclick="openRolePanel()" title="Buka panel kerja sesuai akun" aria-label="Buka panel kerja sesuai akun">
         <span class="rocket-icon">🚀</span>
@@ -1534,6 +1537,7 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
       <div class="sky-controls">
         <div id="skyJoystick" class="sky-joystick" aria-label="Analog gerak"><div id="skyKnob" class="sky-knob"></div></div>
         <div class="sky-fire-wrap">
+          <button id="skySupportBtn" class="sky-support" title="Bantu teman: pulihkan HP dan beri perisai">🤝</button>
           <button id="skyBoxBtn" class="sky-box" title="Kotak misteri">🎁</button>
           <button id="skyFireBtn" class="sky-fire" title="Tembak">🔥</button>
         </div>
@@ -4215,6 +4219,41 @@ function initGuruViews() {
   }
   function weaponLabel(){const p=getProfile(); if(p.weaponUntil && p.weaponUntil>Date.now()) return p.weapon.toUpperCase(); return 'PELURU'}
   function notify(msg){const e=$('skyMessage');if(e)e.textContent=msg}
+  // ===== AUDIO SENJATA =====
+  let audioCtx=null;
+  function ensureAudio(){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}}
+  function weaponSound(type,remote=false){
+    ensureAudio(); if(!audioCtx)return;
+    const now=audioCtx.currentTime, o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    const map={normal:[520,150,'square',.045],laser:[1100,280,'sawtooth',.055],electric:[760,180,'triangle',.06],missile:[180,70,'sawtooth',.075],support:[420,820,'sine',.045],freeze:[900,1450,'sine',.06],burn:[180,95,'sawtooth',.06]};
+    const a=map[type]||map.normal; o.type=a[2]; o.frequency.setValueAtTime(a[0],now); o.frequency.exponentialRampToValueAtTime(Math.max(40,a[1]),now+.11);
+    g.gain.setValueAtTime(a[3],now); g.gain.exponentialRampToValueAtTime(.001,now+.13); o.connect(g);g.connect(audioCtx.destination);o.start(now);o.stop(now+.14);
+  }
+  function broadcastEvent(type,payload={}){
+    if(!gs?.eventsRef||!currentUser)return;
+    const ev={type,by:profileKey(),role:currentUser.role||'Siswa',nama:currentUser.nama||currentUser.username||'Pemain',ts:firebase.database.ServerValue.TIMESTAMP,...payload};
+    gs.eventsRef.push(ev).catch(()=>{});
+  }
+  function broadcastShot(type,b){
+    broadcastEvent('shot',{weapon:type,x:(b.x/Math.max(1,gs.w)),y:(b.y/Math.max(1,gs.h)),dx:b.dx,dy:b.dy,damage:b.damage,color:b.color});
+  }
+  function applySupport(){
+    if(!gs?.player||gs.gameOver)return;
+    ensureAudio(); weaponSound('support');
+    const p=gs.player;
+    if(p.hp<=0||p.deadUntil){respawnPlayer('prank');p.hp=1;}
+    else p.hp=Math.min(3,(p.hp||1)+1);
+    p.inv=Math.max(p.inv||0,2200);
+    broadcastEvent('support',{x:p.x/Math.max(1,gs.w),y:p.y/Math.max(1,gs.h),amount:1});
+    notify('🤝 Bantuan dikirim! HP dipulihkan + perisai 2,2 detik.');
+  }
+  function receiveSupport(ev){
+    if(!gs?.player||ev.by===profileKey())return;
+    const p=gs.player;
+    if(p.hp<=0||p.deadUntil){respawnPlayer('prank');p.hp=1;} else p.hp=Math.min(3,(p.hp||1)+1);
+    p.inv=Math.max(p.inv||0,2200); weaponSound('support',true);
+    notify('🤝 '+(ev.nama||'Teman')+' membantu! HP +1 dan perisai aktif.');
+  }
   function updateHud(){
     const p=getProfile(), plane=effectivePlane(), special=roleSpecial();
     if($('skyPoints'))$('skyPoints').textContent=p.points||0;
@@ -4268,6 +4307,7 @@ function initGuruViews() {
     const p=gs.player;
     p.x=gs.w/2; p.y=gs.h-100; p.hp=3; p.inv=2200; p.deadUntil=0;
     p.frozenUntil=0; p.burningUntil=0; gs.gameOver=false; gs.vel={x:0,y:0};
+    setTimeout(()=>{try{if(gs&&gs.onlineRef)gs.onlineRef.child(profileFirebaseKey()).update({hp:3,alive:true,deadUntil:0,inv:p.inv||0})}catch(e){}},30);
     gs.keys.fire=false; notify(reason==='prank'?'✨ Pesawatmu kembali ke arena!':'🚀 Pesawat siswa hidup kembali! HP 3');
     updateHud();
   }
@@ -4287,9 +4327,12 @@ function initGuruViews() {
       if(type==='guru' && v.role==='Admin')return;
       gs.onlineRef.child(id).update({battleEffect:{type:type,until:now+3200,by:profileKey()}}).catch(()=>{});
     });
+    broadcastEvent(type==='guru'?'guruPower':'prankPower',{effect:type,until:now+3200});
+    weaponSound(type==='freeze'?'freeze':'burn');
   }
   function guruStatusPower(type){
     if(roleSpecial()!=='guru4'||!gs)return;
+    ensureAudio(); weaponSound(type);
     const now=Date.now();
     gs.enemies.forEach(e=>{
       if(type==='freeze') e.frozenUntil=Math.max(e.frozenUntil||0,now+3200);
@@ -4325,35 +4368,41 @@ function initGuruViews() {
     const now=Date.now(), interval=Math.max(850,(e.fire||1500)-gs.level*25);
     if(!e.lastFire)e.lastFire=now+Math.random()*900;
     if(now-e.lastFire<interval)return; e.lastFire=now;
-    const dx=gs.player.x-e.x,dy=gs.player.y-e.y,len=Math.hypot(dx,dy)||1,speed=e.bulletSpeed||4.8;
-    gs.enemyBullets.push({x:e.x,y:e.y+e.size*.7,dx:dx/len*speed,dy:dy/len*speed,damage:e.damage||1,color:e.bulletColor||'#ef4444',life:0});
+    const candidates=[{id:profileKey(),x:gs.player.x,y:gs.player.y,role:currentUser?.role||'Siswa'}].concat(Object.values(gs.remotePlayers||{}).map(v=>({id:v.id,x:(v.x||0),y:(v.y||0),role:v.role}))).filter(v=>v.role==='Siswa');
+    const target=candidates.length?candidates[Math.floor(Math.random()*candidates.length)]:{x:gs.player.x,y:gs.player.y,id:profileKey()};
+    const dx=target.x-e.x,dy=target.y-e.y,len=Math.hypot(dx,dy)||1,speed=e.bulletSpeed||4.8;
+    gs.enemyBullets.push({x:e.x,y:e.y+e.size*.7,dx:dx/len*speed,dy:dy/len*speed,damage:e.damage||1,color:e.bulletColor||'#ef4444',life:0,targetId:target.id});
+    weaponSound('normal',true);
   }
-  function hitPlayer(damage=1){
+  function hitPlayer(damage=1,attackerId='enemy'){
     if(!gs||gs.gameOver||gs.player.inv>0)return;
     if(isInvulnerable()){ gs.player.inv=350; notify('🛡️ Pesawat Admin/Guru Kelas 4 kebal!'); return; }
     gs.player.inv=1300; gs.player.hp=Math.max(0,(gs.player.hp??3)-damage);
     if(gs.player.hp>0){notify('💥 Pesawat terkena tembakan musuh! HP '+gs.player.hp);}
     else{
       gs.player.hp=0; gs.player.deadUntil=Date.now()+1800; gs.keys.fire=false; gs.gameOver=true;
-      notify('💥 Pesawat siswa hancur! 🚀 Hidup kembali dalam 1,8 detik...');
-      setTimeout(()=>{if(gs&&currentUser&&roleSpecial()==='normal'&&gs.player.deadUntil)respawnPlayer();},1800);
+      broadcastEvent('playerDeath',{victim:profileKey(),killer:attackerId||'enemy'});
+      notify(attackerId&&attackerId!=='enemy'?'💥 Pesawatmu ditembak pemain lain! 🚀 Hidup kembali dalam 1,8 detik...':'💥 Pesawat siswa hancur! 🚀 Hidup kembali dalam 1,8 detik...');
+      setTimeout(()=>{if(gs&&currentUser&&roleSpecial()==='normal'&&gs.player.deadUntil){broadcastEvent('playerRespawn',{victim:profileKey()});respawnPlayer();}},1800);
     }
   }
   function fire(){
     if(!gs||gs.gameOver)return; const now=Date.now(),pl=gs.player, cd=pl.plane.fire;
-    if(now-gs.lastFire<cd)return;gs.lastFire=now;
+    if(now-gs.lastFire<cd)return;gs.lastFire=now; ensureAudio();
     const w=weaponLabel(),x=pl.x,y=pl.y-30;
+    const before=gs.bullets.length;
     if(roleSpecial()!=='normal'){
-      // Admin dan Guru Kelas 4 selalu membawa tiga jenis senjata sekaligus.
       bullet(x,y,0,-13,'laser',3,'#f43f5e');
       bullet(x-18,y+5,-.5,-10,'electric',2,'#38bdf8');
       bullet(x+18,y+5,.5,-10,'electric',2,'#38bdf8');
       bullet(x-14,y+5,0,-8,'missile',4,'#fb923c');
       bullet(x+14,y+5,0,-8,'missile',4,'#fb923c');
-    } else if(w==='LASER'){bullet(x,y,0,-12,'laser',3,'#f43f5e');}
-    else if(w==='LISTRIK'){bullet(x-10,y,0,-10,'electric',2,'#38bdf8');bullet(x+10,y,0,-10,'electric',2,'#38bdf8');}
-    else if(w==='RUDAL'){bullet(x-15,y,0,-8,'missile',4,'#fb923c');bullet(x+15,y,0,-8,'missile',4,'#fb923c');}
-    else {bullet(x,y,0,-10,'normal',1,'#fde047');bullet(x-13,y+12,-.4,-9,'normal',1,'#fde047');bullet(x+13,y+12,.4,-9,'normal',1,'#fde047');}
+      weaponSound('laser');
+    } else if(w==='LASER'){bullet(x,y,0,-12,'laser',3,'#f43f5e'); weaponSound('laser');}
+    else if(w==='LISTRIK'){bullet(x-10,y,0,-10,'electric',2,'#38bdf8');bullet(x+10,y,0,-10,'electric',2,'#38bdf8'); weaponSound('electric');}
+    else if(w==='RUDAL'){bullet(x-15,y,0,-8,'missile',4,'#fb923c');bullet(x+15,y,0,-8,'missile',4,'#fb923c'); weaponSound('missile');}
+    else {bullet(x,y,0,-10,'normal',1,'#fde047');bullet(x-13,y+12,-.4,-9,'normal',1,'#fde047');bullet(x+13,y+12,.4,-9,'normal',1,'#fde047'); weaponSound('normal');}
+    for(let i=before;i<gs.bullets.length;i++)broadcastShot(gs.bullets[i].type,gs.bullets[i]);
   }
   function collectBox(){
     if(!gs)return;
@@ -4402,6 +4451,12 @@ function initGuruViews() {
     gs.boxes.forEach(b=>b.y+=b.vy*dt*.05);
     gs.bullets.forEach(b=>{b.x+=b.dx*60*dt/1000;b.y+=b.dy*60*dt/1000;b.life+=dt});
     gs.enemyBullets.forEach(b=>{b.x+=b.dx*60*dt/1000;b.y+=b.dy*60*dt/1000;b.life+=dt;});
+    gs.remoteBullets.forEach(b=>{b.x+=b.dx*60*dt/1000;b.y+=b.dy*60*dt/1000;b.life+=dt;});
+    gs.remoteBullets=gs.remoteBullets.filter(b=>{
+      if(b.y< -50||b.y>gs.h+50||b.x< -50||b.x>gs.w+50||b.life>3000)return false;
+      if(Math.hypot(b.x-p.x,b.y-p.y)<28){hitPlayer(b.damage||1,b.by);return false;}
+      return true;
+    });
     gs.enemyBullets=gs.enemyBullets.filter(b=>{
       if(b.y< -40||b.y>gs.h+40||b.x< -40||b.x>gs.w+40||b.life>3000)return false;
       if(Math.hypot(b.x-p.x,b.y-p.y)<28){hitPlayer(b.damage);return false;}
@@ -4467,9 +4522,10 @@ function initGuruViews() {
     gs.boxes.forEach(b=>{c.save();c.translate(b.x,b.y);c.rotate(Math.sin(gs.t/250)*.1);c.shadowColor='rgba(15,23,42,.25)';c.shadowBlur=8;c.fillStyle='#f59e0b';c.strokeStyle='#fff';c.lineWidth=3;c.fillRect(-17,-17,34,34);c.strokeRect(-17,-17,34,34);c.shadowBlur=0;c.fillStyle='#fff';c.font='20px sans-serif';c.textAlign='center';c.fillText('?',0,7);c.restore()});
     gs.bullets.forEach(b=>{c.save();c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=b.type==='laser'?8:4;c.shadowColor=b.color;c.shadowBlur=b.type==='laser'?14:6;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*.25,b.y-b.dy*.25);c.stroke();c.restore();});
     gs.enemyBullets.forEach(b=>{c.save();c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=4;c.shadowColor=b.color;c.shadowBlur=9;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*1.8,b.y-b.dy*1.8);c.stroke();c.beginPath();c.arc(b.x,b.y,3.5,0,Math.PI*2);c.fill();c.restore();});
+    gs.remoteBullets.forEach(b=>{c.save();c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=b.type==='laser'?7:4;c.shadowColor=b.color;c.shadowBlur=14;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*1.7,b.y-b.dy*1.7);c.stroke();c.restore();});
     gs.enemies.forEach(e=>drawEnemy(c,e));drawPlane(c,gs.player);
     if(gs.player){c.save();c.fillStyle='rgba(15,23,42,.65)';c.fillRect(gs.player.x-28,gs.player.y+58,56,6);c.fillStyle='#22c55e';c.fillRect(gs.player.x-28,gs.player.y+58,56*((gs.player.hp??3)/3),6);c.font='bold 11px sans-serif';c.textAlign='center';c.fillStyle='#0f172a';c.fillText('HP '+(gs.player.hp??3),gs.player.x,gs.player.y+77);c.restore();}
-    if(gs.remotePlayers) Object.values(gs.remotePlayers).forEach(r=>{if(r.id!==profileKey()){c.save();c.globalAlpha=.6;drawPlane(c,{x:r.x||50,y:r.y||80,plane:{color:r.color||'#22c55e',big:1},inv:0});c.restore();}});
+    if(gs.remotePlayers) Object.values(gs.remotePlayers).forEach(r=>{if(r.id!==profileKey()){c.save();const dead=r.hp<=0||r.alive===false||r.deadUntil>Date.now(); if(dead){c.globalAlpha=.95;c.font='34px sans-serif';c.textAlign='center';c.fillText('💥',r.x||50,r.y||80);c.font='bold 10px sans-serif';c.fillStyle='#fff';c.fillText('HANCUR',r.x||50,(r.y||80)+28);}else{c.globalAlpha=.78;drawPlane(c,{x:r.x||50,y:r.y||80,plane:{color:r.color||'#22c55e',big:1},inv:r.inv||0}); if(r.frozenUntil>Date.now()){c.font='20px sans-serif';c.fillText('❄️',r.x||50,(r.y||80)-35)} if(r.burningUntil>Date.now()){c.font='20px sans-serif';c.fillText('🔥',r.x||50,(r.y||80)-55)}} c.restore();}});
   }
   function loop(ts){
     if(!gs)return;
@@ -4481,10 +4537,12 @@ function initGuruViews() {
   }
   function setupControls(){
     const joy=$('skyJoystick'),knob=$('skyKnob');if(!joy)return;
+    $('skyCanvas')?.addEventListener('pointerdown',()=>ensureAudio(),{passive:true});
     const setJoy=e=>{const r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let x=(e.clientX-cx)/(r.width*.38),y=(e.clientY-cy)/(r.height*.38);const l=Math.hypot(x,y);if(l>1){x/=l;y/=l}gs.joy={x,y};knob.style.transform=`translate(calc(-50% + ${x*35}px),calc(-50% + ${y*35}px))`};
     const end=()=>{if(!gs)return;gs.joy={x:0,y:0};knob.style.transform='translate(-50%,-50%)'};
     joy.addEventListener('pointerdown',e=>{joy.setPointerCapture(e.pointerId);setJoy(e)});joy.addEventListener('pointermove',e=>{if(e.buttons)setJoy(e)});joy.addEventListener('pointerup',end);joy.addEventListener('pointercancel',end);
-    $('skyFireBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();gs.keys.fire=true;fire()});['pointerup','pointercancel','pointerleave'].forEach(ev=>$('skyFireBtn')?.addEventListener(ev,()=>{if(gs)gs.keys.fire=false}));
+    $('skyFireBtn')?.addEventListener('pointerdown',e=>{e.preventDefault();ensureAudio();gs.keys.fire=true;fire()});['pointerup','pointercancel','pointerleave'].forEach(ev=>$('skyFireBtn')?.addEventListener(ev,()=>{if(gs)gs.keys.fire=false}));
+    $('skySupportBtn')?.addEventListener('click',e=>{e.preventDefault();applySupport()});
     $('skyBoxBtn')?.addEventListener('click',()=>{if(gs){const near=gs.boxes.findIndex(b=>Math.hypot(b.x-gs.player.x,b.y-gs.player.y)<85);if(near>=0){gs.boxes.splice(near,1);collectBox()}else notify('🎁 Dekati kotak misteri yang jatuh dari langit!')}})
     window.addEventListener('keydown',e=>{if(!gs)return;const k=e.key.toLowerCase();if(['arrowleft','a'].includes(k))gs.keys.left=true;if(['arrowright','d'].includes(k))gs.keys.right=true;if(['arrowup','w'].includes(k))gs.keys.up=true;if(['arrowdown','s'].includes(k))gs.keys.down=true;if(k===' ')gs.keys.fire=true});
     window.addEventListener('keyup',e=>{if(!gs)return;const k=e.key.toLowerCase();if(['arrowleft','a'].includes(k))gs.keys.left=false;if(['arrowright','d'].includes(k))gs.keys.right=false;if(['arrowup','w'].includes(k))gs.keys.up=false;if(['arrowdown','s'].includes(k))gs.keys.down=false;if(k===' ')gs.keys.fire=false});
@@ -4517,7 +4575,7 @@ function initGuruViews() {
     $('secSkyBattle')?.classList.remove('hidden');$('schoolFeatureDock')?.style.setProperty('display','flex');
     enterSkyFullscreen();
     if(gs){gs.vel=gs.vel||{x:0,y:0};resize();updateHud();return}
-    gs={canvas,ctx:canvas.getContext('2d',{alpha:false}),w:0,h:0,t:0,prev:performance.now(),acc:0,lastFire:0,lastSpawn:0,spawnDelay:900,lastBox:0,level:1,enemies:[],bullets:[],enemyBullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{},onlineRef:null,presenceTimer:null,resizeHandler:null,vel:{x:0,y:0}};
+    gs={canvas,ctx:canvas.getContext('2d',{alpha:false}),w:0,h:0,t:0,prev:performance.now(),acc:0,lastFire:0,lastSpawn:0,spawnDelay:900,lastBox:0,level:1,enemies:[],bullets:[],enemyBullets:[],remoteBullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{},onlineRef:null,eventsRef:null,presenceTimer:null,resizeHandler:null,vel:{x:0,y:0}};
     resize();gs.player=makePlayer();gs.player.prankCharges=(getProfile().prankCharges||0);setupControls();updateHud();notify('🌟 Mode online ringan aktif.');gs.raf=requestAnimationFrame(loop);
     gs.resizeHandler=()=>resize(); window.addEventListener('resize',gs.resizeHandler,{passive:true});
 
@@ -4530,19 +4588,20 @@ function initGuruViews() {
       const publish=()=>{
         if(!gs||!currentUser)return;
         const p=gs.player;
-        const data={id:profileKey(),x:Math.round(p.x),y:Math.round(p.y),color:p.plane.color,role:currentUser.role,nama:currentUser.nama||currentUser.username,updatedAt:firebase.database.ServerValue.TIMESTAMP};
+        const data={id:profileKey(),x:Math.round(p.x),y:Math.round(p.y),xN:p.x/Math.max(1,gs.w),yN:p.y/Math.max(1,gs.h),color:p.plane.color,role:currentUser.role,nama:currentUser.nama||currentUser.username,hp:p.hp||0,alive:!gs.gameOver,deadUntil:p.deadUntil||0,inv:p.inv||0,frozenUntil:p.frozenUntil||0,burningUntil:p.burningUntil||0,updatedAt:firebase.database.ServerValue.TIMESTAMP};
         me.update(data).catch(()=>{}); gs.lastNetX=p.x;gs.lastNetY=p.y;
       };
-      publish();
+      publish(); gs.lastNetHp=gs.player.hp; gs.lastNetDead=!!gs.player.deadUntil;
       gs.presenceTimer=setInterval(()=>{
         if(!gs||!currentUser)return;
         const p=gs.player;
-        if(Math.hypot(p.x-(gs.lastNetX||-9999),p.y-(gs.lastNetY||-9999))>8) publish();
+        if(Math.hypot(p.x-(gs.lastNetX||-9999),p.y-(gs.lastNetY||-9999))>8 || p.hp!==gs.lastNetHp || !!p.deadUntil!==!!gs.lastNetDead){publish();gs.lastNetHp=p.hp;gs.lastNetDead=!!p.deadUntil;}
       },1200);
       const sync=(snap)=>{
         if(!gs)return;
         const v=snap.val();
         if(v){
+          if(v.xN!=null){v.x=v.xN*gs.w;v.y=v.yN*gs.h;}
           gs.remotePlayers[v.id]=v;
           const eff=v.battleEffect;
           if(v.id!==profileKey() && eff && eff.until>Date.now()){
@@ -4555,7 +4614,20 @@ function initGuruViews() {
       };
       onlineRef.on('child_added',sync); onlineRef.on('child_changed',sync);
       onlineRef.on('child_removed',sync);
-      gs.cleanupOnline=()=>{onlineRef.off('child_added',sync);onlineRef.off('child_changed',sync);onlineRef.off('child_removed',sync);try{me.remove()}catch(e){}};
+      // Event stream terpisah membuat tembakan, kematian, efek, dan bantuan terlihat semua pemain.
+      gs.eventsRef=onlineRef.child('_events');
+      const eventSync=snap=>{
+        const ev=snap.val(); if(!ev||ev.by===profileKey())return; if(ev.ts && Date.now()-Number(ev.ts)>7000)return;
+        if(ev.type==='shot'){const b={x:(ev.x||0)*gs.w,y:(ev.y||0)*gs.h,dx:ev.dx||0,dy:ev.dy||-10,type:ev.weapon||'normal',damage:ev.damage||1,color:ev.color||'#fde047',life:0,by:ev.by};gs.remoteBullets.push(b);weaponSound(ev.weapon||'normal',true);}
+        else if(ev.type==='playerDeath'){ if(ev.victim!==profileKey()){const v=gs.remotePlayers[ev.victim];if(v){v.hp=0;v.alive=false;v.deadUntil=Date.now()+1800;} notify('💥 '+(v?.nama||'Teman')+' hancur!'); if(ev.killer===profileKey()){const p=getProfile();p.points=(p.points||0)+60;p.kills=(p.kills||0)+1;saveProfile(p);notify('🏆 Kamu membantu menjatuhkan pesawat pemain! +60 poin');}}}
+        else if(ev.type==='playerRespawn'){const v=gs.remotePlayers[ev.victim];if(v){v.hp=3;v.alive=true;v.deadUntil=0;}}
+        else if(ev.type==='support')receiveSupport(ev);
+        else if(ev.type==='guruPower'||ev.type==='prankPower'){const t=ev.effect;if(t==='freeze'||t==='guru')applyLocalStatus('freeze',3200);if(t==='burn'||t==='prank'||t==='guru')applyLocalStatus('burn',3200);notify(ev.type==='guruPower'?'⚡ Guru mengaktifkan kekuatan khusus!':'🎭 PRANK menyerang!');}
+      };
+      gs.eventsRef.on('child_added',eventSync);
+      // Hapus event lama secara berkala agar database tidak membesar.
+      setTimeout(()=>{try{gs.eventsRef.orderByChild('ts').endAt(Date.now()-120000).limitToFirst(200).once('value').then(s=>{const x=s.val()||{};Object.keys(x).forEach(k=>gs.eventsRef.child(k).remove())})}catch(e){}},5000);
+      gs.cleanupOnline=()=>{onlineRef.off('child_added',sync);onlineRef.off('child_changed',sync);onlineRef.off('child_removed',sync);try{gs.eventsRef.off('child_added',eventSync)}catch(e){}try{me.remove()}catch(e){}};
     }
   }
   window.initSpaceGame=start;
