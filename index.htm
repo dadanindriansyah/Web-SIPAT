@@ -316,10 +316,10 @@
 .sky-overlay{position:absolute;inset:0;z-index:4;pointer-events:none}
 .sky-title{position:absolute;left:18px;top:16px;color:#fff;text-shadow:0 2px 5px #0f172a;font-weight:1000;font-size:clamp(16px,2.2vw,27px)}
 .sky-help{position:absolute;right:18px;top:16px;max-width:280px;color:#fff;text-align:right;font-size:11px;font-weight:800;text-shadow:0 1px 4px #0f172a}
-.sky-controls{position:absolute;z-index:8;left:14px;bottom:16px;display:flex;align-items:flex-end;gap:14px;pointer-events:none}
-.sky-joystick{width:126px;height:126px;border-radius:50%;background:rgba(15,23,42,.26);border:3px solid rgba(255,255,255,.72);box-shadow:inset 0 0 20px rgba(0,0,0,.18);position:relative;pointer-events:auto;touch-action:none}
+.sky-controls{position:absolute;inset:0;z-index:8;pointer-events:none}
+.sky-joystick{position:absolute;left:14px;bottom:16px;width:126px;height:126px;border-radius:50%;background:rgba(15,23,42,.26);border:3px solid rgba(255,255,255,.72);box-shadow:inset 0 0 20px rgba(0,0,0,.18);pointer-events:auto;touch-action:none}
 .sky-knob{width:54px;height:54px;border-radius:50%;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:linear-gradient(145deg,#f8fafc,#93c5fd);border:3px solid #fff;box-shadow:0 7px 15px rgba(15,23,42,.25)}
-.sky-fire-wrap{display:flex;gap:8px;align-items:flex-end;pointer-events:auto}
+.sky-fire-wrap{position:absolute;right:18px;bottom:16px;display:flex;gap:10px;align-items:flex-end;pointer-events:auto}
 .sky-fire,.sky-box{border:3px solid #fff;color:#fff;font-weight:1000;border-radius:22px;box-shadow:0 8px 20px rgba(15,23,42,.3);cursor:pointer;user-select:none;touch-action:none}
 .sky-fire{width:78px;height:78px;background:linear-gradient(145deg,#ef4444,#b91c1c);font-size:29px}
 .sky-box{width:62px;height:62px;background:linear-gradient(145deg,#facc15,#f97316);font-size:23px}
@@ -340,6 +340,15 @@
 .sky-buy[disabled]{background:#cbd5e1;color:#64748b;cursor:not-allowed}
 #skyLeaderMini{font-size:10px;color:#475569}
 
+
+        /* ===== KONTROL KHUSUS GURU: BEKU & BAKAR ===== */
+        .sky-special-controls{position:absolute;z-index:21;left:50%;top:58px;transform:translateX(-50%);display:none;gap:8px;pointer-events:auto;align-items:center;justify-content:center}
+        .sky-special-btn{border:2px solid #fff;color:#fff;border-radius:14px;padding:9px 12px;font-size:11px;font-weight:1000;cursor:pointer;box-shadow:0 7px 18px rgba(15,23,42,.3);text-shadow:0 1px 2px rgba(0,0,0,.25)}
+        .sky-special-btn.freeze{background:linear-gradient(135deg,#0284c7,#2563eb)}
+        .sky-special-btn.burn{background:linear-gradient(135deg,#ea580c,#dc2626)}
+        .sky-special-btn.prank{background:linear-gradient(135deg,#9333ea,#db2777)}
+        .sky-special-btn:active{transform:translateY(2px) scale(.97)}
+        @media(max-width:640px){.sky-special-controls{top:54px;max-width:70vw;flex-wrap:wrap}.sky-special-btn{font-size:9px;padding:7px 9px;border-radius:11px}}
 
         /* ===== TOMBOL PANEL AKUN DI DALAM GAME PESAWAT ===== */
         .sky-role-rocket{
@@ -423,7 +432,7 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
 @media(max-width:640px){
  #skyCanvas{min-height:410px;height:64vh}
  .sky-help{display:none}.sky-mobile-note{display:block;font-size:10px;color:#64748b;margin-top:6px}
- .sky-controls{left:9px;bottom:9px}.sky-joystick{width:108px;height:108px}.sky-knob{width:48px;height:48px}.sky-fire{width:70px;height:70px}.sky-box{width:56px;height:56px}
+ .sky-controls{inset:0}.sky-joystick{left:9px;bottom:9px;width:108px;height:108px}.sky-knob{width:48px;height:48px}.sky-fire-wrap{right:9px;bottom:9px;gap:7px}.sky-fire{width:70px;height:70px}.sky-box{width:56px;height:56px}
  .sky-bottom-info{right:9px;bottom:9px}.sky-message{max-width:180px}
  #schoolFeatureDock{width:max-content;max-width:calc(100vw - 12px)}
  body{padding-bottom:74px}
@@ -1518,8 +1527,9 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
         <span class="rocket-text"><b id="skyRoleRocketText">Panel Siswa</b><small id="skyRoleRocketHint">Buka panel kerja</small></span>
       </button>
       <div id="skySpecialControls" class="sky-special-controls">
-        <button id="skyGuruPowerBtn" class="sky-special-btn teacher" onclick="guruBattlePower()" title="Membekukan dan membakar musuh komputer serta pesawat siswa">⚡ Guru: Bekukan + 🔥 Bakar</button>
-        <button id="skyPrankBtn" class="sky-special-btn prank" onclick="usePrankPower()" title="Gunakan item prank dari kotak misteri">🎭 Prank: Bekukan + 🔥 Bakar</button>
+        <button id="skyGuruFreezeBtn" class="sky-special-btn freeze" onclick="guruFreezePower()" title="Membekukan pesawat musuh komputer dan siswa">❄️ Bekukan</button>
+        <button id="skyGuruBurnBtn" class="sky-special-btn burn" onclick="guruBurnPower()" title="Membakar pesawat musuh komputer dan siswa">🔥 Bakar</button>
+        <button id="skyPrankBtn" class="sky-special-btn prank" onclick="usePrankPower()" title="Gunakan item prank dari kotak misteri">🎭 Prank</button>
       </div>
       <div class="sky-controls">
         <div id="skyJoystick" class="sky-joystick" aria-label="Analog gerak"><div id="skyKnob" class="sky-knob"></div></div>
@@ -4211,9 +4221,10 @@ function initGuruViews() {
     if($('skyKills'))$('skyKills').textContent=p.kills||0;
     if($('skyRoleBadge'))$('skyRoleBadge').textContent=(currentUser?.role||'Pemain')+' • '+plane.name;
     if($('skyWeapon'))$('skyWeapon').textContent='Senjata: '+weaponLabel();
-    const gc=$('skyGuruPowerBtn'), pc=$('skyPrankBtn'), sc=$('skySpecialControls');
+    const gf=$('skyGuruFreezeBtn'), gb=$('skyGuruBurnBtn'), pc=$('skyPrankBtn'), sc=$('skySpecialControls');
     if(sc) sc.style.display=(special==='guru4'||(special==='normal'&&gs?.player?.prankCharges>0))?'flex':'none';
-    if(gc) gc.style.display=special==='guru4'?'inline-flex':'none';
+    if(gf) gf.style.display=special==='guru4'?'inline-flex':'none';
+    if(gb) gb.style.display=special==='guru4'?'inline-flex':'none';
     if(pc){pc.style.display=(special==='normal'&&((gs?.player?.prankCharges||0)>0))?'inline-flex':'none'; pc.textContent='🎭 Prank: Bekukan + 🔥 Bakar ('+(gs?.player?.prankCharges||0)+')';}
     renderShop();
   }
@@ -4274,16 +4285,22 @@ function initGuruViews() {
       if(id===profileKey())return;
       if(type==='prank' && v.role!=='Siswa')return;
       if(type==='guru' && v.role==='Admin')return;
-      gs.onlineRef.child(id).update({battleEffect:{type:type==='prank'?'prank':type,until:now+3200,by:profileKey()}}).catch(()=>{});
+      gs.onlineRef.child(id).update({battleEffect:{type:type,until:now+3200,by:profileKey()}}).catch(()=>{});
     });
   }
-  window.guruBattlePower=function(){
+  function guruStatusPower(type){
     if(roleSpecial()!=='guru4'||!gs)return;
     const now=Date.now();
-    gs.enemies.forEach(e=>{e.frozenUntil=now+3200;e.burningUntil=now+3200;});
-    targetRemotePlayers('guru');
-    notify('⚡🔥 Guru Kelas 4 mengaktifkan Bekukan + Bakar! Musuh dan pesawat siswa terkena efek.');
-  };
+    gs.enemies.forEach(e=>{
+      if(type==='freeze') e.frozenUntil=Math.max(e.frozenUntil||0,now+3200);
+      if(type==='burn') e.burningUntil=Math.max(e.burningUntil||0,now+3200);
+    });
+    targetRemotePlayers(type);
+    notify(type==='freeze'?'❄️ Guru Kelas 4 membekukan musuh dan pesawat siswa!':'🔥 Guru Kelas 4 membakar musuh dan pesawat siswa!');
+  }
+  window.guruFreezePower=function(){guruStatusPower('freeze')};
+  window.guruBurnPower=function(){guruStatusPower('burn')};
+  window.guruBattlePower=function(){guruStatusPower('freeze');guruStatusPower('burn')};
   window.usePrankPower=function(){
     if(roleSpecial()!=='normal'||!gs?.player)return;
     if((gs.player.prankCharges||0)<=0)return notify('🎁 Belum punya Prank. Cari kotak misteri!');
