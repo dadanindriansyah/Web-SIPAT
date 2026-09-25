@@ -786,36 +786,47 @@
             </div>
 
             
-<div id="tabJurnal" class="guru-content hidden no-print bg-white p-6 rounded-2xl shadow">
-<h3 class="font-bold text-lg">📔 Jurnal Harian Guru</h3>
-<div class="grid grid-cols-3 gap-3 mt-3">
-<input type="date" placeholder="Tanggal" class="border p-2 rounded">
-<input type="text" placeholder="Mata Pelajaran" class="border p-2 rounded">
-<input type="text" placeholder="Keterangan Kegiatan Pembelajaran" class="border p-2 rounded">
-</div></div>
+<div id="tabJurnal" class="guru-content hidden no-print space-y-6">
+    <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
+        <div class="flex justify-between items-center gap-3 flex-wrap">
+            <div><h3 class="font-bold text-lg text-emerald-700">📔 Jurnal Harian Guru</h3><p class="text-xs text-slate-500 mt-1">Jurnal tersimpan berdasarkan kelas, tahun pelajaran, dan akun guru.</p></div>
+            <button onclick="exportTableToExcel('tblJurnalGuru','Jurnal_Harian_Guru')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold">⬇️ Unduh Excel</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+            <input type="date" id="jurnalTanggal" class="border p-2.5 rounded-lg text-sm">
+            <select id="jurnalMapel" class="border p-2.5 rounded-lg text-sm bg-white"></select>
+            <input type="text" id="jurnalMateri" placeholder="Materi / Topik Pembelajaran" class="border p-2.5 rounded-lg text-sm">
+            <input type="text" id="jurnalKegiatan" placeholder="Kegiatan Pembelajaran" class="border p-2.5 rounded-lg text-sm">
+        </div>
+        <textarea id="jurnalKeterangan" rows="3" placeholder="Keterangan / refleksi pembelajaran" class="mt-3 w-full border p-2.5 rounded-lg text-sm"></textarea>
+        <button onclick="submitJurnalGuru()" class="mt-3 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold">💾 Simpan Jurnal</button>
+    </div>
+    <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
+        <div class="overflow-x-auto"><table id="tblJurnalGuru" class="w-full text-left text-xs"><thead class="bg-slate-50"><tr><th class="p-3">Tanggal</th><th class="p-3">Mapel</th><th class="p-3">Materi</th><th class="p-3">Kegiatan</th><th class="p-3">Keterangan</th><th class="p-3">Guru</th><th class="p-3 text-right">Aksi</th></tr></thead><tbody id="bodyJurnalGuru" class="divide-y"></tbody></table></div>
+    </div>
+</div>
 
 <div id="tabJadwal" class="guru-content hidden no-print bg-white p-6 rounded-2xl shadow">
-<h3 class="font-bold text-lg">🗓️ Jadwal Pelajaran</h3>
-<div class="grid grid-cols-4 gap-3 mt-3">
-<input type="text" placeholder="Hari" class="border p-2 rounded">
-<input type="text" placeholder="Jam" class="border p-2 rounded">
-<input type="text" placeholder="Mata Pelajaran" class="border p-2 rounded">
-<button class="bg-emerald-600 text-white rounded p-2">Simpan</button>
-</div></div>
+    <h3 class="font-bold text-lg">🗓️ Jadwal Pelajaran</h3>
+    <div class="grid grid-cols-4 gap-3 mt-3"><input type="text" placeholder="Hari" class="border p-2 rounded"><input type="text" placeholder="Jam" class="border p-2 rounded"><input type="text" placeholder="Mata Pelajaran" class="border p-2 rounded"><button class="bg-emerald-600 text-white rounded p-2">Simpan</button></div>
+</div>
 
-<div id="tabKKTP" class="guru-content hidden no-print bg-white p-6 rounded-2xl shadow">
-<h3 class="font-bold text-lg">🎯 Kriteria Ketuntasan Tujuan Pembelajaran (KKTP)</h3>
-<table class="w-full text-xs mt-3 border">
-<tr><th>BAB</th><th>Mapel</th><th>Perlu Bimbingan</th><th>Cukup</th><th>Baik</th><th>Sangat Baik</th><th>Keterangan</th></tr>
-<tr>
-<td><input id="kktpBab" placeholder="BAB 1" class="border p-1 w-full"></td>
-<td><input id="kktpMapel" class="border p-1 w-full"></td>
-<td><input class="border p-1 w-full"></td>
-<td><input class="border p-1 w-full"></td>
-<td><input class="border p-1 w-full"></td>
-<td><input class="border p-1 w-full"></td>
-<td><input class="border p-1 w-full"></td>
-</tr></table></div>
+<div id="tabKKTP" class="guru-content hidden no-print space-y-6">
+    <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
+        <div class="flex justify-between items-center gap-3 flex-wrap"><div><h3 class="font-bold text-lg text-emerald-700">🎯 KKTP</h3><p class="text-xs text-slate-500 mt-1">KKTP terhubung otomatis dengan akun Guru Kelas pada kelas dan tahun pelajaran yang sama.</p></div><button onclick="exportTableToExcel('tblKKTP','KKTP_Kelas')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold">⬇️ Unduh Excel</button></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
+            <input id="kktpBab" placeholder="BAB 1 / BAB 2 / dst." class="border p-2.5 rounded-lg text-sm">
+            <select id="kktpMapel" class="border p-2.5 rounded-lg text-sm bg-white"></select>
+            <input id="kktpPerlu" placeholder="Perlu Bimbingan" class="border p-2.5 rounded-lg text-sm">
+            <input id="kktpCukup" placeholder="Cukup" class="border p-2.5 rounded-lg text-sm">
+            <input id="kktpBaik" placeholder="Baik" class="border p-2.5 rounded-lg text-sm">
+            <input id="kktpSangat" placeholder="Sangat Baik" class="border p-2.5 rounded-lg text-sm">
+        </div>
+        <textarea id="kktpKeterangan" rows="2" placeholder="Keterangan / indikator ketercapaian" class="mt-3 w-full border p-2.5 rounded-lg text-sm"></textarea>
+        <button onclick="submitKKTPGuru()" class="mt-3 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold">💾 Simpan KKTP</button>
+    </div>
+    <div class="bg-white p-6 rounded-2xl shadow border border-slate-200"><div class="overflow-x-auto"><table id="tblKKTP" class="w-full text-left text-xs"><thead class="bg-slate-50"><tr><th class="p-3">BAB</th><th class="p-3">Mapel</th><th class="p-3">Perlu Bimbingan</th><th class="p-3">Cukup</th><th class="p-3">Baik</th><th class="p-3">Sangat Baik</th><th class="p-3">Keterangan</th><th class="p-3">Input Oleh</th><th class="p-3 text-right">Aksi</th></tr></thead><tbody id="bodyKKTP" class="divide-y"></tbody></table></div></div>
+</div>
 
 <!-- GURU: TAB LEGGER NILAI & RANKING -->
             <div id="tabLegger" class="guru-content space-y-6 hidden no-print">
@@ -1209,6 +1220,8 @@
         if (!localStorage.getItem('nilai_ekskul')) localStorage.setItem('nilai_ekskul', JSON.stringify([]));
         if (!localStorage.getItem('tabungan')) localStorage.setItem('tabungan', JSON.stringify([]));
         if (!localStorage.getItem('bintang')) localStorage.setItem('bintang', JSON.stringify([]));
+        if (!localStorage.getItem('jurnal')) localStorage.setItem('jurnal', JSON.stringify([]));
+        if (!localStorage.getItem('kktp')) localStorage.setItem('kktp', JSON.stringify([]));
 
         let currentUser = null;
         let chartInstanceAbsen = null;
@@ -1274,8 +1287,8 @@
         function requireGuruAccess(feature) {
             if (currentUser?.role !== 'Guru') return true;
             if (!isGuruMapel()) return true;
-            const allowed = ['absensi','nilai','bintang'];
-            if (!allowed.includes(feature)) { alert('Akses Guru Mata Pelajaran hanya untuk input Nilai, Absensi, dan Bintang Perilaku.'); return false; }
+            const allowed = ['nilai','bintang','jurnal','kktp'];
+            if (!allowed.includes(feature)) { alert('Akses Guru Mata Pelajaran hanya untuk input Nilai, Bintang Perilaku, Jurnal Harian, dan KKTP.'); return false; }
             return true;
         }
 
@@ -1765,16 +1778,6 @@
             if (tabId === 'tabTabungan') renderTabunganGuru();
         }
 
-        function initGuruViews() {
-            populateGuruDropdowns();
-            renderAbsensiGuru();
-            renderNilaiGuru();
-            renderLegger();
-            renderNilaiEkskulGuru();
-            renderBintangGuru();
-            renderTabunganGuru();
-        }
-
         function getSiswaSekelas() {
             const users = JSON.parse(localStorage.getItem('users')) || [];
             const tapel = currentUser?.tapel || getActiveTapel();
@@ -1791,26 +1794,82 @@
         }
 
         function applyGuruAccess(){
-            const restricted=isGuruMapel();
-            const allowed=['tabAbsensi','tabNilai','tabBintang'];
+            const restricted = isGuruMapel();
+            const allowed = restricted
+                ? ['tabNilai','tabBintang','tabJurnal','tabKKTP']
+                : ['tabAbsensi','tabNilai','tabLegger','tabEkskul','tabBintang','tabTabungan','tabCetakDoc','tabJurnal','tabJadwal','tabKKTP'];
             document.querySelectorAll('.guru-tab-btn').forEach(btn=>{
-                const onclick=btn.getAttribute('onclick')||''; const m=onclick.match(/switchGuruTab\('([^']+)'\)/); const id=m?m[1]:'';
-                btn.classList.toggle('hidden',restricted&&!allowed.includes(id));
+                const onclick=btn.getAttribute('onclick')||'';
+                const m=onclick.match(/switchGuruTab\('([^']+)'\)/);
+                const id=m?m[1]:'';
+                btn.classList.toggle('hidden', !allowed.includes(id));
             });
-            document.getElementById('tabAbsensi')?.classList.toggle('hidden',restricted?false:document.getElementById('tabAbsensi').classList.contains('hidden'));
-            if(restricted){ document.querySelectorAll('.guru-content').forEach(c=>c.classList.add('hidden')); document.getElementById('tabAbsensi')?.classList.remove('hidden'); }
-            const clearBtn=document.querySelector('button[onclick="clearAllGuruData()"]'); if(clearBtn) clearBtn.classList.toggle('hidden',restricted);
+            document.querySelectorAll('.guru-content').forEach(c=>{
+                if (!allowed.includes(c.id)) c.classList.add('hidden');
+            });
+            if(restricted){
+                document.querySelectorAll('.guru-content').forEach(c=>c.classList.add('hidden'));
+                document.getElementById('tabNilai')?.classList.remove('hidden');
+                document.getElementById('tabAbsensi')?.classList.add('hidden');
+                document.getElementById('tabLegger')?.classList.add('hidden');
+                document.getElementById('tabEkskul')?.classList.add('hidden');
+                document.getElementById('tabTabungan')?.classList.add('hidden');
+                document.getElementById('tabCetakDoc')?.classList.add('hidden');
+                document.getElementById('tabJadwal')?.classList.add('hidden');
+            } else {
+                document.getElementById('tabAbsensi')?.classList.remove('hidden');
+            }
+            const clearBtn=document.querySelector('button[onclick="clearAllGuruData()"]');
+            if(clearBtn) clearBtn.classList.toggle('hidden',restricted);
         }
 
         function switchGuruTab(tabId) {
-            if(!requireGuruAccess(tabId==='tabAbsensi'?'absensi':tabId==='tabNilai'?'nilai':tabId==='tabBintang'?'bintang':'other')) return;
+            const featureMap={tabAbsensi:'absensi',tabNilai:'nilai',tabBintang:'bintang',tabJurnal:'jurnal',tabKKTP:'kktp'};
+            if(!requireGuruAccess(featureMap[tabId] || 'other')) return;
+            if(isGuruMapel() && ['tabAbsensi','tabLegger','tabEkskul','tabTabungan','tabCetakDoc','tabJadwal'].includes(tabId)) return;
             document.querySelectorAll('.guru-tab-btn').forEach(btn=>{btn.classList.remove('bg-white','text-emerald-800');btn.classList.add('text-emerald-100','hover:bg-emerald-800/50');});
             if(window.event){window.event.target.classList.add('bg-white','text-emerald-800');window.event.target.classList.remove('text-emerald-100','hover:bg-emerald-800/50');}
             document.querySelectorAll('.guru-content').forEach(c=>c.classList.add('hidden')); document.getElementById(tabId)?.classList.remove('hidden');
-            if(tabId==='tabLegger')renderLegger(); if(tabId==='tabBintang')renderBintangGuru(); if(tabId==='tabTabungan')renderTabunganGuru();
+            if(tabId==='tabLegger')renderLegger(); if(tabId==='tabBintang')renderBintangGuru(); if(tabId==='tabTabungan')renderTabunganGuru(); if(tabId==='tabJurnal')renderJurnalGuru(); if(tabId==='tabKKTP')renderKKTPGuru();
         }
 
-        function initGuruViews(){ populateGuruDropdowns(); renderAbsensiGuru(); renderNilaiGuru(); renderLegger(); renderNilaiEkskulGuru(); renderBintangGuru(); renderTabunganGuru(); applyGuruAccess(); }
+        function populateJurnalKktpMapel(){
+            const allMapel=JSON.parse(localStorage.getItem('mapel'))||[];
+            const mapel=isGuruMapel()?allMapel.filter(m=>getGuruMapelNames().includes(m.nama)):allMapel;
+            ['jurnalMapel','kktpMapel'].forEach(id=>{const el=document.getElementById(id); if(el) el.innerHTML=mapel.map(m=>`<option value="${m.nama}">${m.nama}</option>`).join('')||'<option value="">Tidak ada mapel</option>';});
+        }
+
+        function submitJurnalGuru(){
+            if(!requireGuruAccess('jurnal')) return;
+            const tanggal=document.getElementById('jurnalTanggal').value, mapel=document.getElementById('jurnalMapel').value, materi=document.getElementById('jurnalMateri').value.trim(), kegiatan=document.getElementById('jurnalKegiatan').value.trim(), keterangan=document.getElementById('jurnalKeterangan').value.trim();
+            if(!tanggal||!mapel||!materi||!kegiatan) return alert('Lengkapi tanggal, mata pelajaran, materi, dan kegiatan.');
+            if(isGuruMapel()&&!getGuruMapelNames().includes(mapel)) return alert('Mata pelajaran tidak sesuai penugasan Admin.');
+            const data=JSON.parse(localStorage.getItem('jurnal'))||[];
+            data.push({id:Date.now(),tanggal,mapel,materi,kegiatan,keterangan,kelas:currentUser.kelas,tapel:currentUser.tapel||getActiveTapel(),inputBy:currentUser.username,inputByType:currentUser.jenisGuru||'Guru Kelas'});
+            saveAppData('jurnal',JSON.stringify(data)); renderJurnalGuru(); document.getElementById('jurnalMateri').value=''; document.getElementById('jurnalKegiatan').value=''; document.getElementById('jurnalKeterangan').value=''; showSaveToast('Jurnal harian tersimpan');
+        }
+        function renderJurnalGuru(){
+            populateJurnalKktpMapel(); const body=document.getElementById('bodyJurnalGuru'); if(!body)return;
+            const tapel=currentUser?.tapel||getActiveTapel(); const list=(JSON.parse(localStorage.getItem('jurnal'))||[]).filter(j=>j.kelas===currentUser.kelas&&String(j.tapel||tapel)===String(tapel)&&(!isGuruMapel()||getGuruMapelNames().includes(j.mapel)));
+            body.innerHTML=list.length?list.map(j=>`<tr><td class="p-3">${j.tanggal}</td><td class="p-3 font-semibold">${j.mapel}</td><td class="p-3">${j.materi}</td><td class="p-3">${j.kegiatan}</td><td class="p-3">${j.keterangan||'-'}</td><td class="p-3">${j.inputBy}</td><td class="p-3 text-right"><button onclick="deleteJurnalGuru(${j.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada jurnal.</td></tr>';
+        }
+        function deleteJurnalGuru(id){ const target=(JSON.parse(localStorage.getItem('jurnal'))||[]).find(x=>x.id===id); if(!target)return; if(isGuruMapel()&&target.inputBy!==currentUser.username)return alert('Guru Mata Pelajaran hanya dapat menghapus jurnal yang dibuat oleh akun sendiri.'); if(!confirm('Hapus jurnal ini?'))return; saveAppData('jurnal',JSON.stringify((JSON.parse(localStorage.getItem('jurnal'))||[]).filter(x=>x.id!==id))); renderJurnalGuru(); }
+
+        function submitKKTPGuru(){
+            if(!requireGuruAccess('kktp')) return;
+            const bab=document.getElementById('kktpBab').value.trim(),mapel=document.getElementById('kktpMapel').value,perlu=document.getElementById('kktpPerlu').value.trim(),cukup=document.getElementById('kktpCukup').value.trim(),baik=document.getElementById('kktpBaik').value.trim(),sangat=document.getElementById('kktpSangat').value.trim(),keterangan=document.getElementById('kktpKeterangan').value.trim();
+            if(!bab||!mapel||!perlu||!cukup||!baik||!sangat)return alert('Lengkapi BAB, mapel, dan seluruh kriteria KKTP.');
+            if(isGuruMapel()&&!getGuruMapelNames().includes(mapel))return alert('Mata pelajaran tidak sesuai penugasan Admin.');
+            const data=JSON.parse(localStorage.getItem('kktp'))||[]; const tapel=currentUser.tapel||getActiveTapel();
+            data.push({id:Date.now(),bab,mapel,perlu,cukup,baik,sangat,keterangan,kelas:currentUser.kelas,tapel,inputBy:currentUser.username,inputByType:currentUser.jenisGuru||'Guru Kelas'});
+            saveAppData('kktp',JSON.stringify(data)); renderKKTPGuru(); ['kktpBab','kktpPerlu','kktpCukup','kktpBaik','kktpSangat','kktpKeterangan'].forEach(id=>document.getElementById(id).value=''); showSaveToast('KKTP tersimpan dan terhubung dengan Guru Kelas');
+        }
+        function renderKKTPGuru(){
+            populateJurnalKktpMapel(); const body=document.getElementById('bodyKKTP'); if(!body)return; const tapel=currentUser?.tapel||getActiveTapel();
+            const list=(JSON.parse(localStorage.getItem('kktp'))||[]).filter(k=>k.kelas===currentUser.kelas&&String(k.tapel||tapel)===String(tapel)&&(!isGuruMapel()||getGuruMapelNames().includes(k.mapel)));
+            body.innerHTML=list.length?list.map(k=>`<tr><td class="p-3 font-semibold">${k.bab}</td><td class="p-3">${k.mapel}</td><td class="p-3">${k.perlu}</td><td class="p-3">${k.cukup}</td><td class="p-3">${k.baik}</td><td class="p-3">${k.sangat}</td><td class="p-3">${k.keterangan||'-'}</td><td class="p-3">${k.inputBy}</td><td class="p-3 text-right"><button onclick="deleteKKTPGuru(${k.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="9" class="p-4 text-center text-slate-400">Belum ada KKTP untuk kelas dan tahun pelajaran ini.</td></tr>';
+        }
+        function deleteKKTPGuru(id){ const target=(JSON.parse(localStorage.getItem('kktp'))||[]).find(x=>x.id===id); if(!target)return; if(isGuruMapel()&&target.inputBy!==currentUser.username)return alert('Guru Mata Pelajaran hanya dapat menghapus KKTP yang dibuat oleh akun sendiri.'); if(!confirm('Hapus KKTP ini?'))return; saveAppData('kktp',JSON.stringify((JSON.parse(localStorage.getItem('kktp'))||[]).filter(x=>x.id!==id))); renderKKTPGuru(); }
 
         function clearAllGuruData() {
             if(isGuruMapel()) return alert('Guru Mata Pelajaran tidak memiliki akses menghapus seluruh data kelas.');
@@ -2638,7 +2697,7 @@ const dbRef = firebase.database().ref('sipat_data');
 
 // Semua perubahan aplikasi ditulis langsung ke LocalStorage (cache) DAN Firebase.
 // Tidak ada lagi tombol Sinkron ke Cloud / Ambil dari Cloud.
-const CLOUD_KEYS = ['schoolProfile','adminPassword','users','mapel','ekskul','absensi','nilai','nilai_ekskul','tabungan','bintang'];
+const CLOUD_KEYS = ['schoolProfile','adminPassword','users','mapel','ekskul','absensi','nilai','nilai_ekskul','tabungan','bintang','jurnal','kktp'];
 let firebaseReady = false;
 let applyingFirebaseData = false;
 
@@ -2789,13 +2848,15 @@ function renderRekapAbsenSiswa() {
 }
 function initGuruViews() {
     populateGuruDropdowns();
-    renderAbsensiGuru();
-    renderRekapAbsenSiswa(); // <-- Tambahkan di sini
+    if(!isGuruMapel()){ renderAbsensiGuru(); renderRekapAbsenSiswa(); }
     renderNilaiGuru();
     renderLegger();
     renderNilaiEkskulGuru();
     renderBintangGuru();
     renderTabunganGuru();
+    renderJurnalGuru();
+    renderKKTPGuru();
+    applyGuruAccess();
 }
     </script>
 </body>
