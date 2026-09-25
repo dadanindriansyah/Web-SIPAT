@@ -360,6 +360,12 @@
  #schoolFeatureDock{width:max-content;max-width:calc(100vw - 12px)}
  body{padding-bottom:74px}
 }
+
+ /* ===== SKY BATTLE - MODE ONLINE RINGAN ===== */
+ #secSkyBattle{contain:layout style;}
+ #skyCanvas{image-rendering:auto;touch-action:none;display:block;}
+ .sky-low-data{font-size:10px;color:#64748b;margin-top:3px;}
+ @media (prefers-reduced-motion: reduce){#skyCanvas{scroll-behavior:auto}.sky-game-shell *{animation:none!important;transition:none!important;}}
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -3992,11 +3998,21 @@ function initGuruViews() {
   const $=id=>document.getElementById(id);
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   function profileKey(){return currentUser ? String(currentUser.username||'guest')+'_'+String(currentUser.tapel||getActiveTapel()) : 'guest';}
+  function profileFirebaseKey(){return profileKey().replace(/[.#$\/\[\]]/g,'_').slice(0,180);}
   function getProfiles(){try{return JSON.parse(localStorage.getItem(GAME_KEY)||'{}')}catch(e){return {}}}
   function getProfile(){const all=getProfiles(),k=profileKey();let p=all[k];if(!p)p={points:0,kills:0,plane:'starter',owned:['starter'],weapon:'peluru',weaponUntil:0};return p}
+  let profileSaveTimer=0, profileSavePending=null;
   function saveProfile(p){
     const all=getProfiles(); all[profileKey()]=p; localStorage.setItem(GAME_KEY,JSON.stringify(all));
-    if(typeof saveAppData==='function') saveAppData(GAME_KEY,JSON.stringify(all));
+    // Jangan menulis seluruh database setiap tembakan/kill. Simpan hanya profil game pemain.
+    profileSavePending={...p};
+    clearTimeout(profileSaveTimer);
+    profileSaveTimer=setTimeout(()=>{
+      if(typeof dbRef!=='undefined' && typeof firebaseReady!=='undefined' && firebaseReady && currentUser){
+        dbRef.child(GAME_KEY).child(profileFirebaseKey()).set(profileSavePending).catch(()=>{});
+      }
+      profileSavePending=null;
+    },350);
     updateHud();
   }
   function roleSpecial(){
@@ -4038,8 +4054,14 @@ function initGuruViews() {
     if(gs) gs.player=makePlayer();
   };
   function resize(){
-    if(!gs||!gs.canvas)return;const r=gs.canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);
-    gs.canvas.width=Math.floor(r.width*d);gs.canvas.height=Math.floor(r.height*d);gs.ctx.setTransform(d,0,0,d,0,0);gs.w=r.width;gs.h=r.height;
+    if(!gs||!gs.canvas)return;
+    const r=gs.canvas.getBoundingClientRect();
+    // Batasi resolusi canvas agar ringan di HP/laptop dan hemat GPU.
+    const d=Math.min(window.devicePixelRatio||1, 1.25);
+    gs.canvas.width=Math.max(1,Math.floor(r.width*d));
+    gs.canvas.height=Math.max(1,Math.floor(r.height*d));
+    gs.ctx.setTransform(d,0,0,d,0,0);
+    gs.w=r.width;gs.h=r.height;
   }
   function makePlayer(){
     const pl=effectivePlane();return{x:gs.w/2,y:gs.h-100,plane:pl,shots:0,inv:0};
@@ -4119,14 +4141,21 @@ function initGuruViews() {
   function draw(){
     if(!gs)return;const c=gs.ctx,w=gs.w,h=gs.h;c.clearRect(0,0,w,h);
     const g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,'#38bdf8');g.addColorStop(1,'#e0f2fe');c.fillStyle=g;c.fillRect(0,0,w,h);
-    for(let i=0;i<9;i++)drawCloud(c,(i*173+gs.t*.015)% (w+180)-90,80+(i%4)*130,55+(i%3)*15);
-    for(let i=0;i<55;i++){const x=(i*97)%w,y=(i*53+gs.t*.08)%h;c.fillStyle='rgba(255,255,255,.55)';c.fillRect(x,y,2,5)}
+    for(let i=0;i<5;i++)drawCloud(c,(i*241+gs.t*.015)% (w+180)-90,90+(i%3)*170,48+(i%2)*12);
+    for(let i=0;i<24;i++){const x=(i*97)%w,y=(i*53+gs.t*.08)%h;c.fillStyle='rgba(255,255,255,.55)';c.fillRect(x,y,2,5)}
     gs.boxes.forEach(b=>{c.save();c.translate(b.x,b.y);c.rotate(Math.sin(gs.t/250)*.1);c.fillStyle='#f59e0b';c.strokeStyle='#fff';c.lineWidth=3;c.fillRect(-17,-17,34,34);c.strokeRect(-17,-17,34,34);c.fillStyle='#fff';c.font='20px sans-serif';c.textAlign='center';c.fillText('?',0,7);c.restore()});
     gs.bullets.forEach(b=>{c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=b.type==='laser'?8:4;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*2,b.y-b.dy*2);c.stroke();});
     gs.enemies.forEach(e=>drawEnemy(c,e));drawPlane(c,gs.player);
     if(gs.remotePlayers) Object.values(gs.remotePlayers).forEach(r=>{if(r.id!==profileKey()){c.save();c.globalAlpha=.55;drawPlane(c,{x:r.x||50,y:r.y||80,plane:{color:r.color||'#22c55e',big:false},inv:0});c.restore();}});
   }
-  function loop(ts){if(!gs)return;const dt=Math.min(32,ts-gs.prev||16);gs.prev=ts;gs.t+=dt;update(dt);draw();requestAnimationFrame(loop)}
+  function loop(ts){
+    if(!gs)return;
+    const raw=Math.min(50, ts-gs.prev||16); gs.prev=ts;
+    gs.acc=(gs.acc||0)+raw;
+    // Game berjalan sekitar 30 FPS saat online agar hemat CPU/baterai.
+    if(gs.acc>=33){ const dt=Math.min(33,gs.acc); gs.acc=0; gs.t+=dt; update(dt); draw(); }
+    gs.raf=requestAnimationFrame(loop);
+  }
   function setupControls(){
     const joy=$('skyJoystick'),knob=$('skyKnob');if(!joy)return;
     const setJoy=e=>{const r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let x=(e.clientX-cx)/(r.width*.38),y=(e.clientY-cy)/(r.height*.38);const l=Math.hypot(x,y);if(l>1){x/=l;y/=l}gs.joy={x,y};knob.style.transform=`translate(calc(-50% + ${x*35}px),calc(-50% + ${y*35}px))`};
@@ -4141,17 +4170,41 @@ function initGuruViews() {
     const canvas=$('skyCanvas');if(!canvas||!currentUser)return;
     $('secSkyBattle')?.classList.remove('hidden');$('schoolFeatureDock')?.style.setProperty('display','flex');
     if(gs){resize();updateHud();return}
-    gs={canvas,ctx:canvas.getContext('2d'),w:0,h:0,t:0,prev:performance.now(),lastFire:0,lastSpawn:0,spawnDelay:800,lastBox:0,level:1,enemies:[],bullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{}};
-    resize();gs.player=makePlayer();setupControls();updateHud();notify('🌟 Selamat bermain! Musuh komputer memiliki beberapa tingkat kesulitan.');requestAnimationFrame(loop);
-    window.addEventListener('resize',resize);
-    if(typeof dbRef!=='undefined'){
-      dbRef.child('skyBattleOnline').on('value',snap=>{gs.remotePlayers=snap.val()||{};if($('skyPlayers'))$('skyPlayers').textContent=String(Math.max(1,Object.keys(gs.remotePlayers).length));if(currentUser){const p=gs.player;dbRef.child('skyBattleOnline').child(profileKey()).set({id:profileKey(),x:p.x,y:p.y,color:p.plane.color,role:currentUser.role,nama:currentUser.nama||currentUser.username,updatedAt:firebase.database.ServerValue.TIMESTAMP})}});
-      setInterval(()=>{if(gs&&currentUser)dbRef.child('skyBattleOnline').child(profileKey()).update({x:gs.player.x,y:gs.player.y,color:gs.player.plane.color,updatedAt:firebase.database.ServerValue.TIMESTAMP})},500);
+    gs={canvas,ctx:canvas.getContext('2d',{alpha:false}),w:0,h:0,t:0,prev:performance.now(),acc:0,lastFire:0,lastSpawn:0,spawnDelay:900,lastBox:0,level:1,enemies:[],bullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{},onlineRef:null,presenceTimer:null,resizeHandler:null};
+    resize();gs.player=makePlayer();setupControls();updateHud();notify('🌟 Mode online ringan aktif.');gs.raf=requestAnimationFrame(loop);
+    gs.resizeHandler=()=>resize(); window.addEventListener('resize',gs.resizeHandler,{passive:true});
+
+    // Multiplayer memakai path Firebase terpisah dari data sekolah. Jadi perubahan posisi
+    // pesawat tidak memicu listener besar sipat_data dan tidak mengunduh ulang seluruh database.
+    if(typeof firebase!=='undefined' && firebase.apps?.length){
+      const onlineRef=firebase.database().ref('skyBattleOnline'); gs.onlineRef=onlineRef;
+      const me=onlineRef.child(profileFirebaseKey());
+      me.onDisconnect().remove();
+      const publish=()=>{
+        if(!gs||!currentUser)return;
+        const p=gs.player;
+        const data={id:profileKey(),x:Math.round(p.x),y:Math.round(p.y),color:p.plane.color,role:currentUser.role,nama:currentUser.nama||currentUser.username,updatedAt:firebase.database.ServerValue.TIMESTAMP};
+        me.update(data).catch(()=>{}); gs.lastNetX=p.x;gs.lastNetY=p.y;
+      };
+      publish();
+      gs.presenceTimer=setInterval(()=>{
+        if(!gs||!currentUser)return;
+        const p=gs.player;
+        if(Math.hypot(p.x-(gs.lastNetX||-9999),p.y-(gs.lastNetY||-9999))>8) publish();
+      },1200);
+      const sync=(snap)=>{if(!gs)return;const v=snap.val();if(v)gs.remotePlayers[v.id]=v;else delete gs.remotePlayers[snap.key];if($('skyPlayers'))$('skyPlayers').textContent=String(Math.max(1,Object.keys(gs.remotePlayers).length));};
+      onlineRef.on('child_added',sync); onlineRef.on('child_changed',sync);
+      onlineRef.on('child_removed',sync);
+      gs.cleanupOnline=()=>{onlineRef.off('child_added',sync);onlineRef.off('child_changed',sync);onlineRef.off('child_removed',sync);try{me.remove()}catch(e){}};
     }
   }
   window.initSpaceGame=start;
   window.stopSpaceGame=function(){
-    if(typeof dbRef!=='undefined'&&currentUser){try{dbRef.child('skyBattleOnline').child(profileKey()).remove()}catch(e){}}
+    if(!gs)return;
+    try{if(gs.raf)cancelAnimationFrame(gs.raf)}catch(e){}
+    try{if(gs.presenceTimer)clearInterval(gs.presenceTimer)}catch(e){}
+    try{if(gs.cleanupOnline)gs.cleanupOnline()}catch(e){}
+    try{if(gs.resizeHandler)window.removeEventListener('resize',gs.resizeHandler)}catch(e){}
     gs=null;$('secSkyBattle')?.classList.add('hidden');$('schoolFeatureDock')?.style.setProperty('display','none');
   };
   window.scrollToSkyBattle=function(){$('secSkyBattle')?.scrollIntoView({behavior:'smooth',block:'start'})};
