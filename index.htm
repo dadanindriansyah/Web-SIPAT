@@ -15,6 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link class="no-print" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
@@ -1090,8 +1091,8 @@
                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4"><div class="rounded-2xl border-2 border-blue-100 bg-blue-50 p-5 text-center"><div id="siswaTotalSakit" class="text-3xl font-black text-blue-600">0</div><div class="text-sm font-extrabold text-blue-800 mt-1">Sakit</div></div><div class="rounded-2xl border-2 border-amber-100 bg-amber-50 p-5 text-center"><div id="siswaTotalIzin" class="text-3xl font-black text-amber-600">0</div><div class="text-sm font-extrabold text-amber-800 mt-1">Izin</div></div><div class="rounded-2xl border-2 border-rose-100 bg-rose-50 p-5 text-center"><div id="siswaTotalAlfa" class="text-3xl font-black text-rose-600">0</div><div class="text-sm font-extrabold text-rose-800 mt-1">Alfa</div></div></div>
             </div>
             <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
-                <h3 class="font-extrabold text-base text-slate-800 mb-2">📄 Download Hasil Belajar PDF</h3><p class="text-xs text-slate-500 mb-4">Data terbaru dari input guru dan tempat/tanggal dokumen dari Admin.</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3"><button onclick="downloadSiswaPDF('raport')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-sm"><i class="fa-solid fa-file-pdf"></i> Download Raport PDF</button><button onclick="downloadSiswaPDF('bukuinduk')" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-xl text-sm"><i class="fa-solid fa-address-book"></i> Download Buku Induk PDF</button><button onclick="downloadSiswaPDF('semua')" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-4 rounded-xl text-sm"><i class="fa-solid fa-file-arrow-down"></i> Download Semua Hasil PDF</button></div>
+                <h3 class="font-extrabold text-base text-slate-800 mb-2">🖼️ Download Hasil Belajar sebagai Gambar</h3><p class="text-xs text-slate-500 mb-4">Hasil belajar akan disimpan sebagai gambar PNG utuh. Seluruh isi dokumen ditampilkan dalam satu gambar dan otomatis menyesuaikan tinggi agar tulisan tidak terpotong.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3"><button onclick="downloadSiswaImage('raport')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-sm"><i class="fa-solid fa-image"></i> Download Raport PNG</button><button onclick="downloadSiswaImage('bukuinduk')" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-xl text-sm"><i class="fa-solid fa-image"></i> Download Buku Induk PNG</button><button onclick="downloadSiswaImage('semua')" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-4 rounded-xl text-sm"><i class="fa-solid fa-images"></i> Download Semua Hasil PNG</button></div>
                 <div class="mt-4 flex items-center gap-3"><label class="text-xs font-bold text-slate-500">Semester Raport:</label><select id="siswaPdfSemester" class="border rounded-xl px-3 py-2 text-sm"><option value="1">Semester 1</option><option value="2">Semester 2</option></select></div>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -2319,75 +2320,118 @@ function submitAbsensi() {
             if(type==='bukuinduk')return `<div class="dokumen-km buku-induk">${header}${ident}${sem(1)}<div class="dok-grid">${eh}${ah(1)}</div>${sign}${sem(2)}<div class="dok-grid">${eh}${ah(2)}</div>${sign}</div>`;
             let saldo=0;tab.filter(t=>t.username===username).forEach(t=>{if(t.jenis==='Masuk')saldo+=Number(t.nominalBersih||0);else saldo-=Number(t.nominalAsli||0)});let bs=10+bin.filter(b=>b.username===username).reduce((x,b)=>x+Number(b.jumlah||0),0);return `<div class="dokumen-km">${header}${ident}${sem(1)}<div class="dok-grid">${eh}${ah(1)}</div>${sem(2)}<div class="dok-grid">${eh}${ah(2)}</div><section><h4>BINTANG PERILAKU</h4><p><b>Bintang Aktif:</b> ${bs}</p></section><section><h4>SALDO TABUNGAN</h4><p><b>Saldo Akhir:</b> Rp ${saldo.toLocaleString('id-ID')}</p></section>${sign}</div>`;
         }
-        function downloadSiswaPDF(type){
-            if(typeof html2pdf==='undefined'){
-                return alert('Fitur PDF belum siap. Pastikan internet aktif.');
+        async function downloadSiswaImage(type){
+            if(typeof html2canvas==='undefined'){
+                return alert('Fitur gambar belum siap. Pastikan internet aktif lalu coba lagi.');
             }
+            if(!currentUser){
+                return alert('Sesi siswa tidak ditemukan. Silakan login kembali.');
+            }
+
+            let w=null;
             try{
-                const w=document.createElement('div');
+                // Buat salinan dokumen khusus ekspor sehingga tampilan akun siswa
+                // tidak berubah dan seluruh isi dapat diukur sebelum dibuat gambar.
+                w=document.createElement('div');
                 w.className='pdf-export-root';
-                w.style.width='190mm';
-                w.style.maxWidth='190mm';
-                w.style.margin='0 auto';
-                w.style.background='#fff';
-                w.style.boxSizing='border-box';
+                w.style.cssText=[
+                    'position:absolute',
+                    'left:-100000px',
+                    'top:0',
+                    'width:190mm',
+                    'max-width:190mm',
+                    'min-width:190mm',
+                    'margin:0',
+                    'padding:0',
+                    'background:#fff',
+                    'box-sizing:border-box',
+                    'overflow:visible',
+                    'height:auto'
+                ].join(';');
                 w.innerHTML=buildSiswaPDFHTML(type);
                 document.body.appendChild(w);
 
-                const n=(currentUser.nama||currentUser.username)
+                // Pastikan semua gambar/logo di dalam dokumen sudah selesai dimuat.
+                const imgs=Array.from(w.querySelectorAll('img'));
+                await Promise.all(imgs.map(img=>{
+                    if(img.complete) return Promise.resolve();
+                    return new Promise(resolve=>{
+                        img.onload=resolve;
+                        img.onerror=resolve;
+                    });
+                }));
+                if(document.fonts && document.fonts.ready){
+                    try{ await document.fonts.ready; }catch(e){}
+                }
+
+                // Beri kesempatan browser menyelesaikan layout agar tinggi dokumen
+                // terukur penuh, bukan hanya bagian yang sedang terlihat di layar.
+                await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+
+                const rect=w.getBoundingClientRect();
+                const widthPx=Math.ceil(Math.max(w.scrollWidth, w.offsetWidth, rect.width));
+                const heightPx=Math.ceil(Math.max(w.scrollHeight, w.offsetHeight, rect.height));
+
+                // Target kualitas tinggi, tetapi otomatis diturunkan jika gambar
+                // terlalu besar agar tidak melewati batas maksimum canvas browser.
+                const maxCanvasSide=30000;
+                const maxPixels=65000000;
+                let scale=2;
+                if(widthPx*scale>maxCanvasSide || heightPx*scale>maxCanvasSide){
+                    scale=Math.min(maxCanvasSide/widthPx, maxCanvasSide/heightPx, scale);
+                }
+                if(widthPx*heightPx*scale*scale>maxPixels){
+                    scale=Math.min(scale, Math.sqrt(maxPixels/(widthPx*heightPx)));
+                }
+                scale=Math.max(0.75, Math.min(scale,2));
+
+                const canvas=await html2canvas(w,{
+                    scale:scale,
+                    useCORS:true,
+                    allowTaint:false,
+                    backgroundColor:'#ffffff',
+                    logging:false,
+                    imageTimeout:15000,
+                    width:widthPx,
+                    height:heightPx,
+                    windowWidth:widthPx,
+                    windowHeight:heightPx,
+                    scrollX:0,
+                    scrollY:0
+                });
+
+                const n=(currentUser.nama||currentUser.username||'Siswa')
                     .replace(/[^a-z0-9]+/gi,'_');
                 const f=type==='raport'?'Raport':
                         type==='bukuinduk'?'Buku_Induk':'Semua_Hasil';
 
-                const options={
-                    // F4 portrait 210 x 330 mm dengan margin 10 mm setiap sisi.
-                    // Area isi efektif = 190 x 310 mm dan diposisikan tepat di tengah kertas.
-                    margin:[10,10,10,10],
-                    filename:`${f}_${n}.pdf`,
-                    image:{type:'jpeg',quality:.98},
-                    html2canvas:{
-                        scale:2,
-                        useCORS:true,
-                        backgroundColor:'#fff',
-                        letterRendering:true,
-                        scrollX:0,
-                        scrollY:0,
-                        windowWidth:718,
-                        windowHeight:1169
-                    },
-                    jsPDF:{
-                        unit:'mm',
-                        format:[210,330],
-                        orientation:'portrait',
-                        compress:true,
-                        hotfixes:['px_scaling']
-                    },
-                    pagebreak:{
-                        mode:['css','legacy'],
-                        before:[],
-                        after:[],
-                        avoid:['.dok-header','.dok-identity','.dok-sign','.semester-block','tr']
+                canvas.toBlob(blob=>{
+                    if(!blob){
+                        alert('Gambar gagal dibuat. Silakan coba lagi.');
+                        return;
                     }
-                };
+                    const url=URL.createObjectURL(blob);
+                    const a=document.createElement('a');
+                    a.href=url;
+                    a.download=`${f}_${n}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    setTimeout(()=>URL.revokeObjectURL(url),1500);
+                },'image/png');
 
-                // Pastikan area hasil PDF memiliki lebar efektif 190 mm dan berada tepat di tengah kertas F4.
-                w.style.setProperty('width','190mm','important');
-                w.style.setProperty('max-width','190mm','important');
-                w.style.setProperty('min-width','190mm','important');
-                w.style.setProperty('margin','0 auto','important');
-                w.style.setProperty('padding','0','important');
-
-                html2pdf().set(options).from(w).save()
-                    .then(()=>w.remove())
-                    .catch(e=>{
-                        w.remove();
-                        console.error(e);
-                        alert('PDF gagal dibuat. Silakan coba lagi.');
-                    });
             }catch(e){
-                console.error(e);
-                alert(e.message||'PDF gagal dibuat.');
+                console.error('Download gambar siswa:',e);
+                alert('Gambar gagal dibuat. Silakan coba lagi. Detail: '+(e.message||e));
+            }finally{
+                if(w) w.remove();
             }
+        }
+
+        // Tetap disediakan untuk kompatibilitas kode lama:
+        // pemanggilan fungsi lama akan diarahkan ke format gambar PNG.
+        function downloadSiswaPDF(type){
+            return downloadSiswaImage(type);
         }
 
         // BACKUP & RESTORE / CLOUD SYNC PLACEHOLDER FUNCTIONS
