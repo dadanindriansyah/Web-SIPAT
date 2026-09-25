@@ -1380,6 +1380,7 @@
     
 <!-- ===== MULTIPLAYER SKY BATTLE ===== -->
 <section id="secSkyBattle" class="hidden no-print">
+  <div id="skyRotateHint">📱↔️<div style="margin-top:12px">Putar HP ke posisi <b>LANDSCAPE</b><br><span style="font-size:12px;font-weight:600;opacity:.8">Game akan memenuhi layar secara otomatis.</span></div></div>
   <div class="sky-game-shell">
     <div class="sky-topbar">
       <div class="sky-stat"><span>✈️ SKY BATTLE</span><span id="skyRoleBadge" class="sky-chip">Memuat...</span></div>
@@ -1844,6 +1845,7 @@
         // sampai panel benar-benar dibutuhkan sehingga login tetap ringan.
         function openRolePanel(){
             if(!currentUser || rolePanelOpening) return;
+            if(typeof exitSkyFullscreen==='function') exitSkyFullscreen();
             rolePanelOpening = true;
             document.body.classList.remove('sky-home-mode');
             document.body.classList.add('sky-panel-mode');
@@ -1882,6 +1884,7 @@
 
         function showGameHome(){
             if(!currentUser) return;
+            if(typeof enterSkyFullscreen==='function') enterSkyFullscreen();
             rolePanelOpening=false;
             document.body.classList.add('sky-home-mode');
             document.body.classList.remove('sky-panel-mode');
@@ -4104,9 +4107,18 @@ function initGuruViews() {
     return false;
   }
   function update(dt){
-    if(!gs||gs.paused)return; const p=gs.player, pl=p.plane, speed=pl.speed*dt*.06;
+    if(!gs||gs.paused)return; const p=gs.player, pl=p.plane;
+    // Gerakan memakai akselerasi + perlambatan, sehingga analog/keyboard terasa halus
+    // dan kecepatan mengikuti seberapa jauh analog ditekan, bukan langsung melesat.
     let ax=gs.keys.left?-1:gs.keys.right?1:gs.joy.x, ay=gs.keys.up?-1:gs.keys.down?1:gs.joy.y;
-    p.x=clamp(p.x+ax*speed*dt,30,gs.w-30);p.y=clamp(p.y+ay*speed*dt,55,gs.h-55);
+    const mag=Math.min(1,Math.hypot(ax,ay));
+    if(mag>1){ax/=mag;ay/=mag;}
+    const maxSpeed=(pl.speed||4)*42; // px/detik; jauh lebih terkontrol di HP maupun laptop
+    const targetX=ax*maxSpeed*mag, targetY=ay*maxSpeed*mag;
+    const accel=Math.min(1,dt/150), friction=Math.pow(0.82,dt/16.67);
+    gs.vel.x += (targetX-gs.vel.x)*accel; gs.vel.y += (targetY-gs.vel.y)*accel;
+    if(mag<0.04){gs.vel.x*=friction;gs.vel.y*=friction;}
+    p.x=clamp(p.x+gs.vel.x*dt/1000,30,gs.w-30);p.y=clamp(p.y+gs.vel.y*dt/1000,55,gs.h-55);
     if(gs.keys.fire)fire();
     if(p.inv>0)p.inv-=dt;
     if(Date.now()-gs.lastBox>12000 && Math.random()<0.0015*dt){gs.boxes.push({x:35+Math.random()*(gs.w-70),y:-30,vy:1.4});gs.lastBox=Date.now();}
@@ -4166,9 +4178,33 @@ function initGuruViews() {
     window.addEventListener('keydown',e=>{if(!gs)return;const k=e.key.toLowerCase();if(['arrowleft','a'].includes(k))gs.keys.left=true;if(['arrowright','d'].includes(k))gs.keys.right=true;if(['arrowup','w'].includes(k))gs.keys.up=true;if(['arrowdown','s'].includes(k))gs.keys.down=true;if(k===' ')gs.keys.fire=true});
     window.addEventListener('keyup',e=>{if(!gs)return;const k=e.key.toLowerCase();if(['arrowleft','a'].includes(k))gs.keys.left=false;if(['arrowright','d'].includes(k))gs.keys.right=false;if(['arrowup','w'].includes(k))gs.keys.up=false;if(['arrowdown','s'].includes(k))gs.keys.down=false;if(k===' ')gs.keys.fire=false});
   }
+  async function enterSkyFullscreen(){
+    const root=document.documentElement, body=document.body;
+    root.classList.add('sky-game-fullscreen'); body.classList.add('sky-game-fullscreen');
+    try{
+      if(!document.fullscreenElement && document.documentElement.requestFullscreen){
+        await document.documentElement.requestFullscreen({navigationUI:'hide'});
+      }
+    }catch(e){ /* browser dapat menolak fullscreen; CSS mode tetap aktif */ }
+    try{
+      if(screen.orientation?.lock) await screen.orientation.lock('landscape');
+    }catch(e){}
+    setTimeout(()=>{ if(gs) resize(); },120);
+  }
+  async function exitSkyFullscreen(){
+    document.documentElement.classList.remove('sky-game-fullscreen');
+    document.body.classList.remove('sky-game-fullscreen');
+    try{ if(screen.orientation?.unlock) screen.orientation.unlock(); }catch(e){}
+    try{ if(document.fullscreenElement && document.exitFullscreen) await document.exitFullscreen(); }catch(e){}
+    setTimeout(()=>{ if(gs) resize(); },120);
+  }
+  window.enterSkyFullscreen=enterSkyFullscreen;
+  window.exitSkyFullscreen=exitSkyFullscreen;
+
   function start(){
     const canvas=$('skyCanvas');if(!canvas||!currentUser)return;
     $('secSkyBattle')?.classList.remove('hidden');$('schoolFeatureDock')?.style.setProperty('display','flex');
+    enterSkyFullscreen();
     if(gs){resize();updateHud();return}
     gs={canvas,ctx:canvas.getContext('2d',{alpha:false}),w:0,h:0,t:0,prev:performance.now(),acc:0,lastFire:0,lastSpawn:0,spawnDelay:900,lastBox:0,level:1,enemies:[],bullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{},onlineRef:null,presenceTimer:null,resizeHandler:null};
     resize();gs.player=makePlayer();setupControls();updateHud();notify('🌟 Mode online ringan aktif.');gs.raf=requestAnimationFrame(loop);
@@ -4200,6 +4236,7 @@ function initGuruViews() {
   }
   window.initSpaceGame=start;
   window.stopSpaceGame=function(){
+    if(typeof exitSkyFullscreen==='function') exitSkyFullscreen();
     if(!gs)return;
     try{if(gs.raf)cancelAnimationFrame(gs.raf)}catch(e){}
     try{if(gs.presenceTimer)clearInterval(gs.presenceTimer)}catch(e){}
