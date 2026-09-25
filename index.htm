@@ -256,6 +256,11 @@
                             </select>
                         </div>
                         <div>
+                            <label class="block text-sm font-black text-blue-900 mb-2 ml-1">Tahun Pelajaran</label>
+                            <select id="loginTapel" class="block w-full px-5 py-4 bg-white rounded-2xl border-2 border-blue-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all font-bold text-slate-700"></select>
+                            <p class="text-[10px] text-slate-400 mt-1 ml-1">Akun hanya dapat masuk pada tahun pelajaran yang ditetapkan Admin.</p>
+                        </div>
+                        <div>
                             <label class="block text-sm font-black text-blue-900 mb-2 ml-1">Nama Pengguna</label>
                             <input type="text" id="loginUser" class="block w-full px-5 py-4 bg-white rounded-2xl border-2 border-blue-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-700 placeholder:text-slate-300 font-medium" placeholder="Masukkan username kamu...">
                         </div>
@@ -459,7 +464,17 @@
                             <input type="text" id="guruNama" placeholder="Nama Lengkap" class="border p-2 rounded text-xs col-span-2">
                             <input type="text" id="guruNip" placeholder="NIP Guru" class="border p-2 rounded text-xs col-span-2">
                             <div class="col-span-2 grid grid-cols-2 gap-2">
-                                <input type="text" id="guruKelas" placeholder="Kelas Diajar (Contoh: 1, 2, 3A)" class="border p-2 rounded text-xs">
+                                <select id="guruJenis" class="border p-2 rounded text-xs bg-white text-slate-600" onchange="toggleGuruMapelField()">
+                                    <option value="Guru Kelas">Guru Kelas</option>
+                                    <option value="Guru Mapel">Guru Mata Pelajaran</option>
+                                </select>
+                                <input type="text" id="guruKelas" placeholder="Kelas yang diampu" class="border p-2 rounded text-xs">
+                            </div>
+                            <div id="guruMapelWrap" class="col-span-2 hidden">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Mata Pelajaran yang Diampu (bisa pilih lebih dari satu)</label>
+                                <select id="guruMapel" multiple class="border p-2 rounded text-xs bg-white w-full min-h-24"></select>
+                            </div>
+                            <div class="col-span-2 grid grid-cols-2 gap-2">
                                 <select id="guruFase" class="border p-2 rounded text-xs bg-white text-slate-600">
                                     <option value="">-- Pilih Fase Kelas --</option>
                                     <option value="A">Fase A (Kelas 1-2)</option>
@@ -467,12 +482,13 @@
                                     <option value="C">Fase C (Kelas 5-6)</option>
                                 </select>
                             </div>
+                            <input type="text" id="guruTapel" placeholder="Tahun Pelajaran (contoh: 2026/2027)" class="border p-2 rounded text-xs col-span-2">
                             <button id="btnSubmitGuru" onclick="addUserManual('Guru')" class="bg-indigo-600 text-white p-2 rounded text-xs font-semibold col-span-2 hover:bg-indigo-700">Tambah Guru Manual</button>
                             <button id="btnCancelGuru" onclick="cancelEditUser('Guru')" class="hidden bg-slate-500 text-white p-2 rounded text-xs font-semibold col-span-2 hover:bg-slate-600">Batal Edit</button>
                         </div>
                         <div class="overflow-x-auto border rounded-xl max-h-60 overflow-y-auto">
                             <table class="w-full text-left text-xs">
-                                <thead class="bg-slate-100"><tr><th class="p-2">User</th><th class="p-2">Nama</th><th class="p-2">NIP</th><th class="p-2">Kelas</th><th class="p-2">Fase</th><th class="p-2 text-right">Aksi</th></tr></thead>
+                                <thead class="bg-slate-100"><tr><th class="p-2">User</th><th class="p-2">Nama</th><th class="p-2">Jenis</th><th class="p-2">Kelas</th><th class="p-2">Mapel</th><th class="p-2">TP</th><th class="p-2 text-right">Aksi</th></tr></thead>
                                 <tbody id="tblAdminGuru" class="divide-y"></tbody>
                             </table>
                         </div>
@@ -521,12 +537,13 @@
                                     <option value="C">Fase C</option>
                                 </select>
                             </div>
+                            <input type="text" id="siswaTapel" placeholder="Tahun Pelajaran (contoh: 2026/2027)" class="border p-2 rounded text-xs col-span-2">
                             <button id="btnSubmitSiswa" onclick="addUserManual('Siswa')" class="bg-indigo-600 text-white p-2 rounded text-xs font-semibold col-span-2 hover:bg-indigo-700">Tambah Siswa Manual</button>
                             <button id="btnCancelSiswa" onclick="cancelEditUser('Siswa')" class="hidden bg-slate-500 text-white p-2 rounded text-xs font-semibold col-span-2 hover:bg-slate-600">Batal Edit</button>
                         </div>
                         <div class="overflow-x-auto border rounded-xl max-h-60 overflow-y-auto">
                             <table class="w-full text-left text-xs">
-                                <thead class="bg-slate-100"><tr><th class="p-2">User</th><th class="p-2">Nama</th><th class="p-2">Kelas</th><th class="p-2">Fase</th><th class="p-2 text-right">Aksi</th></tr></thead>
+                                <thead class="bg-slate-100"><tr><th class="p-2">User</th><th class="p-2">Nama</th><th class="p-2">Kelas</th><th class="p-2">Fase</th><th class="p-2">TP</th><th class="p-2 text-right">Aksi</th></tr></thead>
                                 <tbody id="tblAdminSiswa" class="divide-y"></tbody>
                             </table>
                         </div>
@@ -789,9 +806,10 @@
 <div id="tabKKTP" class="guru-content hidden no-print bg-white p-6 rounded-2xl shadow">
 <h3 class="font-bold text-lg">🎯 Kriteria Ketuntasan Tujuan Pembelajaran (KKTP)</h3>
 <table class="w-full text-xs mt-3 border">
-<tr><th>Mapel</th><th>Perlu Bimbingan</th><th>Cukup</th><th>Baik</th><th>Sangat Baik</th><th>Keterangan</th></tr>
+<tr><th>BAB</th><th>Mapel</th><th>Perlu Bimbingan</th><th>Cukup</th><th>Baik</th><th>Sangat Baik</th><th>Keterangan</th></tr>
 <tr>
-<td><input class="border p-1 w-full"></td>
+<td><input id="kktpBab" placeholder="BAB 1" class="border p-1 w-full"></td>
+<td><input id="kktpMapel" class="border p-1 w-full"></td>
 <td><input class="border p-1 w-full"></td>
 <td><input class="border p-1 w-full"></td>
 <td><input class="border p-1 w-full"></td>
@@ -1171,6 +1189,7 @@
             }));
         }
         if (!localStorage.getItem('users')) localStorage.setItem('users', JSON.stringify([]));
+        else { const _u=JSON.parse(localStorage.getItem('users')||'[]'); const _tapel=(JSON.parse(localStorage.getItem('schoolProfile')||'{}').tapel)||'2025/2026'; localStorage.setItem('users', JSON.stringify(_u.map(u=>({...u,tapel:u.tapel||_tapel,jenisGuru:u.role==='Guru'?(u.jenisGuru||'Guru Kelas'):'',mapelDiampu:Array.isArray(u.mapelDiampu)?u.mapelDiampu:(u.mapelDiampu?String(u.mapelDiampu).split(',').map(x=>x.trim()).filter(Boolean):[])})))); }
         if (!localStorage.getItem('mapel')) {
             localStorage.setItem('mapel', JSON.stringify([
                 { id: 1, nama: "Matematika" },
@@ -1204,6 +1223,7 @@
             document.getElementById('navSchoolNpsn').innerText = "NPSN: " + profile.npsn + " | TP: " + (profile.tapel || "-");
         }
         loadNavSchool();
+        populateLoginTapel();
 
         function filterSiswaDropdown(inputId, selectId) {
             const keyword = document.getElementById(inputId).value.toLowerCase();
@@ -1225,30 +1245,73 @@
             }
         }
 
+        function getActiveTapel() {
+            const profile = JSON.parse(localStorage.getItem('schoolProfile')) || {};
+            return profile.tapel || '';
+        }
+
+        function populateLoginTapel() {
+            const el = document.getElementById('loginTapel');
+            if (!el) return;
+            const tapel = getActiveTapel();
+            el.innerHTML = tapel ? `<option value="${tapel}">${tapel}</option>` : '<option value="">Belum ditentukan Admin</option>';
+        }
+
+        function normalizeUserRecord(u) {
+            if (!u) return u;
+            u.tapel = u.tapel || getActiveTapel();
+            u.jenisGuru = u.role === 'Guru' ? (u.jenisGuru || 'Guru Kelas') : '';
+            u.mapelDiampu = Array.isArray(u.mapelDiampu) ? u.mapelDiampu : (u.mapelDiampu ? String(u.mapelDiampu).split(',').map(x=>x.trim()).filter(Boolean) : []);
+            return u;
+        }
+
+        function getGuruMapelNames() {
+            const arr = currentUser && Array.isArray(currentUser.mapelDiampu) ? currentUser.mapelDiampu : [];
+            return arr.map(String);
+        }
+
+        function isGuruMapel() { return currentUser && currentUser.role === 'Guru' && currentUser.jenisGuru === 'Guru Mapel'; }
+        function requireGuruAccess(feature) {
+            if (currentUser?.role !== 'Guru') return true;
+            if (!isGuruMapel()) return true;
+            const allowed = ['absensi','nilai','bintang'];
+            if (!allowed.includes(feature)) { alert('Akses Guru Mata Pelajaran hanya untuk input Nilai, Absensi, dan Bintang Perilaku.'); return false; }
+            return true;
+        }
+
+        function toggleGuruMapelField() {
+            const jenis = document.getElementById('guruJenis')?.value;
+            const wrap = document.getElementById('guruMapelWrap');
+            if (wrap) wrap.classList.toggle('hidden', jenis !== 'Guru Mapel');
+        }
+
+        function populateAdminGuruMapel(selected=[]) {
+            const el = document.getElementById('guruMapel');
+            if (!el) return;
+            const mapel = JSON.parse(localStorage.getItem('mapel')) || [];
+            el.innerHTML = mapel.map(m => `<option value="${m.nama}" ${selected.includes(m.nama) ? 'selected' : ''}>${m.nama}</option>`).join('');
+        }
+
         function handleLogin() {
             const userIn = document.getElementById('loginUser').value.trim();
             const passIn = document.getElementById('loginPass').value.trim();
             const roleIn = document.getElementById('loginRole').value;
+            const tapelIn = document.getElementById('loginTapel')?.value || getActiveTapel();
 
-            if (roleIn === "Admin") {
-                if (userIn === "Admin" && passIn === localStorage.getItem('adminPassword')) {
-                    currentUser = { username: "Admin", role: "Admin" };
-                    showDashboard("Admin");
-                    return;
-                } else {
-                    return alert("Username atau Password Admin salah!");
+            if (tapelIn !== getActiveTapel()) return alert('Tahun pelajaran login tidak sesuai dengan Tahun Pelajaran Aktif Admin.');
+            if (roleIn === 'Admin') {
+                if (userIn === 'Admin' && passIn === localStorage.getItem('adminPassword')) {
+                    currentUser = { username: 'Admin', role: 'Admin', tapel: tapelIn };
+                    showDashboard('Admin'); return;
                 }
+                return alert('Username atau Password Admin salah!');
             }
 
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            const foundUser = users.find(u => u.username === userIn && u.password === passIn && u.role === roleIn);
-
-            if (foundUser) {
-                currentUser = foundUser;
-                showDashboard(foundUser.role);
-            } else {
-                alert("Kesalahan! Username, Password, atau Role tidak sesuai.");
-            }
+            const users = (JSON.parse(localStorage.getItem('users')) || []).map(normalizeUserRecord);
+            const foundUser = users.find(u => u.username === userIn && u.password === passIn && u.role === roleIn && String(u.tapel || '') === String(tapelIn));
+            if (!foundUser) return alert('Login gagal. Pastikan Username, Password, Peran, Kelas, dan Tahun Pelajaran akun sesuai data Admin.');
+            currentUser = foundUser;
+            showDashboard(foundUser.role);
         }
 
         function logout() {
@@ -1280,8 +1343,9 @@
                 initAdminDashboard();
             } else if (role === "Guru") {
                 document.getElementById('secGuru').classList.remove('hidden');
-                document.getElementById('guruTitle').innerText = `Panel Kerja Guru - Kelas ${currentUser.kelas}`;
-                document.getElementById('txtGuruTapel').innerText = `TP: ${currentTapel}`;
+                document.getElementById('guruTitle').innerText = `Panel Kerja ${currentUser.jenisGuru || 'Guru'} - Kelas ${currentUser.kelas}`;
+                document.getElementById('txtGuruTapel').innerText = `TP: ${currentUser.tapel || currentTapel}`;
+                applyGuruAccess();
                 initGuruViews();
             } else if (role === "Siswa") {
                 document.getElementById('secSiswa').classList.remove('hidden');
@@ -1316,8 +1380,8 @@
 
         function downloadTemplateUsers(role) {
             const templateData = role === 'Guru' ? 
-                [{ "Username": "guru123", "Password": "password123", "Nama": "Nama Lengkap Guru", "NIP": "199012122020012001", "Kelas": "1", "Fase": "A" }] :
-                [{ "Username": "232401001", "Password": "password123", "Nama": "Nama Lengkap Siswa", "Kelas": "1", "Fase": "A" }];
+                [{ "Username": "guru123", "Password": "password123", "Nama": "Nama Lengkap Guru", "NIP": "199012122020012001", "JenisGuru": "Guru Kelas", "Kelas": "1", "MapelDiampu": "", "Fase": "A", "TahunPelajaran": getActiveTapel() }] :
+                [{ "Username": "232401001", "Password": "password123", "Nama": "Nama Lengkap Siswa", "Kelas": "1", "Fase": "A", "TahunPelajaran": getActiveTapel() }];
             const worksheet = XLSX.utils.json_to_sheet(templateData);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Template " + role);
@@ -1337,6 +1401,7 @@
             document.getElementById('schTanggalDokumen').value = profile.tanggalDokumen || new Date().toISOString().split('T')[0];
             renderSchoolLogo(profile.logo || '');
             loadAdminMetadata();
+            populateAdminGuruMapel();
             loadAdminUsers();
         }
 
@@ -1412,8 +1477,14 @@
             const tempatDokumen = document.getElementById('schTempat').value.trim();
             const tanggalDokumen = document.getElementById('schTanggalDokumen').value || new Date().toISOString().split('T')[0];
             const oldProfile = JSON.parse(localStorage.getItem('schoolProfile')) || {};
+            if (!tapel) return alert('Tahun Pelajaran Aktif wajib diisi.');
             saveAppData('schoolProfile', JSON.stringify({ nama, npsn, alamat, tapel, kepsek, nipKepsek, jabatan, tempatDokumen, tanggalDokumen, logo: oldProfile.logo || '' }));
+            const users = (JSON.parse(localStorage.getItem('users')) || []).map(u => ({...u, tapel: u.tapel || tapel}));
+            saveAppData('users', JSON.stringify(users));
             loadNavSchool();
+            populateLoginTapel();
+            populateAdminGuruMapel();
+            loadAdminUsers();
             renderSchoolLogo(oldProfile.logo || '');
             showCloudStatus('online');
         }
@@ -1498,32 +1569,21 @@
         }
 
         function loadAdminUsers() {
-            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const users = (JSON.parse(localStorage.getItem('users')) || []).map(normalizeUserRecord);
             const filterKelas = document.getElementById('filterKelasSiswa').value;
-            const searchKeyword = document.getElementById('searchAdminSiswa') ? document.getElementById('searchAdminSiswa').value.toLowerCase().trim() : '';
-            
-            const uniqueClasses = [...new Set(users.filter(u => u.role === 'Siswa').map(u => u.kelas))];
+            const searchKeyword = document.getElementById('searchAdminSiswa')?.value.toLowerCase().trim() || '';
+            const uniqueClasses = [...new Set(users.filter(u => u.role === 'Siswa').map(u => u.kelas))].filter(Boolean).sort();
             const filterSelect = document.getElementById('filterKelasSiswa');
             const currentSelection = filterSelect.value;
-            filterSelect.innerHTML = '<option value="Semua">Semua Kelas</option>';
-            uniqueClasses.forEach(c => {
-                filterSelect.innerHTML += `<option value="${c}" ${c === currentSelection ? 'selected' : ''}>Kelas ${c}</option>`;
-            });
-
-            const tblGuru = document.getElementById('tblAdminGuru');
-            const tblSiswa = document.getElementById('tblAdminSiswa');
-            tblGuru.innerHTML = '';
-            tblSiswa.innerHTML = '';
-
-            users.forEach((u, index) => {
-                if(u.role === "Guru") {
-                    tblGuru.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.nip || '-'}</td><td class="p-2">${u.kelas}</td><td class="p-2 font-bold text-indigo-600">${u.fase || '-'}</td><td class="p-2 text-right flex justify-end gap-2"><button onclick="editUser('${u.username}', 'Guru')" class="text-amber-600 hover:text-amber-800 mr-1"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
-                } else {
-                    const matchKelas = (filterKelas === "Semua" || u.kelas === filterKelas);
-                    const matchSearch = (u.username.toLowerCase().includes(searchKeyword) || u.nama.toLowerCase().includes(searchKeyword));
-                    if (matchKelas && matchSearch) {
-                        tblSiswa.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.kelas}</td><td class="p-2 font-bold text-indigo-600">${u.fase || '-'}</td><td class="p-2 text-right flex justify-end gap-2"><button onclick="editUser('${u.username}', 'Siswa')" class="text-amber-600 hover:text-amber-800 mr-1"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
-                    }
+            filterSelect.innerHTML = '<option value="Semua">Semua Kelas</option>' + uniqueClasses.map(c => `<option value="${c}" ${c === currentSelection ? 'selected' : ''}>Kelas ${c}</option>`).join('');
+            const tblGuru = document.getElementById('tblAdminGuru'), tblSiswa = document.getElementById('tblAdminSiswa');
+            tblGuru.innerHTML=''; tblSiswa.innerHTML='';
+            users.forEach((u,index)=>{
+                if(u.role==='Guru'){
+                    tblGuru.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.jenisGuru||'Guru Kelas'}</td><td class="p-2">${u.kelas||'-'}</td><td class="p-2">${(u.mapelDiampu||[]).join(', ')||'-'}</td><td class="p-2">${u.tapel||'-'}</td><td class="p-2 text-right flex justify-end gap-2"><button onclick="editUser('${u.username}','Guru')" class="text-amber-600"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                } else if(u.role==='Siswa'){
+                    const matchKelas=filterKelas==='Semua'||u.kelas===filterKelas; const matchSearch=(u.username||'').toLowerCase().includes(searchKeyword)||(u.nama||'').toLowerCase().includes(searchKeyword);
+                    if(matchKelas&&matchSearch) tblSiswa.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.kelas||'-'}</td><td class="p-2">${u.fase||'-'}</td><td class="p-2">${u.tapel||'-'}</td><td class="p-2 text-right flex justify-end gap-2"><button onclick="editUser('${u.username}','Siswa')" class="text-amber-600"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
                 }
             });
         }
@@ -1555,8 +1615,12 @@
                 document.getElementById('guruPass').value = targetUser.password;
                 document.getElementById('guruNama').value = targetUser.nama;
                 document.getElementById('guruNip').value = targetUser.nip || '';
-                document.getElementById('guruKelas').value = targetUser.kelas;
+                document.getElementById('guruKelas').value = targetUser.kelas || '';
+                document.getElementById('guruJenis').value = targetUser.jenisGuru || 'Guru Kelas';
+                document.getElementById('guruTapel').value = targetUser.tapel || getActiveTapel();
                 document.getElementById('guruFase').value = targetUser.fase || '';
+                populateAdminGuruMapel(targetUser.mapelDiampu || []);
+                toggleGuruMapelField();
                 document.getElementById('btnSubmitGuru').innerText = "Perbarui Data Guru";
                 document.getElementById('btnCancelGuru').classList.remove('hidden');
                 document.getElementById('titleFormGuru').innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-500"></i> Edit Data Guru`;
@@ -1566,7 +1630,8 @@
                 document.getElementById('siswaUser').disabled = true;
                 document.getElementById('siswaPass').value = targetUser.password;
                 document.getElementById('siswaNama').value = targetUser.nama;
-                document.getElementById('siswaKelas').value = targetUser.kelas;
+                document.getElementById('siswaKelas').value = targetUser.kelas || '';
+                document.getElementById('siswaTapel').value = targetUser.tapel || getActiveTapel();
                 document.getElementById('siswaFase').value = targetUser.fase || '';
                 document.getElementById('btnSubmitSiswa').innerText = "Perbarui Data Siswa";
                 document.getElementById('btnCancelSiswa').classList.remove('hidden');
@@ -1583,7 +1648,11 @@
                 document.getElementById('guruNama').value = '';
                 document.getElementById('guruNip').value = '';
                 document.getElementById('guruKelas').value = '';
+                document.getElementById('guruJenis').value = 'Guru Kelas';
+                document.getElementById('guruTapel').value = getActiveTapel();
                 document.getElementById('guruFase').value = '';
+                populateAdminGuruMapel([]);
+                toggleGuruMapelField();
                 document.getElementById('btnSubmitGuru').innerText = "Tambah Guru Manual";
                 document.getElementById('btnCancelGuru').classList.add('hidden');
                 document.getElementById('titleFormGuru').innerHTML = `<i class="fa-solid fa-chalkboard-user"></i> Manajemen Guru`;
@@ -1602,44 +1671,35 @@
         }
 
         function addUserManual(role) {
-            const user = document.getElementById(role === 'Guru' ? 'guruUser' : 'siswaUser').value.trim();
-            const pass = document.getElementById(role === 'Guru' ? 'guruPass' : 'siswaPass').value.trim();
-            const nama = document.getElementById(role === 'Guru' ? 'guruNama' : 'siswaNama').value.trim();
-            const kelas = document.getElementById(role === 'Guru' ? 'guruKelas' : 'siswaKelas').value.trim().toUpperCase();
-            const fase = document.getElementById(role === 'Guru' ? 'guruFase' : 'siswaFase').value;
-            const nip = role === 'Guru' ? document.getElementById('guruNip').value.trim() : "";
+            const isGuru = role === 'Guru';
+            const user = document.getElementById(isGuru ? 'guruUser' : 'siswaUser').value.trim();
+            const pass = document.getElementById(isGuru ? 'guruPass' : 'siswaPass').value.trim();
+            const nama = document.getElementById(isGuru ? 'guruNama' : 'siswaNama').value.trim();
+            const kelas = document.getElementById(isGuru ? 'guruKelas' : 'siswaKelas').value.trim().toUpperCase();
+            const fase = document.getElementById(isGuru ? 'guruFase' : 'siswaFase').value;
+            const tapel = document.getElementById(isGuru ? 'guruTapel' : 'siswaTapel').value.trim() || getActiveTapel();
+            const nip = isGuru ? document.getElementById('guruNip').value.trim() : '';
+            const jenisGuru = isGuru ? document.getElementById('guruJenis').value : '';
+            const mapelDiampu = isGuru ? Array.from(document.getElementById('guruMapel').selectedOptions).map(o=>o.value) : [];
+            if (!user || !pass || !nama || !kelas || !tapel) return alert('Isi seluruh kolom utama termasuk kelas dan tahun pelajaran!');
+            if (isGuru && jenisGuru === 'Guru Mapel' && mapelDiampu.length === 0) return alert('Pilih minimal satu mata pelajaran untuk Guru Mata Pelajaran.');
+            if (tapel !== getActiveTapel()) return alert('Tahun Pelajaran akun harus sama dengan Tahun Pelajaran Aktif Admin.');
 
-            if(!user || !pass || !nama || !kelas) return alert("Isi seluruh kolom utama!");
-
-            let users = JSON.parse(localStorage.getItem('users')) || [];
-            const currentEditUsername = (role === 'Guru') ? editGuruUsername : editSiswaUsername;
-
+            let users = (JSON.parse(localStorage.getItem('users')) || []).map(normalizeUserRecord);
+            const currentEditUsername = isGuru ? editGuruUsername : editSiswaUsername;
             if (currentEditUsername) {
                 const index = users.findIndex(u => u.username === currentEditUsername);
                 if (index !== -1) {
-                    users[index].password = pass;
-                    users[index].nama = nama;
-                    users[index].kelas = kelas;
-                    users[index].fase = fase;
-                    if(role === 'Guru') users[index].nip = nip;
+                    users[index] = {...users[index], password: pass, nama, kelas, fase, tapel, nip, jenisGuru, mapelDiampu};
                     saveAppData('users', JSON.stringify(users));
-                    showSaveToast("Data pengguna diperbarui");
-                    cancelEditUser(role);
-                    loadAdminUsers();
+                    showSaveToast('Data pengguna diperbarui'); cancelEditUser(role); loadAdminUsers(); return;
                 }
-            } else {
-                if(users.find(u => u.username === user)) return alert("Username sudah terdaftar!");
-                users.push({ username: user, password: pass, nama, kelas, role, nip, fase });
-                saveAppData('users', JSON.stringify(users));
-                showSaveToast("Data berhasil ditambahkan");
-                loadAdminUsers();
-                document.getElementById(role === 'Guru' ? 'guruUser' : 'siswaUser').value = '';
-                document.getElementById(role === 'Guru' ? 'guruPass' : 'siswaPass').value = '';
-                document.getElementById(role === 'Guru' ? 'guruNama' : 'siswaNama').value = '';
-                document.getElementById(role === 'Guru' ? 'guruKelas' : 'siswaKelas').value = '';
-                document.getElementById(role === 'Guru' ? 'guruFase' : 'siswaFase').value = '';
-                if(role === 'Guru') document.getElementById('guruNip').value = '';
             }
+            if (users.find(u => u.username === user)) return alert('Username sudah terdaftar!');
+            users.push({username:user,password:pass,nama,kelas,role,nip,fase,tapel,jenisGuru,mapelDiampu});
+            saveAppData('users', JSON.stringify(users));
+            showSaveToast('Data berhasil ditambahkan'); loadAdminUsers();
+            cancelEditUser(role);
         }
 
         function deleteUser(index) {
@@ -1669,10 +1729,13 @@
                     const kelas = String(row.Kelas || '').trim().toUpperCase();
                     const fase = row.Fase ? String(row.Fase).trim().toUpperCase() : '';
                     const nip = row.NIP ? String(row.NIP).trim() : '';
+                    const tapel = String(row.TahunPelajaran || row.Tapel || getActiveTapel()).trim();
+                    const jenisGuru = role === 'Guru' ? String(row.JenisGuru || 'Guru Kelas').trim() : '';
+                    const mapelDiampu = role === 'Guru' ? String(row.MapelDiampu || '').split(',').map(x=>x.trim()).filter(Boolean) : [];
 
                     if(username && password && nama && kelas) {
                         if(!users.find(u => u.username === username)) {
-                            users.push({ username, password, nama, kelas, role, nip, fase });
+                            users.push({ username, password, nama, kelas, role, nip, fase, tapel, jenisGuru, mapelDiampu });
                             count++;
                         }
                     }
@@ -1714,40 +1777,43 @@
 
         function getSiswaSekelas() {
             const users = JSON.parse(localStorage.getItem('users')) || [];
-            return users.filter(u => u.role === 'Siswa' && u.kelas === currentUser.kelas);
+            const tapel = currentUser?.tapel || getActiveTapel();
+            return users.filter(u => u.role === 'Siswa' && u.kelas === currentUser.kelas && String(u.tapel || tapel) === String(tapel));
         }
 
         function populateGuruDropdowns() {
-            const siswa = getSiswaSekelas();
-            const mapel = JSON.parse(localStorage.getItem('mapel')) || [];
-            const ekskul = JSON.parse(localStorage.getItem('ekskul')) || [];
-
-            const ddSiswa = ['absensiSiswa', 'nilaiSiswa', 'ekskulSiswa', 'bintangSiswa', 'tabunganSiswa', 'cetakSiswaSelect'];
-            ddSiswa.forEach(id => {
-                const el = document.getElementById(id);
-                if(!el) return;
-                el.innerHTML = '';
-                if(siswa.length === 0) {
-                    el.innerHTML = '<option value="">Tidak ada siswa</option>';
-                } else {
-                    siswa.forEach(s => el.innerHTML += `<option value="${s.username}">${s.nama}</option>`);
-                }
-            });
-
-            const ddMapel = document.getElementById('nilaiMapel');
-            if(ddMapel) {
-                ddMapel.innerHTML = '';
-                mapel.forEach(m => ddMapel.innerHTML += `<option value="${m.nama}">${m.nama}</option>`);
-            }
-
-            const ddEkskul = document.getElementById('ekskulPilihan');
-            if(ddEkskul) {
-                ddEkskul.innerHTML = '';
-                ekskul.forEach(e => ddEkskul.innerHTML += `<option value="${e.nama}">${e.nama}</option>`);
-            }
+            const siswa=getSiswaSekelas(), allMapel=JSON.parse(localStorage.getItem('mapel'))||[], ekskul=JSON.parse(localStorage.getItem('ekskul'))||[];
+            const ddSiswa=['absensiSiswa','nilaiSiswa','ekskulSiswa','bintangSiswa','tabunganSiswa','cetakSiswaSelect'];
+            ddSiswa.forEach(id=>{const el=document.getElementById(id); if(!el)return; el.innerHTML=siswa.length?siswa.map(x=>`<option value="${x.username}">${x.nama}</option>`).join():'<option value="">Tidak ada siswa</option>';});
+            const mapel=isGuruMapel()?allMapel.filter(m=>getGuruMapelNames().includes(m.nama)):allMapel;
+            const dm=document.getElementById('nilaiMapel'); if(dm) dm.innerHTML=mapel.map(m=>`<option value="${m.nama}">${m.nama}</option>`).join()||'<option value="">Tidak ada mapel</option>';
+            const de=document.getElementById('ekskulPilihan'); if(de) de.innerHTML=ekskul.map(e=>`<option value="${e.nama}">${e.nama}</option>`).join();
         }
 
+        function applyGuruAccess(){
+            const restricted=isGuruMapel();
+            const allowed=['tabAbsensi','tabNilai','tabBintang'];
+            document.querySelectorAll('.guru-tab-btn').forEach(btn=>{
+                const onclick=btn.getAttribute('onclick')||''; const m=onclick.match(/switchGuruTab\('([^']+)'\)/); const id=m?m[1]:'';
+                btn.classList.toggle('hidden',restricted&&!allowed.includes(id));
+            });
+            document.getElementById('tabAbsensi')?.classList.toggle('hidden',restricted?false:document.getElementById('tabAbsensi').classList.contains('hidden'));
+            if(restricted){ document.querySelectorAll('.guru-content').forEach(c=>c.classList.add('hidden')); document.getElementById('tabAbsensi')?.classList.remove('hidden'); }
+            const clearBtn=document.querySelector('button[onclick="clearAllGuruData()"]'); if(clearBtn) clearBtn.classList.toggle('hidden',restricted);
+        }
+
+        function switchGuruTab(tabId) {
+            if(!requireGuruAccess(tabId==='tabAbsensi'?'absensi':tabId==='tabNilai'?'nilai':tabId==='tabBintang'?'bintang':'other')) return;
+            document.querySelectorAll('.guru-tab-btn').forEach(btn=>{btn.classList.remove('bg-white','text-emerald-800');btn.classList.add('text-emerald-100','hover:bg-emerald-800/50');});
+            if(window.event){window.event.target.classList.add('bg-white','text-emerald-800');window.event.target.classList.remove('text-emerald-100','hover:bg-emerald-800/50');}
+            document.querySelectorAll('.guru-content').forEach(c=>c.classList.add('hidden')); document.getElementById(tabId)?.classList.remove('hidden');
+            if(tabId==='tabLegger')renderLegger(); if(tabId==='tabBintang')renderBintangGuru(); if(tabId==='tabTabungan')renderTabunganGuru();
+        }
+
+        function initGuruViews(){ populateGuruDropdowns(); renderAbsensiGuru(); renderNilaiGuru(); renderLegger(); renderNilaiEkskulGuru(); renderBintangGuru(); renderTabunganGuru(); applyGuruAccess(); }
+
         function clearAllGuruData() {
+            if(isGuruMapel()) return alert('Guru Mata Pelajaran tidak memiliki akses menghapus seluruh data kelas.');
             if (confirm("Hapus semua inputan kelas Anda?")) {
                 const kelasGuru = currentUser.kelas;
                 saveAppData('absensi', JSON.stringify((JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.kelas !== kelasGuru)));
@@ -1772,6 +1838,7 @@ function getAbsensiSemesterAktif() {
 }
 
 function submitAbsensi() {
+    if(!requireGuruAccess('absensi')) return;
     const semester = getAbsensiSemesterAktif();
     const date = document.getElementById('absensiDate').value;
     const userSiswa = document.getElementById('absensiSiswa').value;
@@ -1817,7 +1884,7 @@ function submitAbsensi() {
 
         function renderAbsensiGuru() {
             const semester = getAbsensiSemesterAktif();
-            const absensi = (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.kelas === currentUser.kelas && getAbsensiSemester(a) === semester);
+            const absensi = (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.kelas === currentUser.kelas && String(a.tapel || currentUser.tapel || getActiveTapel()) === String(currentUser.tapel || getActiveTapel()) && getAbsensiSemester(a) === semester);
             const tbody = document.getElementById('bodyLogAbsen');
             if(!tbody) return;
             tbody.innerHTML = '';
@@ -1844,6 +1911,7 @@ function submitAbsensi() {
         }
 
         function submitNilai() {
+            if(!requireGuruAccess('nilai')) return;
             const username = document.getElementById('nilaiSiswa').value;
             const mapel = document.getElementById('nilaiMapel').value;
             const semester = document.getElementById('nilaiSemester').value;
@@ -1852,11 +1920,12 @@ function submitAbsensi() {
             const angka = parseFloat(document.getElementById('nilaiAngka').value);
 
             if(!username || !mapel || !date || isNaN(angka)) return alert("Lengkapi data!");
+            if(isGuruMapel() && !getGuruMapelNames().includes(mapel)) return alert("Anda hanya dapat menginput nilai untuk mata pelajaran yang ditetapkan Admin.");
             let nilai = JSON.parse(localStorage.getItem('nilai')) || [];
             const sObj = getSiswaSekelas().find(s => s.username === username);
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
 
-            nilai.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: currentUser.kelas, mapel, semester, jenis, date, angka, tapel: profile.tapel || "-" });
+            nilai.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: currentUser.kelas, mapel, semester, jenis, date, angka, tapel: currentUser.tapel || profile.tapel || "-", inputBy: currentUser.username, inputByType: currentUser.jenisGuru || "Guru Kelas" });
             saveAppData('nilai', JSON.stringify(nilai));
             renderNilaiGuru();
             renderLegger();
@@ -1864,6 +1933,8 @@ function submitAbsensi() {
         }
 
         function deleteNilai(id) {
+            const target=(JSON.parse(localStorage.getItem('nilai'))||[]).find(n=>n.id===id);
+            if(isGuruMapel() && target && target.inputBy !== currentUser.username) return alert('Guru Mata Pelajaran hanya dapat menghapus nilai yang diinput oleh akun sendiri.');
             if(confirm("Hapus?")) {
                 saveAppData('nilai', JSON.stringify((JSON.parse(localStorage.getItem('nilai'))).filter(n => n.id !== id)));
                 renderNilaiGuru();
@@ -1872,7 +1943,7 @@ function submitAbsensi() {
         }
 
         function renderNilaiGuru() {
-            const nilai = (JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.kelas === currentUser.kelas);
+            const nilai = (JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.kelas === currentUser.kelas && String(n.tapel || currentUser.tapel || getActiveTapel()) === String(currentUser.tapel || getActiveTapel()) && (!isGuruMapel() || getGuruMapelNames().includes(n.mapel)));
             const tbody = document.getElementById('bodyLogNilai');
             if(!tbody) return;
             tbody.innerHTML = '';
@@ -1901,7 +1972,7 @@ function submitAbsensi() {
             const semAktif = semSelect.value;
             const siswaList = getSiswaSekelas();
             const mapelList = JSON.parse(localStorage.getItem('mapel')) || [];
-            const semuaNilai = (JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.kelas === currentUser.kelas && n.semester === semAktif);
+            const semuaNilai = (JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.kelas === currentUser.kelas && String(n.tapel || currentUser.tapel || getActiveTapel()) === String(currentUser.tapel || getActiveTapel()) && n.semester === semAktif);
 
             const thead = document.getElementById('headerLegger');
             const tbody = document.getElementById('bodyLegger');
@@ -1992,6 +2063,7 @@ function submitAbsensi() {
         }
 
         function submitBintangGuru() {
+            if(!requireGuruAccess('bintang')) return;
             const username = document.getElementById('bintangSiswa').value;
             const jumlah = parseInt(document.getElementById('bintangJumlah').value);
             const desc = document.getElementById('bintangDesc').value.trim();
@@ -2002,7 +2074,7 @@ function submitAbsensi() {
             const sObj = getSiswaSekelas().find(s => s.username === username);
             const date = new Date().toISOString().split('T')[0];
 
-            bintangList.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: currentUser.kelas, jumlah, desc, date });
+            bintangList.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: currentUser.kelas, jumlah, desc, date, tapel: currentUser.tapel || getActiveTapel(), inputBy: currentUser.username, inputByType: currentUser.jenisGuru || "Guru Kelas" });
             saveAppData('bintang', JSON.stringify(bintangList));
             document.getElementById('bintangDesc').value = '';
             renderBintangGuru();
@@ -2019,7 +2091,7 @@ function submitAbsensi() {
         }
 
         function renderBintangGuru() {
-            const bintangList = (JSON.parse(localStorage.getItem('bintang')) || []).filter(b => b.kelas === currentUser.kelas);
+            const bintangList = (JSON.parse(localStorage.getItem('bintang')) || []).filter(b => b.kelas === currentUser.kelas && String(b.tapel || currentUser.tapel || getActiveTapel()) === String(currentUser.tapel || getActiveTapel()));
             const tbody = document.getElementById('bodyLogBintang');
             if(!tbody) return;
             tbody.innerHTML = '';
@@ -2638,6 +2710,7 @@ dbRef.on('value', snapshot => {
     } finally { applyingFirebaseData = false; }
     showCloudStatus('online');
     loadNavSchool();
+    populateLoginTapel();
     if (typeof refreshCurrentView === 'function') refreshCurrentView();
 }, err => {
     console.error('Firebase listener error:', err);
@@ -2673,7 +2746,7 @@ function filterRekapSaldo() {
 function renderRekapAbsenSiswa() {
     const siswaList = getSiswaSekelas();
     const semester = getAbsensiSemesterAktif();
-    const absensiList = (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.kelas === currentUser.kelas && getAbsensiSemester(a) === semester);
+    const absensiList = (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.kelas === currentUser.kelas && String(a.tapel || currentUser.tapel || getActiveTapel()) === String(currentUser.tapel || getActiveTapel()) && getAbsensiSemester(a) === semester);
     const searchKeyword = document.getElementById('searchRekapAbsenSiswa') ? document.getElementById('searchRekapAbsenSiswa').value.toLowerCase().trim() : '';
     const tbody = document.getElementById('bodyRekapAbsenSiswa');
     if (!tbody) return;
