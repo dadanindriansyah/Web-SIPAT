@@ -362,8 +362,14 @@
 }
 
  /* ===== SKY BATTLE - MODE ONLINE RINGAN ===== */
- #secSkyBattle{contain:layout style;}
- #skyCanvas{image-rendering:auto;touch-action:none;display:block;}
+ #secSkyBattle{contain:layout style;background:linear-gradient(180deg,#7dd3fc 0%,#bae6fd 48%,#e0f2fe 100%);}
+ #skyCanvas{image-rendering:auto;touch-action:none;display:block;background:linear-gradient(180deg,#38bdf8 0%,#7dd3fc 52%,#e0f2fe 100%);}
+ #skyRotateHint{display:none;}
+ html.sky-game-fullscreen,body.sky-game-fullscreen{background:#7dd3fc!important;overflow:hidden!important;}
+ body.sky-game-fullscreen #secSkyBattle{display:block!important;position:fixed!important;inset:0!important;z-index:9999!important;margin:0!important;padding:0!important;background:linear-gradient(180deg,#38bdf8,#e0f2fe)!important;}
+ body.sky-game-fullscreen .sky-game-shell{position:absolute;inset:0;border:0!important;border-radius:0!important;box-shadow:none!important;background:linear-gradient(180deg,#38bdf8,#e0f2fe)!important;}
+ body.sky-game-fullscreen #skyCanvas{width:100%!important;height:calc(100vh - 58px)!important;min-height:0!important;background:#7dd3fc!important;}
+ @media (orientation:portrait) and (max-width:900px){body.sky-game-fullscreen #skyRotateHint{display:block;position:fixed;inset:0;z-index:10000;background:linear-gradient(180deg,#0ea5e9,#38bdf8);color:#fff;font-weight:1000;text-align:center;padding-top:28vh;font-size:28px;text-shadow:0 3px 8px rgba(15,23,42,.35);pointer-events:none;}}
  .sky-low-data{font-size:10px;color:#64748b;margin-top:3px;}
  @media (prefers-reduced-motion: reduce){#skyCanvas{scroll-behavior:auto}.sky-game-shell *{animation:none!important;transition:none!important;}}
 </style>
@@ -4026,8 +4032,8 @@ function initGuruViews() {
   }
   function effectivePlane(){
     const p=getProfile(), special=roleSpecial();
-    if(special==='admin') return {id:'admin',name:'Admin Colossus',icon:'🛸',speed:3.7,fire:105,color:'#fde047',big:true,special:true};
-    if(special==='guru4') return {id:'guru4',name:'Guru Kelas 4 Titan',icon:'🚁',speed:3.9,fire:115,color:'#22d3ee',big:true,special:true};
+    if(special==='admin') return {id:'admin',name:'Admin Colossus',icon:'🛸',speed:3.45,fire:120,color:'#fde047',big:2.0,special:true};
+    if(special==='guru4') return {id:'guru4',name:'Guru Kelas 4 Thunder Jet',icon:'✈️',speed:3.55,fire:125,color:'#0ea5e9',big:2.25,special:true,guru4Jet:true};
     return PLANES.find(x=>x.id===p.plane)||PLANES[0];
   }
   function weaponLabel(){const p=getProfile(); if(p.weaponUntil && p.weaponUntil>Date.now()) return p.weapon.toUpperCase(); return 'PELURU'}
@@ -4125,7 +4131,7 @@ function initGuruViews() {
     spawnEnemy();
     gs.enemies.forEach(e=>{e.y+=e.speed*dt*.055;e.x+=Math.sin(e.phase+e.y/60)*.35;});
     gs.boxes.forEach(b=>b.y+=b.vy*dt*.05);
-    gs.bullets.forEach(b=>{b.x+=b.dx*dt;b.y+=b.dy*dt;b.life+=dt});
+    gs.bullets.forEach(b=>{b.x+=b.dx*60*dt/1000;b.y+=b.dy*60*dt/1000;b.life+=dt});
     gs.enemies=gs.enemies.filter(e=>{
       if(e.y>gs.h+70)return false;
       for(let i=gs.bullets.length-1;i>=0;i--){const b=gs.bullets[i],dist=Math.hypot(e.x-b.x,e.y-b.y);if(dist<e.size+(b.type==='laser'?10:5)){const dead=hitEnemy(e,b);gs.bullets.splice(i,1);if(dead)return false;}}
@@ -4136,13 +4142,36 @@ function initGuruViews() {
   }
   function drawCloud(ctx,x,y,s){ctx.fillStyle='rgba(255,255,255,.82)';ctx.beginPath();ctx.arc(x,y,s*.5,0,Math.PI*2);ctx.arc(x+s*.35,y-s*.15,s*.38,0,Math.PI*2);ctx.arc(x-s*.35,y-s*.1,s*.42,0,Math.PI*2);ctx.fill();}
   function drawPlane(ctx,p){
-    const x=p.x,y=p.y,pl=p.plane,scale=pl.big?1.45:1;
+    const x=p.x,y=p.y,pl=p.plane,scale=pl.big||1;
     ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);ctx.globalAlpha=p.inv>0?0.55:1;
-    ctx.fillStyle=pl.color;ctx.strokeStyle='#0f172a';ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(0,-36);ctx.lineTo(11,-8);ctx.lineTo(42,7);ctx.lineTo(13,12);ctx.lineTo(8,35);ctx.lineTo(0,28);ctx.lineTo(-8,35);ctx.lineTo(-13,12);ctx.lineTo(-42,7);ctx.lineTo(-11,-8);ctx.closePath();ctx.fill();ctx.stroke();
-    ctx.fillStyle='#dbeafe';ctx.beginPath();ctx.ellipse(0,-10,7,14,0,0,Math.PI*2);ctx.fill();ctx.stroke();
-    if(pl.special){ctx.strokeStyle='#67e8f9';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-33,6);ctx.lineTo(-55,16);ctx.moveTo(33,6);ctx.lineTo(55,16);ctx.stroke();}
-    ctx.fillStyle='#fb923c';ctx.beginPath();ctx.arc(-10,31,5,0,Math.PI*2);ctx.arc(10,31,5,0,Math.PI*2);ctx.fill();ctx.restore();
+    // Siluet jet tempur: badan tengah, sayap lebar, ekor, kokpit dan mesin.
+    ctx.shadowColor='rgba(15,23,42,.28)';ctx.shadowBlur=8;
+    ctx.fillStyle=pl.color;ctx.strokeStyle='#0b1f33';ctx.lineWidth=2.5;
+    ctx.beginPath();
+    ctx.moveTo(0,-48);ctx.lineTo(9,-27);ctx.lineTo(18,-7);ctx.lineTo(58,12);
+    ctx.lineTo(62,22);ctx.lineTo(20,19);ctx.lineTo(13,43);ctx.lineTo(0,52);
+    ctx.lineTo(-13,43);ctx.lineTo(-20,19);ctx.lineTo(-62,22);ctx.lineTo(-58,12);
+    ctx.lineTo(-18,-7);ctx.lineTo(-9,-27);ctx.closePath();ctx.fill();ctx.stroke();
+    // Hidung dan kokpit
+    ctx.shadowBlur=0;ctx.fillStyle='#cbd5e1';ctx.beginPath();ctx.moveTo(0,-44);ctx.quadraticCurveTo(12,-25,8,-7);ctx.lineTo(0,4);ctx.lineTo(-8,-7);ctx.quadraticCurveTo(-12,-25,0,-44);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#0f172a';ctx.beginPath();ctx.ellipse(0,-19,7,15,0,0,Math.PI*2);ctx.fill();
+    // Rudal di bawah sayap untuk pesawat khusus
+    if(pl.special){
+      ctx.fillStyle='#f8fafc';ctx.strokeStyle='#334155';ctx.lineWidth=1.5;
+      [-43,43].forEach(mx=>{ctx.beginPath();ctx.moveTo(mx,17);ctx.lineTo(mx+4,34);ctx.lineTo(mx,42);ctx.lineTo(mx-4,34);ctx.closePath();ctx.fill();ctx.stroke();});
+      // Laser cannon kiri-kanan
+      ctx.strokeStyle='#ef4444';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-19,17);ctx.lineTo(-39,28);ctx.moveTo(19,17);ctx.lineTo(39,28);ctx.stroke();
+      ctx.strokeStyle='#67e8f9';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-25,10);ctx.lineTo(-58,4);ctx.moveTo(25,10);ctx.lineTo(58,4);ctx.stroke();
+    }
+    // Mesin jet dan api knalpot
+    const flame=5+Math.sin(Date.now()/55)*2;
+    ctx.fillStyle='#1e293b';ctx.beginPath();ctx.arc(-10,39,6,0,Math.PI*2);ctx.arc(10,39,6,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fb923c';ctx.beginPath();ctx.moveTo(-10,43);ctx.lineTo(-5,43);ctx.lineTo(-8,43+flame);ctx.closePath();ctx.fill();ctx.beginPath();ctx.moveTo(5,43);ctx.lineTo(10,43);ctx.lineTo(8,43+flame);ctx.closePath();ctx.fill();
+    if(pl.guru4Jet){
+      ctx.fillStyle='rgba(14,165,233,.18)';ctx.beginPath();ctx.ellipse(0,2,72,28,0,0,Math.PI*2);ctx.fill();
+      ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillStyle='#082f49';ctx.fillText('GURU KELAS 4',0,70);
+    }
+    ctx.restore();
   }
   function drawEnemy(ctx,e){
     ctx.save();ctx.translate(e.x,e.y);ctx.fillStyle=e.color;ctx.strokeStyle='#0f172a';ctx.lineWidth=2;
@@ -4152,13 +4181,18 @@ function initGuruViews() {
   }
   function draw(){
     if(!gs)return;const c=gs.ctx,w=gs.w,h=gs.h;c.clearRect(0,0,w,h);
-    const g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,'#38bdf8');g.addColorStop(1,'#e0f2fe');c.fillStyle=g;c.fillRect(0,0,w,h);
-    for(let i=0;i<5;i++)drawCloud(c,(i*241+gs.t*.015)% (w+180)-90,90+(i%3)*170,48+(i%2)*12);
-    for(let i=0;i<24;i++){const x=(i*97)%w,y=(i*53+gs.t*.08)%h;c.fillStyle='rgba(255,255,255,.55)';c.fillRect(x,y,2,5)}
-    gs.boxes.forEach(b=>{c.save();c.translate(b.x,b.y);c.rotate(Math.sin(gs.t/250)*.1);c.fillStyle='#f59e0b';c.strokeStyle='#fff';c.lineWidth=3;c.fillRect(-17,-17,34,34);c.strokeRect(-17,-17,34,34);c.fillStyle='#fff';c.font='20px sans-serif';c.textAlign='center';c.fillText('?',0,7);c.restore()});
-    gs.bullets.forEach(b=>{c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=b.type==='laser'?8:4;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*2,b.y-b.dy*2);c.stroke();});
+    // Langit cerah agar arena tidak tampak gelap/kosong.
+    const g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,'#0284c7');g.addColorStop(.42,'#38bdf8');g.addColorStop(1,'#e0f2fe');c.fillStyle=g;c.fillRect(0,0,w,h);
+    // Matahari lembut
+    const sun=c.createRadialGradient(w*.82,h*.15,5,w*.82,h*.15,90);sun.addColorStop(0,'rgba(255,255,210,.95)');sun.addColorStop(1,'rgba(255,255,210,0)');c.fillStyle=sun;c.fillRect(0,0,w,h);
+    // Awan dan horizon pegunungan
+    for(let i=0;i<6;i++)drawCloud(c,(i*241+gs.t*.018)%(w+220)-110,70+(i%3)*135,48+(i%2)*14);
+    c.fillStyle='rgba(14,116,144,.16)';c.beginPath();c.moveTo(0,h*.78);for(let i=0;i<=w;i+=70)c.lineTo(i,h*.72+Math.sin(i*.015)*28);c.lineTo(w,h);c.lineTo(0,h);c.closePath();c.fill();
+    for(let i=0;i<28;i++){const xx=(i*97)%w,yy=(i*53+gs.t*.08)%h;c.fillStyle='rgba(255,255,255,.48)';c.fillRect(xx,yy,2,5)}
+    gs.boxes.forEach(b=>{c.save();c.translate(b.x,b.y);c.rotate(Math.sin(gs.t/250)*.1);c.shadowColor='rgba(15,23,42,.25)';c.shadowBlur=8;c.fillStyle='#f59e0b';c.strokeStyle='#fff';c.lineWidth=3;c.fillRect(-17,-17,34,34);c.strokeRect(-17,-17,34,34);c.shadowBlur=0;c.fillStyle='#fff';c.font='20px sans-serif';c.textAlign='center';c.fillText('?',0,7);c.restore()});
+    gs.bullets.forEach(b=>{c.save();c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=b.type==='laser'?8:4;c.shadowColor=b.color;c.shadowBlur=b.type==='laser'?14:6;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*.25,b.y-b.dy*.25);c.stroke();c.restore();});
     gs.enemies.forEach(e=>drawEnemy(c,e));drawPlane(c,gs.player);
-    if(gs.remotePlayers) Object.values(gs.remotePlayers).forEach(r=>{if(r.id!==profileKey()){c.save();c.globalAlpha=.55;drawPlane(c,{x:r.x||50,y:r.y||80,plane:{color:r.color||'#22c55e',big:false},inv:0});c.restore();}});
+    if(gs.remotePlayers) Object.values(gs.remotePlayers).forEach(r=>{if(r.id!==profileKey()){c.save();c.globalAlpha=.6;drawPlane(c,{x:r.x||50,y:r.y||80,plane:{color:r.color||'#22c55e',big:1},inv:0});c.restore();}});
   }
   function loop(ts){
     if(!gs)return;
@@ -4205,8 +4239,8 @@ function initGuruViews() {
     const canvas=$('skyCanvas');if(!canvas||!currentUser)return;
     $('secSkyBattle')?.classList.remove('hidden');$('schoolFeatureDock')?.style.setProperty('display','flex');
     enterSkyFullscreen();
-    if(gs){resize();updateHud();return}
-    gs={canvas,ctx:canvas.getContext('2d',{alpha:false}),w:0,h:0,t:0,prev:performance.now(),acc:0,lastFire:0,lastSpawn:0,spawnDelay:900,lastBox:0,level:1,enemies:[],bullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{},onlineRef:null,presenceTimer:null,resizeHandler:null};
+    if(gs){gs.vel=gs.vel||{x:0,y:0};resize();updateHud();return}
+    gs={canvas,ctx:canvas.getContext('2d',{alpha:false}),w:0,h:0,t:0,prev:performance.now(),acc:0,lastFire:0,lastSpawn:0,spawnDelay:900,lastBox:0,level:1,enemies:[],bullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{},onlineRef:null,presenceTimer:null,resizeHandler:null,vel:{x:0,y:0}};
     resize();gs.player=makePlayer();setupControls();updateHud();notify('🌟 Mode online ringan aktif.');gs.raf=requestAnimationFrame(loop);
     gs.resizeHandler=()=>resize(); window.addEventListener('resize',gs.resizeHandler,{passive:true});
 
