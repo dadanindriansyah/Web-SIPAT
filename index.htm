@@ -1511,12 +1511,16 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
       <canvas id="skyCanvas"></canvas>
       <div class="sky-overlay">
         <div class="sky-title">☁️ Misi Langit SIPAT</div>
-        <div class="sky-help">Semua pemain satu arena. Pesawat siswa/guru/admin tidak dapat saling melukai. Hancurkan pesawat komputer dan kumpulkan poin!</div>
+        <div class="sky-help">Semua pemain satu arena. Admin & Guru Kelas 4 kebal. Siswa bisa hidup kembali setelah hancur. Guru punya tombol bekukan+bakar, siswa bisa mendapat Prank dari kotak misteri.</div>
       </div>
       <button id="skyRoleRocketBtn" class="sky-role-rocket role-siswa" onclick="openRolePanel()" title="Buka panel kerja sesuai akun" aria-label="Buka panel kerja sesuai akun">
         <span class="rocket-icon">🚀</span>
         <span class="rocket-text"><b id="skyRoleRocketText">Panel Siswa</b><small id="skyRoleRocketHint">Buka panel kerja</small></span>
       </button>
+      <div id="skySpecialControls" class="sky-special-controls">
+        <button id="skyGuruPowerBtn" class="sky-special-btn teacher" onclick="guruBattlePower()" title="Membekukan dan membakar musuh komputer serta pesawat siswa">⚡ Guru: Bekukan + 🔥 Bakar</button>
+        <button id="skyPrankBtn" class="sky-special-btn prank" onclick="usePrankPower()" title="Gunakan item prank dari kotak misteri">🎭 Prank: Bekukan + 🔥 Bakar</button>
+      </div>
       <div class="sky-controls">
         <div id="skyJoystick" class="sky-joystick" aria-label="Analog gerak"><div id="skyKnob" class="sky-knob"></div></div>
         <div class="sky-fire-wrap">
@@ -4202,11 +4206,15 @@ function initGuruViews() {
   function weaponLabel(){const p=getProfile(); if(p.weaponUntil && p.weaponUntil>Date.now()) return p.weapon.toUpperCase(); return 'PELURU'}
   function notify(msg){const e=$('skyMessage');if(e)e.textContent=msg}
   function updateHud(){
-    const p=getProfile(), plane=effectivePlane();
+    const p=getProfile(), plane=effectivePlane(), special=roleSpecial();
     if($('skyPoints'))$('skyPoints').textContent=p.points||0;
     if($('skyKills'))$('skyKills').textContent=p.kills||0;
     if($('skyRoleBadge'))$('skyRoleBadge').textContent=(currentUser?.role||'Pemain')+' • '+plane.name;
     if($('skyWeapon'))$('skyWeapon').textContent='Senjata: '+weaponLabel();
+    const gc=$('skyGuruPowerBtn'), pc=$('skyPrankBtn'), sc=$('skySpecialControls');
+    if(sc) sc.style.display=(special==='guru4'||(special==='normal'&&gs?.player?.prankCharges>0))?'flex':'none';
+    if(gc) gc.style.display=special==='guru4'?'inline-flex':'none';
+    if(pc){pc.style.display=(special==='normal'&&((gs?.player?.prankCharges||0)>0))?'inline-flex':'none'; pc.textContent='🎭 Prank: Bekukan + 🔥 Bakar ('+(gs?.player?.prankCharges||0)+')';}
     renderShop();
   }
   function renderShop(){
@@ -4236,7 +4244,55 @@ function initGuruViews() {
     gs.w=r.width;gs.h=r.height;
   }
   function makePlayer(){
-    const pl=effectivePlane();return{x:gs.w/2,y:gs.h-100,plane:pl,shots:0,inv:0,hp:3};
+    const pl=effectivePlane();
+    return{x:gs.w/2,y:gs.h-100,plane:pl,shots:0,inv:0,hp:3,deadUntil:0,respawnCount:0,
+      frozenUntil:0,burningUntil:0,prankCharges:(roleSpecial()==='normal'?0:0)};
+  }
+  function isInvulnerable(){
+    const r=roleSpecial();
+    return r==='admin'||r==='guru4';
+  }
+  function respawnPlayer(reason='respawn'){
+    if(!gs)return;
+    const p=gs.player;
+    p.x=gs.w/2; p.y=gs.h-100; p.hp=3; p.inv=2200; p.deadUntil=0;
+    p.frozenUntil=0; p.burningUntil=0; gs.gameOver=false; gs.vel={x:0,y:0};
+    gs.keys.fire=false; notify(reason==='prank'?'✨ Pesawatmu kembali ke arena!':'🚀 Pesawat siswa hidup kembali! HP 3');
+    updateHud();
+  }
+  function applyLocalStatus(type,ms=3200){
+    if(!gs?.player)return;
+    if(isInvulnerable()){notify('🛡️ Pesawat Admin/Guru kebal terhadap serangan pemain.');return;}
+    const p=gs.player;
+    if(type==='freeze') p.frozenUntil=Math.max(p.frozenUntil||0,Date.now()+ms);
+    if(type==='burn') p.burningUntil=Math.max(p.burningUntil||0,Date.now()+ms);
+  }
+  function targetRemotePlayers(type){
+    if(!gs?.onlineRef)return;
+    const now=Date.now(), r=roleSpecial();
+    Object.entries(gs.remotePlayers||{}).forEach(([id,v])=>{
+      if(id===profileKey())return;
+      if(type==='prank' && v.role!=='Siswa')return;
+      if(type==='guru' && v.role==='Admin')return;
+      gs.onlineRef.child(id).update({battleEffect:{type:type==='prank'?'prank':type,until:now+3200,by:profileKey()}}).catch(()=>{});
+    });
+  }
+  window.guruBattlePower=function(){
+    if(roleSpecial()!=='guru4'||!gs)return;
+    const now=Date.now();
+    gs.enemies.forEach(e=>{e.frozenUntil=now+3200;e.burningUntil=now+3200;});
+    targetRemotePlayers('guru');
+    notify('⚡🔥 Guru Kelas 4 mengaktifkan Bekukan + Bakar! Musuh dan pesawat siswa terkena efek.');
+  };
+  window.usePrankPower=function(){
+    if(roleSpecial()!=='normal'||!gs?.player)return;
+    if((gs.player.prankCharges||0)<=0)return notify('🎁 Belum punya Prank. Cari kotak misteri!');
+    gs.player.prankCharges--; saveProfile({...getProfile(),prankCharges:gs.player.prankCharges});
+    const now=Date.now();
+    gs.enemies.forEach(e=>{e.frozenUntil=now+2600;e.burningUntil=now+2600;});
+    targetRemotePlayers('prank');
+    notify('🎭 PRANK aktif! Pesawat siswa lain & musuh membeku dan terbakar.');
+    updateHud();
   }
   function spawnEnemy(force=false){
     if(!gs)return;
@@ -4257,9 +4313,14 @@ function initGuruViews() {
   }
   function hitPlayer(damage=1){
     if(!gs||gs.gameOver||gs.player.inv>0)return;
+    if(isInvulnerable()){ gs.player.inv=350; notify('🛡️ Pesawat Admin/Guru Kelas 4 kebal!'); return; }
     gs.player.inv=1300; gs.player.hp=Math.max(0,(gs.player.hp??3)-damage);
-    notify(gs.player.hp>0?'💥 Pesawat terkena tembakan musuh! HP '+gs.player.hp:'💥 Pesawat hancur! Klik Mulai Ulang untuk bermain lagi.');
-    if(gs.player.hp<=0){gs.gameOver=true;gs.keys.fire=false;}
+    if(gs.player.hp>0){notify('💥 Pesawat terkena tembakan musuh! HP '+gs.player.hp);}
+    else{
+      gs.player.hp=0; gs.player.deadUntil=Date.now()+1800; gs.keys.fire=false; gs.gameOver=true;
+      notify('💥 Pesawat siswa hancur! 🚀 Hidup kembali dalam 1,8 detik...');
+      setTimeout(()=>{if(gs&&currentUser&&roleSpecial()==='normal'&&gs.player.deadUntil)respawnPlayer();},1800);
+    }
   }
   function fire(){
     if(!gs||gs.gameOver)return; const now=Date.now(),pl=gs.player, cd=pl.plane.fire;
@@ -4281,8 +4342,14 @@ function initGuruViews() {
     if(!gs)return;
     if(roleSpecial()!=='normal'){ notify('🎁 Kotak misteri! Arsenal khusus tetap: LASER + LISTRIK + RUDAL.'); return; }
     const p=getProfile(), weapons=['peluru','laser','listrik','rudal'];
-    const w=weapons[Math.floor(Math.random()*weapons.length)];p.weapon=w;p.weaponUntil=Date.now()+12000;saveProfile(p);
-    notify('🎁 Kotak misteri! Senjata '+w.toUpperCase()+' aktif 12 detik.');
+    const w=weapons[Math.floor(Math.random()*weapons.length)];
+    const gotPrank=Math.random()<0.42;
+    p.weapon=w;p.weaponUntil=Date.now()+12000;
+    p.prankCharges=(p.prankCharges||0)+(gotPrank?1:0);
+    saveProfile(p);
+    gs.player.prankCharges=p.prankCharges||0;
+    notify(gotPrank?'🎁✨ KOTAK MISTERI! Kamu mendapat PRANK! Tekan tombol 🎭 untuk membekukan + membakar.':'🎁 Kotak misteri! Senjata '+w.toUpperCase()+' aktif 12 detik.');
+    updateHud();
   }
   function hitEnemy(e,b){
     e.hp-=b.damage;
@@ -4296,18 +4363,25 @@ function initGuruViews() {
     let ax=gs.keys.left?-1:gs.keys.right?1:gs.joy.x, ay=gs.keys.up?-1:gs.keys.down?1:gs.joy.y;
     const mag=Math.min(1,Math.hypot(ax,ay));
     if(mag>1){ax/=mag;ay/=mag;}
+    const frozen=(p.frozenUntil||0)>Date.now();
+    if(frozen){gs.vel.x*=0.72;gs.vel.y*=0.72;ax=0;ay=0;}
     const maxSpeed=(pl.speed||4)*42; // px/detik; jauh lebih terkontrol di HP maupun laptop
     const targetX=ax*maxSpeed*mag, targetY=ay*maxSpeed*mag;
     const accel=Math.min(1,dt/150), friction=Math.pow(0.82,dt/16.67);
     gs.vel.x += (targetX-gs.vel.x)*accel; gs.vel.y += (targetY-gs.vel.y)*accel;
     if(mag<0.04){gs.vel.x*=friction;gs.vel.y*=friction;}
     p.x=clamp(p.x+gs.vel.x*dt/1000,30,gs.w-30);p.y=clamp(p.y+gs.vel.y*dt/1000,55,gs.h-55);
-    if(gs.keys.fire)fire();
+    if(gs.keys.fire&&!frozen)fire();
     if(p.inv>0)p.inv-=dt;
     gs.enemies.forEach(e=>enemyFire(e));
     if(Date.now()-gs.lastBox>12000 && Math.random()<0.0015*dt){gs.boxes.push({x:35+Math.random()*(gs.w-70),y:-30,vy:1.4});gs.lastBox=Date.now();}
     spawnEnemy();
-    gs.enemies.forEach(e=>{e.y+=e.speed*dt*.055;e.x+=Math.sin(e.phase+e.y/60)*.35;});
+    gs.enemies.forEach(e=>{
+      const frozen=(e.frozenUntil||0)>Date.now();
+      if(!frozen)e.y+=e.speed*dt*.055;
+      e.x+=Math.sin(e.phase+e.y/60)*.35;
+      if((e.burningUntil||0)>Date.now() && Math.random()<0.08){e.hp-=0.18;}
+    });
     gs.boxes.forEach(b=>b.y+=b.vy*dt*.05);
     gs.bullets.forEach(b=>{b.x+=b.dx*60*dt/1000;b.y+=b.dy*60*dt/1000;b.life+=dt});
     gs.enemyBullets.forEach(b=>{b.x+=b.dx*60*dt/1000;b.y+=b.dy*60*dt/1000;b.life+=dt;});
@@ -4427,7 +4501,7 @@ function initGuruViews() {
     enterSkyFullscreen();
     if(gs){gs.vel=gs.vel||{x:0,y:0};resize();updateHud();return}
     gs={canvas,ctx:canvas.getContext('2d',{alpha:false}),w:0,h:0,t:0,prev:performance.now(),acc:0,lastFire:0,lastSpawn:0,spawnDelay:900,lastBox:0,level:1,enemies:[],bullets:[],enemyBullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{},onlineRef:null,presenceTimer:null,resizeHandler:null,vel:{x:0,y:0}};
-    resize();gs.player=makePlayer();setupControls();updateHud();notify('🌟 Mode online ringan aktif.');gs.raf=requestAnimationFrame(loop);
+    resize();gs.player=makePlayer();gs.player.prankCharges=(getProfile().prankCharges||0);setupControls();updateHud();notify('🌟 Mode online ringan aktif.');gs.raf=requestAnimationFrame(loop);
     gs.resizeHandler=()=>resize(); window.addEventListener('resize',gs.resizeHandler,{passive:true});
 
     // Multiplayer memakai path Firebase terpisah dari data sekolah. Jadi perubahan posisi
@@ -4448,7 +4522,20 @@ function initGuruViews() {
         const p=gs.player;
         if(Math.hypot(p.x-(gs.lastNetX||-9999),p.y-(gs.lastNetY||-9999))>8) publish();
       },1200);
-      const sync=(snap)=>{if(!gs)return;const v=snap.val();if(v)gs.remotePlayers[v.id]=v;else delete gs.remotePlayers[snap.key];if($('skyPlayers'))$('skyPlayers').textContent=String(Math.max(1,Object.keys(gs.remotePlayers).length));};
+      const sync=(snap)=>{
+        if(!gs)return;
+        const v=snap.val();
+        if(v){
+          gs.remotePlayers[v.id]=v;
+          const eff=v.battleEffect;
+          if(v.id!==profileKey() && eff && eff.until>Date.now()){
+            if(eff.type==='prank' || eff.type==='guru' || eff.type==='freeze') applyLocalStatus('freeze',Math.max(500,eff.until-Date.now()));
+            if(eff.type==='prank' || eff.type==='guru' || eff.type==='burn') applyLocalStatus('burn',Math.max(500,eff.until-Date.now()));
+            if(eff.type==='prank'||eff.type==='guru') notify(eff.type==='guru'?'⚡🔥 Kamu terkena kekuatan Guru Kelas 4!':'🎭🔥 Kamu terkena PRANK!');
+          }
+        } else delete gs.remotePlayers[snap.key];
+        if($('skyPlayers'))$('skyPlayers').textContent=String(Math.max(1,Object.keys(gs.remotePlayers).length));
+      };
       onlineRef.on('child_added',sync); onlineRef.on('child_changed',sync);
       onlineRef.on('child_removed',sync);
       gs.cleanupOnline=()=>{onlineRef.off('child_added',sync);onlineRef.off('child_changed',sync);onlineRef.off('child_removed',sync);try{me.remove()}catch(e){}};
