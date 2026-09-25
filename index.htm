@@ -1199,6 +1199,35 @@
 
     </main>
 
+
+    <!-- CHAT GURU <-> SISWA: pojok kanan bawah -->
+    <div id="chatWidget" class="hidden no-print">
+        <div id="chatPanel" class="hidden">
+            <div class="bg-gradient-to-r from-blue-700 to-violet-700 text-white px-4 py-3 flex items-center justify-between gap-2">
+                <div>
+                    <div class="font-black text-sm"><i class="fa-solid fa-comments"></i> Chat Guru & Siswa</div>
+                    <div id="chatSubTitle" class="text-[10px] text-blue-100">Pesan pribadi</div>
+                </div>
+                <button type="button" onclick="toggleChat(false)" class="text-white/90 hover:text-white text-lg" aria-label="Tutup chat"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-2 border-b bg-white">
+                <select id="chatPartner" onchange="renderChatMessages()" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold bg-white"></select>
+            </div>
+            <div id="chatMessages">
+                <div class="text-center text-xs text-slate-400 py-10">Pilih pengguna untuk mulai chat.</div>
+            </div>
+            <div class="p-2 border-t bg-white">
+                <div class="flex gap-2">
+                    <input id="chatInput" type="text" maxlength="500" onkeydown="if(event.key==='Enter'){event.preventDefault();sendChatMessage();}" class="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-blue-200" placeholder="Tulis pesan...">
+                    <button type="button" onclick="sendChatMessage()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl font-bold" title="Kirim"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+        <button id="chatToggle" type="button" onclick="toggleChat()" class="bg-blue-600 hover:bg-blue-700 text-white" title="Buka Chat">
+            <i class="fa-solid fa-comments"></i>
+        </button>
+    </div>
+
     <!-- FOOTER LINK -->
     <footer class="bg-slate-800 text-slate-400 py-6 text-center text-xs mt-24 border-t border-slate-700 no-print">
         <p>&copy; 2026 Portal Pendidikan Kecamatan Jasinga All Rights Reserved By Dadan Indriansyah, S.Pd.,M.Pd.</p>
@@ -1246,6 +1275,7 @@
         if (!localStorage.getItem('bintang')) localStorage.setItem('bintang', JSON.stringify([]));
         if (!localStorage.getItem('jurnal')) localStorage.setItem('jurnal', JSON.stringify([]));
         if (!localStorage.getItem('kktp')) localStorage.setItem('kktp', JSON.stringify([]));
+        if (!localStorage.getItem('chatMessages')) localStorage.setItem('chatMessages', JSON.stringify({}));
 
         let currentUser = null;
         let chartInstanceAbsen = null;
@@ -1520,6 +1550,9 @@
 
         function logout() {
             currentUser = null;
+            toggleChat(false);
+            const chatWidget = document.getElementById('chatWidget');
+            if (chatWidget) chatWidget.classList.add('hidden');
             document.getElementById('secLogin').classList.remove('hidden');
             document.getElementById('secAdmin').classList.add('hidden');
             document.getElementById('secGuru').classList.add('hidden');
@@ -1534,6 +1567,8 @@
         function showDashboard(role) {
             document.getElementById('secLogin').classList.add('hidden');
             document.getElementById('userInfo').classList.remove('hidden');
+            const chatWidget = document.getElementById('chatWidget');
+            if (chatWidget) chatWidget.classList.remove('hidden');
             document.getElementById('txtActiveUser').innerHTML = `<i class="fa-solid fa-circle-user"></i> ${currentUser.nama || currentUser.username} (${role})`;
 
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
@@ -1552,11 +1587,13 @@
                 document.getElementById('txtGuruTapel').innerText = `TP: ${currentUser.tapel || currentTapel}`;
                 applyGuruAccess();
                 initGuruViews();
+                refreshChatPartners();
             } else if (role === "Siswa") {
                 document.getElementById('secSiswa').classList.remove('hidden');
                 document.getElementById('siswaTitle').innerText = `Hallo My Little Bolu Ketan, Selamat Datang ${currentUser.nama}! (Kelas ${currentUser.kelas})`;
                 document.getElementById('txtSiswaTapel').innerText = `TP: ${currentTapel}`;
                 loadSiswaDashboard();
+                refreshChatPartners();
             }
         }
 
@@ -2966,6 +3003,135 @@ function refreshCurrentView() {
 }
 
 // --- FIREBASE REALTIME DATABASE: PENYIMPANAN OTOMATIS ---
+
+// ===== CHAT GURU <-> SISWA =====
+function chatEsc(v){
+    return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+}
+function getChatStore(){
+    const raw = localStorage.getItem('chatMessages');
+    if(!raw) return {};
+    try{
+        const data = JSON.parse(raw);
+        if(Array.isArray(data)) return Object.fromEntries(data.map(x=>[x.id || ('m_'+Date.now()+'_'+Math.random()),x]));
+        return data && typeof data === 'object' ? data : {};
+    }catch(e){ return {}; }
+}
+function chatUsers(){
+    return (JSON.parse(localStorage.getItem('users')||'[]')||[]).map(normalizeUserRecord);
+}
+function sameChatTapel(a,b){ return String(a||'') === String(b||''); }
+function getChatPartners(){
+    if(!currentUser) return [];
+    const users = chatUsers();
+    const tapel = currentUser.tapel || getActiveTapel();
+
+    if(currentUser.role === 'Guru'){
+        const kelas = getGuruKelasAktif() || currentUser.kelas || '';
+        return users.filter(u =>
+            u.role === 'Siswa' &&
+            sameChatTapel(u.tapel,tapel) &&
+            String(u.kelas||'').trim().toUpperCase() === String(kelas).trim().toUpperCase()
+        ).sort((a,b)=>String(a.nama||'').localeCompare(String(b.nama||''),'id'));
+    }
+
+    if(currentUser.role === 'Siswa'){
+        const kelas = String(currentUser.kelas||'').trim().toUpperCase();
+        return users.filter(u=>{
+            if(u.role !== 'Guru' || !sameChatTapel(u.tapel,tapel)) return false;
+            const kelasGuru = Array.isArray(u.kelasDiampu) ? u.kelasDiampu : [];
+            return u.jenisGuru === 'Guru Mapel'
+                ? kelasGuru.some(k=>String(k).trim().toUpperCase()===kelas)
+                : String(u.kelas||'').trim().toUpperCase()===kelas;
+        }).sort((a,b)=>String(a.nama||'').localeCompare(String(b.nama||''),'id'));
+    }
+    return [];
+}
+function chatConversationId(a,b){ return [String(a.username),String(b.username)].sort().join('__'); }
+
+function refreshChatPartners(){
+    const sel=document.getElementById('chatPartner');
+    if(!sel || !currentUser) return;
+    const partners=getChatPartners();
+    const old=sel.value;
+    sel.innerHTML = partners.length
+      ? partners.map(u=>`<option value="${chatEsc(u.username)}">${chatEsc(u.nama||u.username)}${u.role==='Guru' ? ` • ${chatEsc(u.jenisGuru||'Guru')}` : ''}</option>`).join('')
+      : '<option value="">Belum ada pengguna yang dapat diajak chat</option>';
+    if(old && partners.some(u=>u.username===old)) sel.value=old;
+    document.getElementById('chatSubTitle').textContent =
+      currentUser.role==='Guru' ? 'Pilih siswa pada kelas aktif' : 'Pilih guru yang mengajar kelas Anda';
+    renderChatMessages();
+}
+
+function toggleChat(force){
+    const widget=document.getElementById('chatWidget');
+    if(!widget) return;
+    if(!currentUser){ widget.classList.add('hidden'); return; }
+    widget.classList.remove('hidden');
+    const panel=document.getElementById('chatPanel');
+    const open=force===undefined ? panel.classList.contains('hidden') : !!force;
+    panel.classList.toggle('hidden',!open);
+    if(open){
+        refreshChatPartners();
+        setTimeout(()=>document.getElementById('chatInput')?.focus(),50);
+    }
+}
+
+function renderChatMessages(){
+    const box=document.getElementById('chatMessages'), sel=document.getElementById('chatPartner');
+    if(!box || !sel || !currentUser) return;
+    const partner=chatUsers().find(u=>u.username===sel.value);
+    if(!partner){
+        box.innerHTML='<div class="text-center text-xs text-slate-400 py-10">Belum ada pengguna yang dapat diajak chat.</div>';
+        return;
+    }
+    const cid=chatConversationId(currentUser,partner);
+    const msgs=Object.values(getChatStore())
+        .filter(m=>m.conversationId===cid)
+        .sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt));
+
+    box.innerHTML=msgs.length ? msgs.map(m=>{
+        const mine=m.senderUsername===currentUser.username;
+        const t=new Date(m.createdAt);
+        const time=isNaN(t) ? '' : t.toLocaleString('id-ID',{hour:'2-digit',minute:'2-digit'});
+        return `<div class="chat-bubble ${mine?'chat-me':'chat-other'}"><div>${chatEsc(m.text)}</div><div class="text-[9px] ${mine?'text-blue-100':'text-slate-500'} mt-1">${chatEsc(time)}</div></div>`;
+    }).join('') : '<div class="text-center text-xs text-slate-400 py-10">Belum ada pesan. Silakan mulai percakapan.</div>';
+    box.scrollTop=box.scrollHeight;
+}
+
+function sendChatMessage(){
+    if(!currentUser) return;
+    const input=document.getElementById('chatInput'), sel=document.getElementById('chatPartner');
+    const partner=chatUsers().find(u=>u.username===sel?.value);
+    const text=(input?.value||'').trim();
+    if(!partner || !text) return;
+
+    const id='m_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+    const msg={
+        conversationId:chatConversationId(currentUser,partner),
+        senderUsername:currentUser.username,
+        senderName:currentUser.nama||currentUser.username,
+        receiverUsername:partner.username,
+        receiverName:partner.nama||partner.username,
+        text:text.slice(0,500),
+        createdAt:new Date().toISOString()
+    };
+
+    const store=getChatStore();
+    store[id]=msg;
+    localStorage.setItem('chatMessages',JSON.stringify(store));
+
+    if(typeof firebaseReady!=='undefined' && firebaseReady && typeof dbRef!=='undefined'){
+        dbRef.child('chatMessages').child(id).set(msg).catch(err=>console.error('Chat Firebase:',err));
+    }
+    input.value='';
+    renderChatMessages();
+}
+
+function refreshChatView(){
+    if(currentUser && !document.getElementById('chatWidget')?.classList.contains('hidden')) refreshChatPartners();
+}
+
 const firebaseConfig = {
     apiKey: "AIzaSyA0B0LYbpy_E2L_1S1SVJB74T-fbpaC0aw",
     authDomain: "mysipat.firebaseapp.com",
@@ -2982,7 +3148,7 @@ const dbRef = firebase.database().ref('sipat_data');
 
 // Semua perubahan aplikasi ditulis langsung ke LocalStorage (cache) DAN Firebase.
 // Tidak ada lagi tombol Sinkron ke Cloud / Ambil dari Cloud.
-const CLOUD_KEYS = ['schoolProfile','adminPassword','users','mapel','ekskul','absensi','nilai','nilai_ekskul','tabungan','bintang','jurnal','kktp'];
+const CLOUD_KEYS = ['schoolProfile','adminPassword','users','mapel','ekskul','absensi','nilai','nilai_ekskul','tabungan','bintang','jurnal','kktp','chatMessages'];
 let firebaseReady = false;
 let applyingFirebaseData = false;
 
@@ -3056,11 +3222,17 @@ dbRef.on('value', snapshot => {
     loadNavSchool();
     populateLoginTapel();
     if (typeof refreshCurrentView === 'function') refreshCurrentView();
+     if (typeof refreshChatView === 'function') refreshChatView();
 }, err => {
     console.error('Firebase listener error:', err);
     firebaseReady = false;
     showCloudStatus('offline', 'Firebase tidak tersambung');
 });
+dbRef.child('chatMessages').on('value', snapshot => {
+    const cloudChat = snapshot.val() || {};
+    localStorage.setItem('chatMessages', JSON.stringify(cloudChat));
+    if (typeof refreshChatView === 'function') refreshChatView();
+}, err => console.error('Firebase chat listener error:', err));
 
 function filterRekapSaldo() {
     const input = document.getElementById('searchRekapSaldo');
