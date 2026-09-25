@@ -4189,17 +4189,31 @@ function initGuruViews() {
     gs.w=r.width;gs.h=r.height;
   }
   function makePlayer(){
-    const pl=effectivePlane();return{x:gs.w/2,y:gs.h-100,plane:pl,shots:0,inv:0};
+    const pl=effectivePlane();return{x:gs.w/2,y:gs.h-100,plane:pl,shots:0,inv:0,hp:3};
   }
   function spawnEnemy(force=false){
     if(!gs)return;
     const now=Date.now();if(!force && now-gs.lastSpawn<gs.spawnDelay)return;
     gs.lastSpawn=now;gs.spawnDelay=Math.max(300,1250-gs.level*60);
     const r=Math.random(), pool=r<.58?ENEMIES[0]:r<.87?ENEMIES[1]:r<.98?ENEMIES[2]:ENEMIES[3];
-    const e={...pool,x:25+Math.random()*(gs.w-50),y:-60,ang:0,hp:pool.hp,maxHp:pool.hp,phase:Math.random()*6.28};
+    const e={...pool,x:25+Math.random()*(gs.w-50),y:-60,ang:0,hp:pool.hp,maxHp:pool.hp,phase:Math.random()*6.28,lastFire:Date.now()+500+Math.random()*1200,fire:pool.fire||1500,bulletSpeed:pool.bulletSpeed||4.8,damage:pool.damage||1,bulletColor:pool.bulletColor||'#ef4444'};
     gs.enemies.push(e);
   }
   function bullet(x,y,dx,dy,type,damage=1,color='#fef08a'){gs.bullets.push({x,y,dx,dy,type,damage,color,life:0})}
+  function enemyFire(e){
+    if(!gs||gs.gameOver||!gs.player)return;
+    const now=Date.now(), interval=Math.max(850,(e.fire||1500)-gs.level*25);
+    if(!e.lastFire)e.lastFire=now+Math.random()*900;
+    if(now-e.lastFire<interval)return; e.lastFire=now;
+    const dx=gs.player.x-e.x,dy=gs.player.y-e.y,len=Math.hypot(dx,dy)||1,speed=e.bulletSpeed||4.8;
+    gs.enemyBullets.push({x:e.x,y:e.y+e.size*.7,dx:dx/len*speed,dy:dy/len*speed,damage:e.damage||1,color:e.bulletColor||'#ef4444',life:0});
+  }
+  function hitPlayer(damage=1){
+    if(!gs||gs.gameOver||gs.player.inv>0)return;
+    gs.player.inv=1300; gs.player.hp=Math.max(0,(gs.player.hp??3)-damage);
+    notify(gs.player.hp>0?'💥 Pesawat terkena tembakan musuh! HP '+gs.player.hp:'💥 Pesawat hancur! Klik Mulai Ulang untuk bermain lagi.');
+    if(gs.player.hp<=0){gs.gameOver=true;gs.keys.fire=false;}
+  }
   function fire(){
     if(!gs||gs.gameOver)return; const now=Date.now(),pl=gs.player, cd=pl.plane.fire;
     if(now-gs.lastFire<cd)return;gs.lastFire=now;
@@ -4243,11 +4257,18 @@ function initGuruViews() {
     p.x=clamp(p.x+gs.vel.x*dt/1000,30,gs.w-30);p.y=clamp(p.y+gs.vel.y*dt/1000,55,gs.h-55);
     if(gs.keys.fire)fire();
     if(p.inv>0)p.inv-=dt;
+    gs.enemies.forEach(e=>enemyFire(e));
     if(Date.now()-gs.lastBox>12000 && Math.random()<0.0015*dt){gs.boxes.push({x:35+Math.random()*(gs.w-70),y:-30,vy:1.4});gs.lastBox=Date.now();}
     spawnEnemy();
     gs.enemies.forEach(e=>{e.y+=e.speed*dt*.055;e.x+=Math.sin(e.phase+e.y/60)*.35;});
     gs.boxes.forEach(b=>b.y+=b.vy*dt*.05);
     gs.bullets.forEach(b=>{b.x+=b.dx*60*dt/1000;b.y+=b.dy*60*dt/1000;b.life+=dt});
+    gs.enemyBullets.forEach(b=>{b.x+=b.dx*60*dt/1000;b.y+=b.dy*60*dt/1000;b.life+=dt;});
+    gs.enemyBullets=gs.enemyBullets.filter(b=>{
+      if(b.y< -40||b.y>gs.h+40||b.x< -40||b.x>gs.w+40||b.life>3000)return false;
+      if(Math.hypot(b.x-p.x,b.y-p.y)<28){hitPlayer(b.damage);return false;}
+      return true;
+    });
     gs.enemies=gs.enemies.filter(e=>{
       if(e.y>gs.h+70)return false;
       for(let i=gs.bullets.length-1;i>=0;i--){const b=gs.bullets[i],dist=Math.hypot(e.x-b.x,e.y-b.y);if(dist<e.size+(b.type==='laser'?10:5)){const dead=hitEnemy(e,b);gs.bullets.splice(i,1);if(dead)return false;}}
@@ -4307,7 +4328,9 @@ function initGuruViews() {
     for(let i=0;i<28;i++){const xx=(i*97)%w,yy=(i*53+gs.t*.08)%h;c.fillStyle='rgba(255,255,255,.48)';c.fillRect(xx,yy,2,5)}
     gs.boxes.forEach(b=>{c.save();c.translate(b.x,b.y);c.rotate(Math.sin(gs.t/250)*.1);c.shadowColor='rgba(15,23,42,.25)';c.shadowBlur=8;c.fillStyle='#f59e0b';c.strokeStyle='#fff';c.lineWidth=3;c.fillRect(-17,-17,34,34);c.strokeRect(-17,-17,34,34);c.shadowBlur=0;c.fillStyle='#fff';c.font='20px sans-serif';c.textAlign='center';c.fillText('?',0,7);c.restore()});
     gs.bullets.forEach(b=>{c.save();c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=b.type==='laser'?8:4;c.shadowColor=b.color;c.shadowBlur=b.type==='laser'?14:6;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*.25,b.y-b.dy*.25);c.stroke();c.restore();});
+    gs.enemyBullets.forEach(b=>{c.save();c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=4;c.shadowColor=b.color;c.shadowBlur=9;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*1.8,b.y-b.dy*1.8);c.stroke();c.beginPath();c.arc(b.x,b.y,3.5,0,Math.PI*2);c.fill();c.restore();});
     gs.enemies.forEach(e=>drawEnemy(c,e));drawPlane(c,gs.player);
+    if(gs.player){c.save();c.fillStyle='rgba(15,23,42,.65)';c.fillRect(gs.player.x-28,gs.player.y+58,56,6);c.fillStyle='#22c55e';c.fillRect(gs.player.x-28,gs.player.y+58,56*((gs.player.hp??3)/3),6);c.font='bold 11px sans-serif';c.textAlign='center';c.fillStyle='#0f172a';c.fillText('HP '+(gs.player.hp??3),gs.player.x,gs.player.y+77);c.restore();}
     if(gs.remotePlayers) Object.values(gs.remotePlayers).forEach(r=>{if(r.id!==profileKey()){c.save();c.globalAlpha=.6;drawPlane(c,{x:r.x||50,y:r.y||80,plane:{color:r.color||'#22c55e',big:1},inv:0});c.restore();}});
   }
   function loop(ts){
@@ -4356,7 +4379,7 @@ function initGuruViews() {
     $('secSkyBattle')?.classList.remove('hidden');$('schoolFeatureDock')?.style.setProperty('display','flex');
     enterSkyFullscreen();
     if(gs){gs.vel=gs.vel||{x:0,y:0};resize();updateHud();return}
-    gs={canvas,ctx:canvas.getContext('2d',{alpha:false}),w:0,h:0,t:0,prev:performance.now(),acc:0,lastFire:0,lastSpawn:0,spawnDelay:900,lastBox:0,level:1,enemies:[],bullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{},onlineRef:null,presenceTimer:null,resizeHandler:null,vel:{x:0,y:0}};
+    gs={canvas,ctx:canvas.getContext('2d',{alpha:false}),w:0,h:0,t:0,prev:performance.now(),acc:0,lastFire:0,lastSpawn:0,spawnDelay:900,lastBox:0,level:1,enemies:[],bullets:[],enemyBullets:[],boxes:[],joy:{x:0,y:0},keys:{left:false,right:false,up:false,down:false,fire:false},remotePlayers:{},onlineRef:null,presenceTimer:null,resizeHandler:null,vel:{x:0,y:0}};
     resize();gs.player=makePlayer();setupControls();updateHud();notify('🌟 Mode online ringan aktif.');gs.raf=requestAnimationFrame(loop);
     gs.resizeHandler=()=>resize(); window.addEventListener('resize',gs.resizeHandler,{passive:true});
 
