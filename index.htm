@@ -339,6 +339,16 @@
 .sky-buy{margin-top:8px;width:100%;padding:8px;border-radius:11px;border:0;background:#2563eb;color:#fff;font-weight:900;cursor:pointer}
 .sky-buy[disabled]{background:#cbd5e1;color:#64748b;cursor:not-allowed}
 #skyLeaderMini{font-size:10px;color:#475569}
+
+        /* ===== MODE CEPAT: GAME DULU, PANEL KERJA LAZY ===== */
+        body.sky-home-mode #secAdmin, body.sky-home-mode #secGuru, body.sky-home-mode #secSiswa { display:none !important; }
+        body.sky-panel-mode #secSkyBattle { display:none !important; }
+        #secSkyBattle.sky-full-home { margin-top:0 !important; }
+        .rocket-panel-btn { background:linear-gradient(135deg,#f97316,#ef4444) !important; color:#fff !important; font-weight:1000 !important; box-shadow:0 5px 0 #9a3412,0 10px 25px rgba(239,68,68,.25); }
+        .rocket-panel-btn:active { transform:translateY(2px); box-shadow:0 3px 0 #9a3412; }
+        #skyBackToGame { display:none; }
+        body.sky-panel-mode #skyBackToGame { display:inline-flex; }
+        @media (max-width:640px){ #schoolFeatureDock{gap:5px!important;padding:7px!important;} #schoolFeatureDock button{font-size:10px!important;padding:9px 10px!important;} }
 #schoolFeatureDock{position:fixed;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:80;display:none;gap:6px;padding:7px;background:rgba(15,23,42,.92);border:2px solid rgba(255,255,255,.2);border-radius:20px;box-shadow:0 14px 40px rgba(15,23,42,.28);backdrop-filter:blur(12px);max-width:calc(100vw - 16px);overflow-x:auto}
 #schoolFeatureDock button{white-space:nowrap;border:0;border-radius:13px!important;padding:9px 12px;color:#fff;background:rgba(255,255,255,.1);font-size:11px;font-weight:900;cursor:pointer}
 #schoolFeatureDock button:hover{background:rgba(59,130,246,.75)}
@@ -1398,8 +1408,8 @@
 </section>
 
 <div id="schoolFeatureDock" class="no-print">
-  <button onclick="scrollToRoleDashboard()">🏫 Fitur <span id="dockRole">Saya</span></button>
-  <button onclick="scrollToSkyBattle()">✈️ Game</button>
+  <button class="rocket-panel-btn" onclick="openRolePanel()">🚀 Panel <span id="dockRole">Saya</span></button>
+  <button id="skyBackToGame" onclick="showGameHome()">✈️ Kembali Game</button>
   <button onclick="toggleChat(true)">💬 Chat</button>
   <button onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆️ Atas</button>
 </div>
@@ -1496,6 +1506,9 @@
         if (!localStorage.getItem('chatMessages')) localStorage.setItem('chatMessages', JSON.stringify({}));
 
         let currentUser = null;
+        // Panel kerja dimuat secara LAZY: game tampil dulu setelah login.
+        let rolePanelLoaded = { Admin:false, Guru:false, Siswa:false };
+        let rolePanelOpening = false;
         let chartInstanceAbsen = null;
         let chartInstanceNilai = null;
 
@@ -1769,6 +1782,8 @@
         function logout() {
             if (typeof stopSpaceGame === 'function') stopSpaceGame();
             currentUser = null;
+            rolePanelLoaded = {Admin:false, Guru:false, Siswa:false};
+            document.body.classList.remove('sky-home-mode','sky-panel-mode');
             toggleChat(false);
             const chatWidget = document.getElementById('chatWidget');
             if (chatWidget) chatWidget.classList.add('hidden');
@@ -1785,7 +1800,6 @@
 
         function showDashboard(role) {
             document.getElementById('secLogin').classList.add('hidden');
-            if (typeof initSpaceGame === 'function') initSpaceGame();
             document.getElementById('userInfo').classList.remove('hidden');
             const chatWidget = document.getElementById('chatWidget');
             if (chatWidget) chatWidget.classList.remove('hidden');
@@ -1793,30 +1807,83 @@
             updateChatAdminControls();
             renderChatMessages();
 
-            const profile = JSON.parse(localStorage.getItem('schoolProfile'));
+            const profile = JSON.parse(localStorage.getItem('schoolProfile') || '{}');
             const currentTapel = profile.tapel || "-";
-
             const adminTools = document.getElementById('adminDataTools');
             if (adminTools) adminTools.classList.toggle('admin-only', role !== "Admin");
 
+            // Sembunyikan panel kerja dan tampilkan GAME sebagai halaman utama.
+            document.body.classList.add('sky-home-mode');
+            document.body.classList.remove('sky-panel-mode');
+            ['secAdmin','secGuru','secSiswa'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
+
             if (role === "Admin") {
-                document.getElementById('secAdmin').classList.remove('hidden');
-                initAdminDashboard();
+                document.getElementById('guruTitle') && (document.getElementById('guruTitle').innerText = 'Panel Kerja Administrator');
             } else if (role === "Guru") {
-                document.getElementById('secGuru').classList.remove('hidden');
-                populateGuruKelasAktif();
-                document.getElementById('guruTitle').innerText = `Panel Kerja ${currentUser.jenisGuru || 'Guru'} - Kelas ${getGuruKelasAktif() || currentUser.kelas}`;
-                document.getElementById('txtGuruTapel').innerText = `TP: ${currentUser.tapel || currentTapel}`;
-                applyGuruAccess();
-                initGuruViews();
-                refreshChatPartners();
+                document.getElementById('guruTitle') && (document.getElementById('guruTitle').innerText = `Panel Kerja ${currentUser.jenisGuru || 'Guru'} - Kelas ${currentUser.kelas || '-'}`);
+                document.getElementById('txtGuruTapel') && (document.getElementById('txtGuruTapel').innerText = `TP: ${currentUser.tapel || currentTapel}`);
             } else if (role === "Siswa") {
-                document.getElementById('secSiswa').classList.remove('hidden');
-                document.getElementById('siswaTitle').innerText = `Hallo My Little Bolu Ketan, Selamat Datang ${currentUser.nama}! (Kelas ${currentUser.kelas})`;
-                document.getElementById('txtSiswaTapel').innerText = `TP: ${currentTapel}`;
-                loadSiswaDashboard();
-                refreshChatPartners();
+                document.getElementById('siswaTitle') && (document.getElementById('siswaTitle').innerText = `Hallo My Little Bolu Ketan, Selamat Datang ${currentUser.nama}! (Kelas ${currentUser.kelas})`);
+                document.getElementById('txtSiswaTapel') && (document.getElementById('txtSiswaTapel').innerText = `TP: ${currentTapel}`);
             }
+
+            if (typeof initSpaceGame === 'function') initSpaceGame();
+            // Langsung fokus ke game agar pengguna tidak perlu mencari-cari.
+            requestAnimationFrame(() => {
+                document.getElementById('secSkyBattle')?.scrollIntoView({behavior:'auto', block:'start'});
+            });
+        }
+
+        // Panel kerja dibuka hanya ketika tombol 🚀 ditekan. Inisialisasi berat ditunda
+        // sampai panel benar-benar dibutuhkan sehingga login tetap ringan.
+        function openRolePanel(){
+            if(!currentUser || rolePanelOpening) return;
+            rolePanelOpening = true;
+            document.body.classList.remove('sky-home-mode');
+            document.body.classList.add('sky-panel-mode');
+            document.getElementById('secSkyBattle')?.classList.add('hidden');
+            const role=currentUser.role;
+            const target=role==='Admin'?'secAdmin':role==='Guru'?'secGuru':'secSiswa';
+            ['secAdmin','secGuru','secSiswa'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));
+            document.getElementById(target)?.classList.remove('hidden');
+            document.getElementById(target)?.scrollIntoView({behavior:'auto',block:'start'});
+            document.getElementById('dockRole') && (document.getElementById('dockRole').textContent='Kembali');
+
+            // Beri browser kesempatan menggambar panel dulu sebelum pekerjaan berat berjalan.
+            setTimeout(()=>{
+                try{
+                    if(role==='Admin'){
+                        if(!rolePanelLoaded.Admin){ initAdminDashboard(); rolePanelLoaded.Admin=true; }
+                        else if(typeof loadAdminUsers==='function') loadAdminUsers();
+                    } else if(role==='Guru'){
+                        if(!rolePanelLoaded.Guru){
+                            populateGuruKelasAktif();
+                            applyGuruAccess();
+                            initGuruViews();
+                            refreshChatPartners();
+                            rolePanelLoaded.Guru=true;
+                        } else {
+                            populateGuruKelasAktif();
+                            applyGuruAccess();
+                        }
+                    } else {
+                        if(!rolePanelLoaded.Siswa){ loadSiswaDashboard(); refreshChatPartners(); rolePanelLoaded.Siswa=true; }
+                    }
+                }catch(err){ console.error('Gagal membuka panel kerja:',err); }
+                rolePanelOpening=false;
+            },60);
+        }
+
+        function showGameHome(){
+            if(!currentUser) return;
+            rolePanelOpening=false;
+            document.body.classList.add('sky-home-mode');
+            document.body.classList.remove('sky-panel-mode');
+            ['secAdmin','secGuru','secSiswa'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));
+            document.getElementById('secSkyBattle')?.classList.remove('hidden');
+            document.getElementById('dockRole') && (document.getElementById('dockRole').textContent='Saya');
+            if(typeof initSpaceGame==='function') initSpaceGame();
+            requestAnimationFrame(()=>document.getElementById('secSkyBattle')?.scrollIntoView({behavior:'smooth',block:'start'}));
         }
 
         function switchAdminTab(tabId) {
