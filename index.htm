@@ -3946,103 +3946,399 @@ function initGuruViews() {
     </script>
 
 <!-- ===== SIPAT SCHOOL LIFE 3D - GAME KEGIATAN V2 ===== -->
-<style id="sipat-school-life-3d-v2-style">
-  #sipat3DGameV2{position:fixed;inset:0;z-index:100000;display:none;overflow:hidden;background:#8ed8ff;font-family:Arial,sans-serif}
-  #sipat3DGameV2.open{display:block}
-  .s3d-top{position:absolute;top:0;left:0;right:0;height:64px;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;background:linear-gradient(180deg,rgba(15,23,42,.96),rgba(15,23,42,.78));color:#fff;box-shadow:0 8px 25px rgba(0,0,0,.2)}
-  .s3d-user{display:flex;align-items:center;gap:10px;min-width:0}.s3d-avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#fbbf24,#f97316);font-size:22px;box-shadow:inset 0 2px 4px rgba(255,255,255,.35),0 4px 10px rgba(0,0,0,.25)}
-  .s3d-user b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}.s3d-user small{display:block;color:#cbd5e1;font-size:10px;margin-top:2px}
-  .s3d-top-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.s3d-btn{border:0;border-radius:12px!important;padding:9px 12px;color:#fff;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.22)}.s3d-panel{background:#2563eb}.s3d-exit{background:#dc2626}.s3d-btn:active{transform:translateY(1px)}
 
-  .s3d-world{position:absolute;inset:64px 0 0;perspective:1100px;overflow:hidden;background:linear-gradient(#7dd3fc 0 43%,#bae6fd 43% 48%,#65a30d 48% 100%)}
-  .s3d-sun{position:absolute;right:8%;top:7%;width:74px;height:74px;border-radius:50%;background:#fde047;box-shadow:0 0 40px rgba(253,224,71,.75)}
-  .s3d-cloud{position:absolute;width:150px;height:45px;border-radius:50px;background:rgba(255,255,255,.82);filter:blur(.3px)}.s3d-cloud:before,.s3d-cloud:after{content:"";position:absolute;border-radius:50%;background:inherit}.s3d-cloud:before{width:65px;height:65px;left:25px;bottom:4px}.s3d-cloud:after{width:52px;height:52px;right:24px;bottom:0}.s3d-cloud.c1{left:8%;top:13%}.s3d-cloud.c2{left:54%;top:8%;transform:scale(.72)}
-  .s3d-ground{position:absolute;left:-20%;right:-20%;bottom:-30%;height:68%;transform:rotateX(58deg);transform-origin:center bottom;background-color:#4d9f43;background-image:linear-gradient(90deg,rgba(255,255,255,.09) 2px,transparent 2px),linear-gradient(rgba(255,255,255,.09) 2px,transparent 2px);background-size:60px 60px;box-shadow:inset 0 25px 80px rgba(0,0,0,.2)}
-  .s3d-road{position:absolute;left:-15%;right:-15%;bottom:22%;height:90px;transform:rotateX(58deg);background:#d6c7a1;box-shadow:inset 0 12px 20px rgba(0,0,0,.12)}
-  .s3d-road2{position:absolute;left:45%;bottom:-5%;width:100px;height:80%;transform:rotateX(58deg);background:#d6c7a1;opacity:.9}
-  .s3d-school{position:absolute;left:50%;top:24%;width:310px;height:175px;transform:translateX(-50%) translateZ(60px);background:#fff7ed;border:8px solid #b45309;box-shadow:0 28px 35px rgba(0,0,0,.25);border-radius:8px}.s3d-school:before{content:"SD SIPAT";position:absolute;left:50%;top:14px;transform:translateX(-50%);font-size:22px;font-weight:1000;color:#1e3a8a}.s3d-roof{position:absolute;left:-36px;right:-36px;top:-68px;height:82px;background:#dc2626;clip-path:polygon(50% 0,100% 100%,0 100%);filter:drop-shadow(0 9px 4px rgba(0,0,0,.18))}.s3d-door{position:absolute;bottom:0;left:132px;width:48px;height:82px;background:#7c2d12;border:4px solid #431407}.s3d-window{position:absolute;top:66px;width:55px;height:48px;background:#7dd3fc;border:5px solid #1e3a8a}.s3d-window.wl{left:25px}.s3d-window.wr{right:25px}
+<!-- ===== SIPAT SCHOOL LIFE 3D - THREE.JS + FIREBASE REALTIME ===== -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
-  .s3d-location{position:absolute;z-index:10;min-width:150px;padding:10px 12px;border:3px solid rgba(255,255,255,.95);border-radius:16px;background:linear-gradient(145deg,rgba(15,23,42,.88),rgba(30,64,175,.78));color:#fff;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,.25);cursor:pointer;transform-style:preserve-3d;transition:.18s}.s3d-location:hover{transform:translateY(-5px) rotateX(4deg) rotateY(-4deg) scale(1.03)}.s3d-location b{display:block;font-size:13px}.s3d-location small{display:block;margin-top:3px;color:#dbeafe;font-size:9px}.s3d-location .ico{font-size:28px;display:block;margin-bottom:3px}.loc-class{left:10%;top:46%}.loc-field{right:8%;top:48%}.loc-canteen{left:9%;bottom:12%}.loc-garden{right:8%;bottom:13%}.loc-library{left:39%;top:48%}.loc-ceremony{left:39%;bottom:13%}
-
-  .s3d-character{position:absolute;z-index:15;left:50%;bottom:19%;width:66px;height:106px;transform:translateX(-50%);transition:left .35s,bottom .35s;filter:drop-shadow(0 9px 5px rgba(0,0,0,.28));pointer-events:none}.s3d-head{width:38px;height:38px;margin:auto;border-radius:50%;background:#f2c6a0;border:3px solid rgba(0,0,0,.2)}.s3d-body{width:54px;height:48px;margin:0 auto;background:#2563eb;border:3px solid #1e3a8a;border-radius:11px 11px 7px 7px}.s3d-character.guru .s3d-body{background:#166534;border-color:#14532d}.s3d-character.admin .s3d-body{background:#7c3aed;border-color:#4c1d95}.s3d-label{position:absolute;top:-24px;left:50%;transform:translateX(-50%);white-space:nowrap;background:rgba(15,23,42,.9);color:#fff;border-radius:8px;padding:3px 7px;font-size:9px;font-weight:900}
-
-  .s3d-hint{position:absolute;left:14px;top:14px;z-index:30;padding:8px 11px;border-radius:12px;background:rgba(255,255,255,.9);color:#0f172a;font-size:10px;font-weight:800;box-shadow:0 5px 14px rgba(0,0,0,.12)}
-  .s3d-points{position:absolute;right:14px;top:14px;z-index:30;padding:8px 11px;border-radius:12px;background:rgba(15,23,42,.82);color:#fff;font-size:10px;font-weight:900}
-
-  .s3d-select{position:absolute;inset:64px 0 0;z-index:80;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(2,6,23,.38);backdrop-filter:blur(4px)}.s3d-select.open{display:flex}.s3d-select-card{width:min(980px,94vw);max-height:88vh;overflow:auto;padding:20px;border-radius:28px;background:linear-gradient(180deg,#fff,#eff6ff);box-shadow:0 25px 80px rgba(0,0,0,.35);border:3px solid #fff}.s3d-select-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.s3d-select-head h2{margin:0;color:#1e3a8a;font-size:22px}.s3d-select-head small{display:block;color:#64748b;margin-top:3px}.s3d-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.s3d-card{position:relative;min-height:150px;padding:15px;border:2px solid #bfdbfe;border-radius:22px;background:linear-gradient(145deg,#fff,#dbeafe);cursor:pointer;transform-style:preserve-3d;box-shadow:0 10px 0 #93c5fd,0 16px 24px rgba(30,64,175,.15);transition:.18s}.s3d-card:hover{transform:perspective(700px) rotateX(7deg) rotateY(-7deg) translateY(-5px);box-shadow:0 13px 0 #60a5fa,0 20px 30px rgba(30,64,175,.2)}.s3d-card .icon{font-size:42px;filter:drop-shadow(0 5px 3px rgba(0,0,0,.18))}.s3d-card h3{margin:6px 0 3px;color:#0f172a;font-size:15px}.s3d-card p{margin:0;color:#475569;font-size:10px;line-height:1.45}.s3d-card .tag{position:absolute;right:10px;top:10px;padding:4px 7px;border-radius:999px;background:#1d4ed8;color:#fff;font-size:8px;font-weight:900}
-
-  .s3d-activity{position:absolute;inset:64px 0 0;z-index:90;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(2,6,23,.48);backdrop-filter:blur(5px)}.s3d-activity.open{display:flex}.s3d-activity-card{width:min(850px,94vw);max-height:88vh;overflow:auto;border-radius:28px;background:#fff;box-shadow:0 25px 80px rgba(0,0,0,.42);border:4px solid #fff}.s3d-activity-scene{position:relative;min-height:330px;overflow:hidden;padding:24px;background:linear-gradient(180deg,#7dd3fc 0 45%,#65a30d 45%);perspective:900px}.s3d-activity-scene:after{content:"";position:absolute;left:-20%;right:-20%;bottom:-35%;height:58%;transform:rotateX(60deg);background:repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 2px,transparent 2px 55px),repeating-linear-gradient(0deg,rgba(255,255,255,.08) 0 2px,transparent 2px 55px),#4d9f43}.s3d-scene-title{position:relative;z-index:4;color:#fff;text-shadow:0 3px 5px #0f172a}.s3d-scene-title h2{margin:0;font-size:26px}.s3d-scene-title p{margin:5px 0;font-size:11px;max-width:600px}.s3d-object{position:absolute;z-index:5;transform-style:preserve-3d;box-shadow:0 18px 20px rgba(0,0,0,.22)}.obj-class{left:34%;bottom:25%;width:300px;height:145px;background:#fff7ed;border:7px solid #b45309;transform:rotateX(5deg) rotateY(-8deg)}.obj-class:before{content:"PAPAN TULIS • KELAS";position:absolute;left:50%;top:18px;transform:translateX(-50%);background:#fff;color:#1e3a8a;padding:7px 14px;font-weight:900}.obj-field{left:22%;right:22%;bottom:10%;height:190px;border:5px solid #fff;background:#4ade80;transform:rotateX(52deg);transform-origin:center bottom}.obj-field:before{content:"";position:absolute;inset:18px;border:4px solid #fff}.obj-field:after{content:"";position:absolute;left:50%;top:50%;width:55px;height:55px;border:4px solid #fff;border-radius:50%;transform:translate(-50%,-50%)}.obj-canteen{left:26%;bottom:22%;width:48%;height:120px;background:#fef3c7;border:6px solid #92400e;transform:rotateY(-8deg)}.obj-canteen:before{content:"KANTIN SEKOLAH";position:absolute;left:50%;top:20px;transform:translateX(-50%);font-weight:1000;color:#92400e;font-size:20px}.obj-garden{left:18%;right:18%;bottom:12%;height:120px;background:#84cc16;border:6px solid #854d0e;transform:rotateX(52deg)}.obj-garden:after{content:"🌱  🌱  🌱  🌱  🌱";position:absolute;left:50%;top:30px;transform:translateX(-50%);font-size:35px;white-space:nowrap}.obj-library{left:26%;bottom:20%;width:48%;height:170px;background:#fde68a;border:6px solid #92400e;transform:rotateY(7deg)}.obj-library:before{content:"📚 PERPUSTAKAAN";position:absolute;left:50%;top:18px;transform:translateX(-50%);font-size:20px;font-weight:1000;color:#78350f}.obj-ceremony{left:24%;right:24%;bottom:16%;height:150px;background:#4ade80;border:5px solid #fff;transform:rotateX(55deg)}.obj-ceremony:before{content:"🇮🇩 LAPANGAN UPACARA";position:absolute;left:50%;top:35px;transform:translateX(-50%);font-size:18px;font-weight:1000;color:#fff;text-shadow:0 2px 3px #14532d;white-space:nowrap}
-  .s3d-activity-body{padding:16px 18px 18px}.s3d-activity-body h3{margin:0 0 5px;color:#0f172a}.s3d-activity-body p{font-size:11px;color:#64748b;margin:0 0 12px}.s3d-choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.s3d-choice{border:2px solid #dbeafe;background:#eff6ff;border-radius:14px;padding:11px;text-align:left;cursor:pointer;font-weight:900;color:#1e3a8a}.s3d-choice:hover{background:#dbeafe}.s3d-choice small{display:block;color:#64748b;font-weight:600;font-size:9px;margin-top:3px}.s3d-activity-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:13px}.s3d-action-btn{border:0;border-radius:12px!important;padding:10px 14px;font-weight:900;cursor:pointer}.s3d-enter{background:#16a34a;color:#fff}.s3d-close{background:#e2e8f0;color:#334155}
-  .s3d-active{position:absolute;inset:64px 0 0;z-index:70;display:none;overflow:hidden;background:#8ed8ff}.s3d-active.open{display:block}.s3d-active-world{position:absolute;inset:0;background:linear-gradient(#7dd3fc 0 42%,#65a30d 42%);perspective:900px}.s3d-active-ground{position:absolute;left:-20%;right:-20%;bottom:-25%;height:70%;transform:rotateX(58deg);background:repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 2px,transparent 2px 55px),repeating-linear-gradient(0deg,rgba(255,255,255,.08) 0 2px,transparent 2px 55px),#4d9f43}.s3d-active-title{position:absolute;z-index:10;top:16px;left:16px;padding:10px 13px;border-radius:14px;background:rgba(15,23,42,.88);color:#fff}.s3d-active-title b{font-size:15px}.s3d-active-title small{display:block;font-size:9px;color:#cbd5e1;margin-top:3px}.s3d-task{position:absolute;z-index:20;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,90vw);padding:20px;border-radius:22px;background:rgba(255,255,255,.96);box-shadow:0 20px 55px rgba(0,0,0,.3);text-align:center}.s3d-task h2{margin:0;color:#1e3a8a}.s3d-task p{font-size:11px;color:#475569;line-height:1.5}.s3d-task button{margin:4px}.s3d-real-object{font-size:70px;filter:drop-shadow(0 12px 7px rgba(0,0,0,.25));margin:12px}.s3d-status{position:absolute;right:16px;top:16px;z-index:15;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.9);font-size:10px;font-weight:900;color:#0f172a}.s3d-exit-activity{position:absolute;z-index:30;right:16px;bottom:16px;border:0;border-radius:13px;padding:11px 15px;background:#dc2626;color:#fff;font-weight:900;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.25)}
-  .s3d-toast{position:absolute;z-index:200;left:50%;top:78px;transform:translateX(-50%) translateY(-10px);opacity:0;pointer-events:none;background:rgba(15,23,42,.92);color:#fff;padding:10px 14px;border-radius:13px;font-size:11px;font-weight:900;transition:.2s}.s3d-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  @media(max-width:800px){.s3d-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.s3d-location{min-width:125px}.s3d-location .ico{font-size:23px}.s3d-school{transform:translateX(-50%) scale(.78);top:20%}.s3d-choice-grid{grid-template-columns:1fr 1fr}.s3d-top{height:58px}.s3d-world,.s3d-select,.s3d-activity,.s3d-active{inset:58px 0 0}.s3d-user b{max-width:150px}.s3d-btn{padding:8px 9px;font-size:10px}}
-  @media(max-width:520px){.s3d-grid{grid-template-columns:1fr 1fr;gap:10px}.s3d-card{min-height:135px;padding:11px}.s3d-card .icon{font-size:32px}.s3d-card h3{font-size:12px}.s3d-card p{font-size:9px}.s3d-select-card{padding:13px}.s3d-select-head h2{font-size:17px}.s3d-location{min-width:100px;padding:7px 8px}.s3d-location b{font-size:10px}.s3d-location small{font-size:7px}.loc-class{left:4%;top:45%}.loc-field{right:4%;top:47%}.loc-library{left:37%;top:47%}.loc-canteen{left:4%;bottom:10%}.loc-garden{right:4%;bottom:11%}.loc-ceremony{left:36%;bottom:10%}.s3d-hint{display:none}.s3d-choice-grid{grid-template-columns:1fr}.s3d-activity-scene{min-height:270px}.obj-class{transform:scale(.72);left:18%;bottom:17%}.obj-field{left:8%;right:8%;height:145px}.obj-canteen{left:14%;width:72%}.obj-garden{left:8%;right:8%}.obj-library{left:14%;width:72%}.obj-ceremony{left:8%;right:8%}.s3d-active-title{max-width:70%}.s3d-active-title b{font-size:12px}}
+<style id="sipat-school-life-3d-v3-style">
+#sipat3DGameV2{position:fixed;inset:0;z-index:100000;display:none;background:#08111f;color:#e2e8f0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#sipat3DGameV2.open{display:block}
+#s3dCanvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.s3d-ui{position:absolute;inset:0;pointer-events:none}
+.s3d-topbar{height:64px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;background:linear-gradient(90deg,rgba(15,23,42,.96),rgba(30,64,175,.90));box-shadow:0 8px 28px rgba(0,0,0,.25);pointer-events:auto}
+.s3d-user{display:flex;align-items:center;gap:10px;min-width:0}.s3d-avatar{width:42px;height:42px;border-radius:14px;background:#fff;display:grid;place-items:center;font-size:24px}.s3d-user b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:310px}.s3d-user small{display:block;color:#cbd5e1;font-size:10px;margin-top:2px}
+.s3d-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.s3d-btn{border:0;border-radius:12px!important;padding:9px 12px;font-weight:900;cursor:pointer;color:#fff;background:#2563eb}.s3d-btn:hover{filter:brightness(1.08)}.s3d-btn.green{background:#16a34a}.s3d-btn.amber{background:#d97706}.s3d-btn.rose{background:#dc2626}.s3d-btn.slate{background:#475569}
+.s3d-hud{position:absolute;left:14px;bottom:14px;display:flex;gap:8px;flex-wrap:wrap;pointer-events:auto}.s3d-pill{padding:8px 11px;border-radius:999px;background:rgba(15,23,42,.86);border:1px solid rgba(255,255,255,.12);font-size:11px;font-weight:900;box-shadow:0 7px 20px rgba(0,0,0,.22)}
+.s3d-help{position:absolute;right:14px;bottom:14px;max-width:360px;padding:10px 12px;border-radius:14px;background:rgba(15,23,42,.80);font-size:10px;color:#cbd5e1;pointer-events:none}
+.s3d-panel{position:absolute;right:12px;top:76px;width:min(470px,calc(100vw - 24px));max-height:calc(100vh - 90px);overflow:auto;background:rgba(248,250,252,.98);color:#0f172a;border-radius:20px;box-shadow:0 25px 80px rgba(0,0,0,.40);padding:14px;pointer-events:auto;display:none}
+.s3d-panel.open{display:block}.s3d-panel h2{font-size:17px;margin:0}.s3d-panel h3{font-size:12px;margin:14px 0 7px}.s3d-panel-head{display:flex;justify-content:space-between;align-items:center;gap:8px}.s3d-close{border:0;background:#e2e8f0;border-radius:10px;padding:7px 10px;font-weight:900;cursor:pointer}
+.s3d-tabs{display:flex;gap:6px;overflow:auto;padding:8px 0}.s3d-tab{white-space:nowrap;border:0;border-radius:10px;background:#e2e8f0;padding:7px 9px;font-size:10px;font-weight:900;cursor:pointer}.s3d-tab.active{background:#2563eb;color:#fff}
+.s3d-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:10px;margin-bottom:8px}.s3d-card-row{display:flex;align-items:center;justify-content:space-between;gap:8px}.s3d-card small{color:#64748b;font-size:9px}.s3d-online-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block}.s3d-input,.s3d-select{width:100%;border:1px solid #cbd5e1;border-radius:10px;padding:8px;font-size:11px;background:#fff;color:#0f172a}.s3d-grid2{display:grid;grid-template-columns:1fr 1fr;gap:7px}.s3d-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.s3d-location-btn{border:1px solid #bfdbfe;background:#eff6ff;border-radius:12px;padding:9px;text-align:left;font-weight:900;font-size:10px;cursor:pointer}.s3d-location-btn:hover{background:#dbeafe}
+.s3d-toast{position:absolute;left:50%;top:78px;transform:translateX(-50%) translateY(-10px);opacity:0;transition:.2s;background:rgba(15,23,42,.94);color:#fff;padding:10px 14px;border-radius:12px;font-size:11px;font-weight:900;pointer-events:none;z-index:10}.s3d-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.s3d-modal{position:absolute;inset:0;background:rgba(2,6,23,.58);display:none;align-items:center;justify-content:center;padding:16px;pointer-events:auto}.s3d-modal.open{display:flex}.s3d-modal-card{width:min(600px,95vw);max-height:90vh;overflow:auto;background:#fff;color:#0f172a;border-radius:22px;padding:18px;box-shadow:0 30px 100px rgba(0,0,0,.45)}
+.s3d-youtube{width:100%;aspect-ratio:16/9;border:0;border-radius:14px;background:#0f172a}.s3d-mic{padding:10px;border-radius:12px;background:#f1f5f9;font-size:10px}.s3d-meter{height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden;margin-top:6px}.s3d-meter i{display:block;height:100%;width:0;background:#22c55e;transition:width .08s}
+.s3d-task-box{border:2px solid #fde68a;background:#fffbeb;border-radius:14px;padding:12px}.s3d-task-box.done{border-color:#bbf7d0;background:#f0fdf4}.s3d-badge{display:inline-block;padding:4px 7px;border-radius:999px;background:#dbeafe;color:#1d4ed8;font-size:9px;font-weight:900}
+.s3d-score{font-size:20px;font-weight:1000;color:#1d4ed8}
+@media(max-width:700px){.s3d-user b{max-width:170px}.s3d-help{display:none}.s3d-topbar{height:58px}.s3d-panel{top:68px}.s3d-grid3{grid-template-columns:1fr 1fr}.s3d-actions .optional{display:none}}
 </style>
 
 <div id="sipat3DGameV2" aria-label="SIPAT School Life 3D">
-  <div class="s3d-top">
-    <div class="s3d-user"><div id="s3dAvatar" class="s3d-avatar">🎒</div><div><b id="s3dUserName">Pengguna</b><small id="s3dUserRole">Role • Kelas</small></div></div>
-    <div class="s3d-top-actions"><button class="s3d-btn s3d-panel" onclick="sipat3DOpenPanel()">☰ Panel</button><button class="s3d-btn s3d-exit" onclick="sipat3DExitGame()">⏻ Keluar Game</button></div>
+  <canvas id="s3dCanvas"></canvas>
+  <div class="s3d-ui">
+    <div class="s3d-topbar">
+      <div class="s3d-user">
+        <div id="s3dAvatar" class="s3d-avatar">🎒</div>
+        <div><b id="s3dUserName">Pengguna</b><small id="s3dUserRole">Role</small></div>
+      </div>
+      <div class="s3d-actions">
+        <button class="s3d-btn green" onclick="sipat3DOpenPanel()">☰ Panel</button>
+        <button class="s3d-btn amber optional" onclick="sipat3DOpenLocations()">🏫 Lokasi</button>
+        <button class="s3d-btn slate" onclick="sipat3DExitGame()">⏻ Keluar</button>
+      </div>
+    </div>
+
+    <div class="s3d-hud">
+      <div class="s3d-pill">⭐ Poin: <span id="s3dPoints">0</span></div>
+      <div class="s3d-pill">🟢 Online: <span id="s3dOnlineCount">1</span></div>
+      <div class="s3d-pill">📍 <span id="s3dLocationName">Halaman Sekolah</span></div>
+    </div>
+    <div class="s3d-help">🎮 Gerak: WASD / tombol panah • Kamera mengikuti karakter • Semua pengguna login terlihat bergerak real-time</div>
+    <div id="s3dToast" class="s3d-toast"></div>
+
+    <div id="s3dPanel" class="s3d-panel">
+      <div class="s3d-panel-head"><div><h2>🏫 SIPAT School Life 3D</h2><small id="s3dPanelSubtitle">Aktivitas sekolah tersinkron otomatis.</small></div><button class="s3d-close" onclick="sipat3DClosePanel()">✕</button></div>
+      <div class="s3d-tabs">
+        <button id="tabWorld" class="s3d-tab active" onclick="s3dPanelTab('world')">🌍 Dunia</button>
+        <button id="tabOnline" class="s3d-tab" onclick="s3dPanelTab('online')">🟢 Pengguna Online</button>
+        <button id="tabTasks" class="s3d-tab" onclick="s3dPanelTab('tasks')">📋 Tugas</button>
+        <button id="tabKaraoke" class="s3d-tab" onclick="s3dPanelTab('karaoke')">🎤 Panggung</button>
+        <button id="tabMonitor" class="s3d-tab" onclick="s3dPanelTab('monitor')">📊 Monitoring</button>
+      </div>
+      <div id="s3dPanelContent"></div>
+    </div>
+
+    <div id="s3dLocationModal" class="s3d-modal">
+      <div class="s3d-modal-card">
+        <div class="s3d-panel-head"><h2>📍 Pilih Lokasi Sekolah</h2><button class="s3d-close" onclick="sipat3DCloseLocations()">✕</button></div>
+        <p style="font-size:10px;color:#64748b">Masuk ke lokasi untuk melakukan aktivitas. Perubahan lokasi dan aktivitas dicatat ke Firebase.</p>
+        <div id="s3dLocationGrid" class="s3d-grid2"></div>
+      </div>
+    </div>
+
+    <div id="s3dKaraokeModal" class="s3d-modal">
+      <div class="s3d-modal-card">
+        <div class="s3d-panel-head"><h2>🎤 Panggung & Karaoke</h2><button class="s3d-close" onclick="s3dCloseKaraoke()">✕</button></div>
+        <p style="font-size:10px;color:#64748b">Pilih video YouTube. Mikrofon digunakan secara lokal di perangkat; audio mikrofon tidak dikirim ke Firebase.</p>
+        <input id="s3dYoutubeUrl" class="s3d-input" placeholder="Tempel URL YouTube, contoh: https://www.youtube.com/watch?v=..." />
+        <div class="s3d-grid2" style="margin-top:7px">
+          <button class="s3d-btn" onclick="s3dPlayYoutube()">▶ Putar Lagu</button>
+          <button class="s3d-btn green" onclick="s3dToggleMic()">🎙️ Nyalakan Mikrofon</button>
+        </div>
+        <div class="s3d-mic" style="margin-top:8px">Status mikrofon: <b id="s3dMicStatus">belum aktif</b><div class="s3d-meter"><i id="s3dMicMeter"></i></div></div>
+        <iframe id="s3dYoutubeFrame" class="s3d-youtube" style="margin-top:10px" allow="autoplay; encrypted-media; microphone" allowfullscreen></iframe>
+      </div>
+    </div>
+
+    <div id="s3dPunishModal" class="s3d-modal">
+      <div class="s3d-modal-card">
+        <div class="s3d-panel-head"><h2>🏃 Tugas Pembinaan</h2><button class="s3d-close" onclick="s3dCloseTaskCreator()">✕</button></div>
+        <p style="font-size:10px;color:#64748b">Guru/Admin dapat memberikan tugas kebugaran terbatas. Gunakan jumlah yang wajar dan sesuai kondisi siswa.</p>
+        <input type="hidden" id="s3dPunishTarget">
+        <label style="font-size:10px;font-weight:900">Jenis tugas</label>
+        <select id="s3dPunishType" class="s3d-select" style="margin:5px 0 8px">
+          <option value="Push Up">Push Up</option>
+          <option value="Squat Jump">Squat Jump</option>
+        </select>
+        <label style="font-size:10px;font-weight:900">Jumlah pengulangan (maks. 20)</label>
+        <input id="s3dPunishCount" class="s3d-input" type="number" min="1" max="20" value="5">
+        <button class="s3d-btn amber" style="margin-top:9px;width:100%" onclick="s3dAssignTask()">📨 Kirim Tugas</button>
+      </div>
+    </div>
   </div>
-
-  <div id="s3dWorld" class="s3d-world">
-    <div class="s3d-sun"></div><div class="s3d-cloud c1"></div><div class="s3d-cloud c2"></div><div class="s3d-ground"></div><div class="s3d-road"></div><div class="s3d-road2"></div>
-    <div class="s3d-school"><div class="s3d-roof"></div><div class="s3d-window wl"></div><div class="s3d-window wr"></div><div class="s3d-door"></div></div>
-    <button class="s3d-location loc-class" onclick="sipat3DSelectActivity('kelas')"><span class="ico">📚</span><b>Ruang Kelas</b><small>Belajar & berdiskusi</small></button>
-    <button class="s3d-location loc-field" onclick="sipat3DSelectActivity('olahraga')"><span class="ico">⚽</span><b>Lapangan</b><small>Senam • Bola • Voli</small></button>
-    <button class="s3d-location loc-library" onclick="sipat3DSelectActivity('perpustakaan')"><span class="ico">📖</span><b>Perpustakaan</b><small>Membaca & meminjam</small></button>
-    <button class="s3d-location loc-ceremony" onclick="sipat3DSelectActivity('upacara')"><span class="ico">🇮🇩</span><b>Lapangan Upacara</b><small>Upacara & apel</small></button>
-    <button class="s3d-location loc-canteen" onclick="sipat3DSelectActivity('kantin')"><span class="ico">🍱</span><b>Kantin</b><small>Makan & istirahat</small></button>
-    <button class="s3d-location loc-garden" onclick="sipat3DSelectActivity('kebun')"><span class="ico">🌱</span><b>Kebun Sekolah</b><small>Merawat tanaman</small></button>
-    <div class="s3d-character" id="s3dCharacter"><div class="s3d-label" id="s3dCharLabel">Siswa</div><div class="s3d-head"></div><div class="s3d-body"></div></div>
-    <div class="s3d-hint">🎮 Pilih lokasi kegiatan • Setiap kegiatan dibuka satu per satu</div><div class="s3d-points">⭐ Poin: <span id="s3dPoints">0</span></div>
-  </div>
-
-  <div id="s3dSelect" class="s3d-select"><div class="s3d-select-card"><div class="s3d-select-head"><div><h2>🏫 Pilih Kegiatan 3D</h2><small>Semua kegiatan dapat dimasuki oleh Admin, Guru, dan Siswa.</small></div><button class="s3d-action-btn s3d-close" onclick="sipat3DCloseSelection()">✕ Tutup</button></div><div id="s3dActivityGrid" class="s3d-grid"></div></div></div>
-
-  <div id="s3dActivity" class="s3d-activity"><div class="s3d-activity-card"><div id="s3dActivityScene" class="s3d-activity-scene"></div><div class="s3d-activity-body"><h3 id="s3dActivityTitle">Kegiatan</h3><p id="s3dActivityDesc"></p><div id="s3dActivityChoices" class="s3d-choice-grid"></div><div class="s3d-activity-actions"><button class="s3d-action-btn s3d-close" onclick="sipat3DBackToSelection()">← Pilih Kegiatan</button><button class="s3d-action-btn s3d-enter" onclick="sipat3DEnterActivity()">▶ Masuk Kegiatan</button></div></div></div></div>
-
-  <div id="s3dActive" class="s3d-active"><div class="s3d-active-world"><div class="s3d-active-ground"></div><div id="s3dActiveObject" class="s3d-real-object" style="position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);z-index:8"></div></div><div class="s3d-active-title"><b id="s3dActiveTitle">Kegiatan</b><small id="s3dActiveSub">Sedang berlangsung</small></div><div class="s3d-status">🟢 Sedang aktif • tidak mengganggu kegiatan lain</div><div id="s3dTask" class="s3d-task"></div><button class="s3d-exit-activity" onclick="sipat3DExitActivity()">↩ Keluar Kegiatan</button></div>
-  <div id="s3dToast" class="s3d-toast"></div>
 </div>
 
-<script id="sipat-school-life-3d-v2-script">
+<script id="sipat-school-life-3d-v3-script">
 (function(){
-  'use strict';
-  const $=id=>document.getElementById(id);
-  let selected=null, active=null, toastTimer=null;
-  const activities={
-    kelas:{icon:'📚',title:'Ruang Kelas',tag:'BELAJAR',desc:'Kegiatan kelas seperti kondisi sekolah sehari-hari: duduk di tempat, membuka buku, menyimak guru, berdiskusi, mengerjakan tugas, lalu merapikan meja.',scene:'obj-class',object:'📚',choices:[['📖 Membaca buku','Membaca materi pelajaran dengan tenang.'],['✍️ Mengerjakan tugas','Menulis jawaban pada buku tugas.'],['💬 Diskusi kelompok','Berdiskusi dan berbagi pendapat dengan teman.'],['🧹 Merapikan meja','Merapikan buku dan meja sebelum keluar.']]},
-    olahraga:{icon:'⚽',title:'Olahraga di Lapangan',tag:'PJOK',desc:'Lapangan digunakan seperti kegiatan nyata. Pilih salah satu aktivitas olahraga agar hanya kegiatan tersebut yang aktif.',scene:'obj-field',object:'🏃',choices:[['🤸 Senam','Pemanasan, gerak dasar, dan pendinginan bersama.'],['⚽ Bermain bola','Mengoper, menendang, menggiring, dan bermain secara sportif.'],['🏐 Bermain voli','Servis, passing, dan permainan voli sederhana.']]},
-    perpustakaan:{icon:'📖',title:'Perpustakaan',tag:'LITERASI',desc:'Suasana perpustakaan dibuat tenang seperti keadaan nyata: memilih buku, membaca, dan mengembalikan buku.',scene:'obj-library',object:'📖',choices:[['📚 Pilih buku','Memilih buku sesuai minat dan kebutuhan belajar.'],['🔎 Membaca','Membaca buku dengan tertib dan tenang.'],['↩️ Kembalikan buku','Mengembalikan buku ke tempatnya.']]},
-    upacara:{icon:'🇮🇩',title:'Upacara & Apel',tag:'KEGIATAN SEKOLAH',desc:'Kegiatan lapangan mengikuti suasana upacara sekolah: berkumpul, berdiri tertib, mengikuti pembina, lalu kembali ke kelas.',scene:'obj-ceremony',object:'🇮🇩',choices:[['🧍 Baris rapi','Berdiri sesuai barisan dan menjaga ketertiban.'],['🇮🇩 Ikuti upacara','Mengikuti rangkaian upacara dengan tertib.'],['🚶 Kembali ke kelas','Membubarkan barisan dan kembali sesuai arahan.']]},
-    kantin:{icon:'🍱',title:'Kantin Sekolah',tag:'ISTIRAHAT',desc:'Kegiatan istirahat seperti keadaan sehari-hari: antre, memilih makanan, makan dengan tertib, dan membersihkan tempat.',scene:'obj-canteen',object:'🍱',choices:[['🚶 Antre','Menunggu giliran dengan tertib.'],['🍚 Pilih makanan','Memilih makanan dan minuman.'],['🗑️ Bersihkan meja','Membuang sampah dan merapikan tempat makan.']]},
-    kebun:{icon:'🌱',title:'Kebun Sekolah',tag:'LINGKUNGAN',desc:'Merawat tanaman seperti kegiatan nyata: menanam, menyiram, membersihkan gulma, dan menjaga kebersihan kebun.',scene:'obj-garden',object:'🌱',choices:[['🌱 Menanam','Menanam bibit pada tanah yang sudah disiapkan.'],['💧 Menyiram','Menyiram tanaman secukupnya.'],['🧹 Merawat kebun','Membersihkan daun kering dan area kebun.']]},
-    kebersihan:{icon:'🧹',title:'Kebersihan Sekolah',tag:'KARAKTER',desc:'Kegiatan menjaga lingkungan sekolah: mengambil sampah, memilah, dan membuang pada tempatnya.',scene:'obj-garden',object:'🧹',choices:[['🧹 Ambil sampah','Mengambil sampah yang terlihat di lingkungan.'],['♻️ Pilah sampah','Memisahkan sampah sesuai jenisnya.'],['🗑️ Buang sampah','Membuang sampah pada tempat yang sesuai.']]},
-    bermain:{icon:'🛝',title:'Waktu Bermain',tag:'ISTIRAHAT',desc:'Waktu bermain digunakan secara tertib dan aman, dengan tetap menghargai teman.',scene:'obj-field',object:'🛝',choices:[['🛝 Bermain bersama','Bermain permainan ringan bersama teman.'],['🏃 Permainan gerak','Melakukan permainan gerak sederhana.'],['🤝 Bermain sportif','Bermain dengan aturan dan saling menghargai.']]}
-  };
-  function user(){return window.currentUser||null}
-  function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-  function showToast(t){const e=$('s3dToast');if(!e)return;e.textContent=t;e.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.classList.remove('show'),2200)}
-  function score(n=10){const u=user();if(!u)return;const key='sipat3DPoints_'+(u.username||u.nama||u.id||'user');let p=Number(localStorage.getItem(key)||0)+n;localStorage.setItem(key,String(p));$('s3dPoints').textContent=p}
-  function loadPoints(){const u=user();const key='sipat3DPoints_'+(u?.username||u?.nama||u?.id||'user');$('s3dPoints').textContent=Number(localStorage.getItem(key)||0)}
-  function prepareGrid(){const box=$('s3dActivityGrid');if(!box)return;box.innerHTML=Object.entries(activities).map(([id,a])=>`<button class="s3d-card" onclick="sipat3DSelectActivity('${id}')"><span class="tag">${a.tag}</span><div class="icon">${a.icon}</div><h3>${a.title}</h3><p>${a.desc}</p></button>`).join('')}
-  function fillActivity(id){selected=id;const a=activities[id];if(!a)return; $('s3dActivityTitle').textContent=a.icon+' '+a.title;$('s3dActivityDesc').textContent=a.desc;$('s3dActivityScene').className='s3d-activity-scene '+a.scene;$('s3dActivityScene').innerHTML=`<div class="s3d-scene-title"><h2>${a.icon} ${a.title}</h2><p>Visual 3D kegiatan sekolah. Pilih aksi, lalu tekan <b>Masuk Kegiatan</b>.</p></div><div class="s3d-object ${a.scene}"></div>`;$('s3dActivityChoices').innerHTML=a.choices.map((c,i)=>`<button class="s3d-choice" onclick="sipat3DChooseAction(${i})" data-choice="${i}">${c[0]}<small>${c[1]}</small></button>`).join('');window.sipat3DChoice=0}
-  window.sipat3DChooseAction=function(i){window.sipat3DChoice=i;document.querySelectorAll('#s3dActivityChoices .s3d-choice').forEach((e,n)=>e.style.outline=n===i?'3px solid #2563eb':'none');showToast('Pilihan aksi: '+activities[selected].choices[i][0])}
-  window.sipat3DSelectActivity=function(id){if(!user())return;fillActivity(id);$('s3dSelect').classList.remove('open');$('s3dActivity').classList.add('open');}
-  window.sipat3DCloseSelection=function(){$('s3dSelect').classList.remove('open')}
-  window.sipat3DBackToSelection=function(){$('s3dActivity').classList.remove('open');$('s3dSelect').classList.add('open')}
-  window.sipat3DEnterActivity=function(){if(!selected)return;const a=activities[selected],i=Number(window.sipat3DChoice||0),choice=a.choices[i]||a.choices[0];active=selected;$('s3dActivity').classList.remove('open');$('s3dActive').classList.add('open');$('s3dActiveTitle').textContent=a.icon+' '+a.title;$('s3dActiveSub').textContent=choice[0]+' • Sedang berlangsung';$('s3dActiveObject').textContent=a.object;$('s3dTask').innerHTML=`<div class="s3d-real-object">${a.object}</div><h2>${choice[0]}</h2><p>${choice[1]}<br><br>Ikuti kegiatan secara tertib seperti di sekolah. Setelah selesai, tekan tombol selesai sebelum keluar.</p><button class="s3d-action-btn s3d-enter" onclick="sipat3DFinishActivity()">✅ Selesai & Dapatkan Poin</button>`;showToast('Masuk ke '+a.title);}
-  window.sipat3DFinishActivity=function(){score(10);showToast('🎉 Kegiatan selesai! +10 poin');setTimeout(()=>sipat3DExitActivity(),700)}
-  window.sipat3DExitActivity=function(){active=null;$('s3dActive').classList.remove('open');selected=null;showToast('↩️ Keluar kegiatan. Kamu kembali ke lingkungan sekolah.')}
-  window.sipat3DOpenPanel=function(){try{if(typeof openRolePanel==='function')openRolePanel();else{alert('Panel akun belum tersedia.');return}sipat3DExitGame()}catch(e){sipat3DExitGame()}}
-  window.sipat3DExitGame=function(){try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}active=null;selected=null;$('s3dGameV2')?.classList.remove('open');$('sipat3DGameV2').classList.remove('open');document.body.classList.remove('sky-home-mode','sky-panel-mode');showToast('Game ditutup')}
-  async function open(){const u=user();if(!u){alert('Silakan login terlebih dahulu.');return}const role=u.role||'Pengguna';$('s3dUserName').textContent=u.nama||u.username||'Pengguna';$('s3dUserRole').textContent=role+(u.kelas?' • Kelas '+u.kelas:'')+(u.tapel?' • '+u.tapel:'');$('s3dCharLabel').textContent=u.nama||u.username||role;const ch=$('s3dCharacter');ch.classList.remove('guru','admin');if(role==='Guru')ch.classList.add('guru');if(role==='Admin')ch.classList.add('admin');$('s3dAvatar').textContent=role==='Admin'?'🛡️':role==='Guru'?'👨‍🏫':'🎒';loadPoints();prepareGrid();$('s3dSelect').classList.remove('open');$('s3dActivity').classList.remove('open');$('s3dActive').classList.remove('open');$('sipat3DGameV2').classList.add('open');try{if(document.documentElement.requestFullscreen&&!document.fullscreenElement)await document.documentElement.requestFullscreen({navigationUI:'hide'})}catch(e){}showToast('🏫 Selamat datang di SIPAT School Life 3D')}
-   // API game tunggal: hanya SIPAT School Life 3D V2 yang dipakai.
-   window.openSipatSchoolLife3D=open;
-  document.addEventListener('DOMContentLoaded',()=>{prepareGrid()});
+'use strict';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let scene,camera,renderer,clock,localAvatar,rafId,openGame=false,selectedLocation='Halaman Sekolah';
+let remoteAvatars=new Map(), presenceRef=null, presenceListeners=[], moveTimer=0, lastSent={x:0,z:0};
+let keys={}, micStream=null,audioCtx=null,analyser=null,micRAF=null, toastTimer=null, currentTab='world';
+const usersRef=()=>firebase.database().ref('sipat_data/gamePresence');
+const gameRef=()=>firebase.database().ref('sipat_data/gameWorld');
+const eventsRef=()=>firebase.database().ref('sipat_data/gameEvents');
+const tasksRef=()=>firebase.database().ref('sipat_data/gameTasks');
+
+const LOCATIONS=[
+ {id:'halaman',name:'Halaman Sekolah',icon:'🏫',color:0x2563eb,x:0,z:0,activity:'Berkumpul & berjalan'},
+ {id:'kelas',name:'Ruang Kelas',icon:'📚',color:0xf59e0b,x:-18,z:-10,activity:'Belajar, membaca, diskusi'},
+ {id:'perpustakaan',name:'Perpustakaan',icon:'📖',color:0x7c3aed,x:18,z:-10,activity:'Membaca & meminjam buku'},
+ {id:'kantin',name:'Kantin',icon:'🍱',color:0xdc2626,x:-18,z:10,activity:'Antre, makan, merapikan meja'},
+ {id:'lapangan',name:'Lapangan',icon:'⚽',color:0x16a34a,x:18,z:10,activity:'Olahraga & permainan'},
+ {id:'panggung',name:'Panggung',icon:'🎤',color:0xdb2777,x:0,z:20,activity:'Karaoke & pertunjukan'},
+ {id:'uks',name:'UKS',icon:'🩺',color:0x0891b2,x:-30,z:0,activity:'Istirahat & layanan UKS'},
+ {id:'lab',name:'Laboratorium',icon:'🧪',color:0x0f766e,x:30,z:0,activity:'Praktik & eksperimen'},
+ {id:'taman',name:'Taman Sekolah',icon:'🌱',color:0x65a30d,x:0,z:-25,activity:'Merawat lingkungan'}
+];
+const ACTIVITY_OPTIONS={
+ kelas:['Membaca buku','Mengerjakan tugas','Diskusi kelompok','Presentasi'],
+ perpustakaan:['Memilih buku','Membaca tenang','Mengembalikan buku'],
+ kantin:['Antre','Makan','Membersihkan meja'],
+ lapangan:['Senam','Bermain bola','Bermain voli'],
+ panggung:['Karaoke','Bernyanyi','Menonton pertunjukan'],
+ uks:['Beristirahat','Konsultasi UKS'],
+ lab:['Praktikum','Mencatat hasil'],
+ taman:['Menanam','Menyiram','Membersihkan taman'],
+ halaman:['Berjalan','Berkumpul','Apel']
+};
+const buildingData=LOCATIONS;
+
+function me(){return window.currentUser||null}
+function uid(){
+ const u=me()||{};
+ return String(u.username||u.nisn||u.id||u.nama||'guest').replace(/[.#$[\]/]/g,'_')+'_'+String(u.role||'Siswa');
+}
+function toast(t){
+ const e=$('s3dToast'); if(!e)return; e.textContent=t;e.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>e.classList.remove('show'),2200);
+}
+function logEvent(type,data={}){
+ const u=me(); if(!u||!firebaseReady)return;
+ eventsRef().push({type,...data,user:uid(),username:u.username||'',name:u.nama||u.username||'',role:u.role||'',ts:firebase.database.ServerValue.TIMESTAMP});
+}
+function currentPoint(){return Number(localStorage.getItem('sipat3DPoints_'+uid())||0)}
+function setPoints(v){
+ localStorage.setItem('sipat3DPoints_'+uid(),String(v));
+ $('s3dPoints').textContent=v;
+ if(firebaseReady) gameRef().child('scores').child(uid()).set({points:v,name:me()?.nama||me()?.username||'',role:me()?.role||'',updatedAt:firebase.database.ServerValue.TIMESTAMP});
+}
+function addPoints(n){setPoints(currentPoint()+Number(n||0))}
+function buildScene(){
+ scene=new THREE.Scene();
+ scene.background=new THREE.Color(0x8ed8ff);
+ scene.fog=new THREE.Fog(0x8ed8ff,45,125);
+ camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,250);
+ renderer=new THREE.WebGLRenderer({canvas:$('s3dCanvas'),antialias:true,powerPreference:'high-performance'});
+ renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=false;
+ clock=new THREE.Clock();
+ const hemi=new THREE.HemisphereLight(0xffffff,0x6b8e23,2.0);scene.add(hemi);
+ const sun=new THREE.DirectionalLight(0xffffff,2.1);sun.position.set(30,50,20);scene.add(sun);
+ const ground=new THREE.Mesh(new THREE.PlaneGeometry(150,150),new THREE.MeshLambertMaterial({color:0x4d9f43}));
+ ground.rotation.x=-Math.PI/2;scene.add(ground);
+ const roadMat=new THREE.MeshLambertMaterial({color:0x64748b});
+ [[0,0,14,150], [0,0,150,10]].forEach(()=>{});
+ addRoad(0,0,8,150,roadMat);addRoad(0,0,150,8,roadMat);
+ buildingData.forEach(b=>addBuilding(b));
+ addTrees();
+ localAvatar=makeAvatar(me()?.role||'Siswa',me()?.nama||me()?.username||'Saya',true);scene.add(localAvatar.group);
+ resetLocalPosition();
+ window.addEventListener('resize',resize);
+ window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault()});
+ window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+ animate();
+}
+function addRoad(x,z,w,d,mat){const m=new THREE.Mesh(new THREE.BoxGeometry(w,.05,d),mat);m.position.set(x,.025,z);scene.add(m)}
+function addBuilding(b){
+ const g=new THREE.Group();g.position.set(b.x,0,b.z);
+ const body=new THREE.Mesh(new THREE.BoxGeometry(11,5,7),new THREE.MeshLambertMaterial({color:b.color}));body.position.y=2.5;g.add(body);
+ const roof=new THREE.Mesh(new THREE.ConeGeometry(7.8,3.2,4),new THREE.MeshLambertMaterial({color:0x334155}));roof.position.y=6.6;roof.rotation.y=Math.PI/4;g.add(roof);
+ const door=new THREE.Mesh(new THREE.BoxGeometry(1.5,2.5,.2),new THREE.MeshLambertMaterial({color:0x111827}));door.position.set(0,1.25,3.55);g.add(door);
+ for(let i=-1;i<=1;i++){const win=new THREE.Mesh(new THREE.BoxGeometry(1.4,1.2,.15),new THREE.MeshLambertMaterial({color:0xbfdbfe}));win.position.set(i*3,2.8,3.58);g.add(win)}
+ const label=makeLabel(b.icon+' '+b.name);label.position.set(0,8,0);g.add(label);
+ scene.add(g);
+}
+function makeLabel(text){
+ const c=document.createElement('canvas');c.width=512;c.height=96;const x=c.getContext('2d');
+ x.fillStyle='rgba(15,23,42,.86)';x.roundRect(4,4,504,88,20);x.fill();x.fillStyle='#fff';x.font='bold 28px Arial';x.textAlign='center';x.fillText(text,256,59);
+ const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true}));s.scale.set(7.5,1.4,1);return s;
+}
+function addTrees(){
+ for(let i=0;i<28;i++){const x=(i*37%76)-38,z=(i*61%76)-38;if(Math.abs(x)<10&&Math.abs(z)<10)continue;
+  const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18,.25,1.5,6),new THREE.MeshLambertMaterial({color:0x78350f}));trunk.position.set(x,.75,z);
+  const top=new THREE.Mesh(new THREE.SphereGeometry(1.15,8,6),new THREE.MeshLambertMaterial({color:0x15803d}));top.position.set(x,2,z);scene.add(trunk,top);
+ }
+}
+function makeAvatar(role,name,isLocal){
+ const g=new THREE.Group();
+ const color=role==='Admin'?0x7c3aed:role==='Guru'?0x059669:0x2563eb;
+ const body=new THREE.Mesh(new THREE.CapsuleGeometry(.55,1.15,4,8),new THREE.MeshLambertMaterial({color}));body.position.y=1.05;g.add(body);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.45,12,8),new THREE.MeshLambertMaterial({color:0xf1c27d}));head.position.y=2.15;g.add(head);
+ const label=makeLabel((isLocal?'⭐ ':'')+name);label.position.y=3.2;label.scale.set(5.4,1,1);g.add(label);
+ g.userData={role,name,phase:Math.random()*10};
+ return {group:g,body,label};
+}
+function resetLocalPosition(){
+ const p=LOCATIONS.find(x=>x.id===selectedLocation)||LOCATIONS[0];localAvatar.group.position.set(p.x,0,p.z+5);camera.position.set(p.x+10,8,p.z+13);camera.lookAt(localAvatar.group.position.x,1,localAvatar.group.position.z);
+}
+function animate(){
+ rafId=requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05);moveLocal(dt);updateCamera(dt);
+ remoteAvatars.forEach(a=>{a.group.position.lerp(a.target,.25);a.group.rotation.y+=(a.targetRot-a.group.rotation.y)*.25;a.body.rotation.z=Math.sin(performance.now()/260+a.group.userData.phase)*.025});
+ renderer.render(scene,camera);
+}
+function moveLocal(dt){
+ if(!openGame||!localAvatar)return;
+ let dx=0,dz=0;
+ if(keys.w||keys.arrowup)dz-=1;if(keys.s||keys.arrowdown)dz+=1;if(keys.a||keys.arrowleft)dx-=1;if(keys.d||keys.arrowright)dx+=1;
+ if(!dx&&!dz)return;
+ const len=Math.hypot(dx,dz);dx/=len;dz/=len;const speed=7;
+ localAvatar.group.position.x=Math.max(-65,Math.min(65,localAvatar.group.position.x+dx*speed*dt));
+ localAvatar.group.position.z=Math.max(-65,Math.min(65,localAvatar.group.position.z+dz*speed*dt));
+ localAvatar.group.rotation.y=Math.atan2(dx,dz);
+ const now=performance.now();
+ if(firebaseReady&&now-moveTimer>100 && (Math.abs(localAvatar.group.position.x-lastSent.x)>.08||Math.abs(localAvatar.group.position.z-lastSent.z)>.08)){
+   moveTimer=now;lastSent={x:localAvatar.group.position.x,z:localAvatar.group.position.z};
+   presenceRef?.update({x:lastSent.x,z:lastSent.z,rotation:localAvatar.group.rotation.y,location:selectedLocation,activity:localAvatar.group.userData.activity||'',lastSeen:firebase.database.ServerValue.TIMESTAMP});
+ }
+}
+function updateCamera(dt){
+ if(!localAvatar)return;
+ const p=localAvatar.group.position;const desired=new THREE.Vector3(p.x+9,7.5,p.z+11);camera.position.lerp(desired,.08);camera.lookAt(p.x,1.2,p.z);
+}
+function resize(){if(!renderer)return;camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}
+function startPresence(){
+ const u=me();if(!u||!firebaseReady)return;
+ presenceRef=usersRef().child(uid());
+ const p=localAvatar.group.position;
+ presenceRef.set({username:u.username||'',name:u.nama||u.username||'',role:u.role||'',kelas:u.kelas||'',x:p.x,z:p.z,rotation:0,location:selectedLocation,activity:'',online:true,lastSeen:firebase.database.ServerValue.TIMESTAMP});
+ presenceRef.onDisconnect().remove();
+ const onAdd=s=>upsertRemote(s);const onChange=s=>upsertRemote(s);const onRemove=s=>removeRemote(s.key);
+ usersRef().on('child_added',onAdd);usersRef().on('child_changed',onChange);usersRef().on('child_removed',onRemove);
+ presenceListeners=[['child_added',onAdd],['child_changed',onChange],['child_removed',onRemove]];
+}
+function stopPresence(){
+ presenceListeners.forEach(([ev,fn])=>usersRef().off(ev,fn));presenceListeners=[];
+ if(presenceRef){presenceRef.remove().catch(()=>{});presenceRef=null}
+ remoteAvatars.forEach(a=>scene.remove(a.group));remoteAvatars.clear();$('s3dOnlineCount').textContent='1';
+}
+function upsertRemote(s){
+ if(s.key===uid())return;const d=s.val();if(!d)return;
+ let a=remoteAvatars.get(s.key);
+ if(!a){a=makeAvatar(d.role,d.name||d.username||'Pengguna',false);scene.add(a.group);remoteAvatars.set(s.key,a)}
+ a.target=new THREE.Vector3(Number(d.x||0),0,Number(d.z||0));a.targetRot=Number(d.rotation||0);a.group.userData={...a.group.userData,...d,key:s.key};
+ $('s3dOnlineCount').textContent=String(remoteAvatars.size+1);
+}
+function removeRemote(key){const a=remoteAvatars.get(key);if(!a)return;scene.remove(a.group);remoteAvatars.delete(key);$('s3dOnlineCount').textContent=String(remoteAvatars.size+1)}
+function open(){
+ const u=me();if(!u){alert('Silakan login terlebih dahulu.');return}
+ if(!renderer)buildScene();openGame=true;$('sipat3DGameV2').classList.add('open');
+ $('s3dUserName').textContent=u.nama||u.username||'Pengguna';$('s3dUserRole').textContent=(u.role||'Siswa')+(u.kelas?' • Kelas '+u.kelas:'');
+ $('s3dAvatar').textContent=u.role==='Admin'?'🛡️':u.role==='Guru'?'👨‍🏫':'🎒';$('s3dPoints').textContent=currentPoint();
+ resetLocalPosition();startPresence();renderWorldTab();toast('🏫 Dunia sekolah 3D siap dimainkan');
+}
+function closeGame(){
+ openGame=false;stopPresence();$('sipat3DGameV2').classList.remove('open');$('s3dPanel').classList.remove('open');
+ if(micStream)stopMic();if(rafId){cancelAnimationFrame(rafId);rafId=null}
+ try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}
+}
+window.openSipatSchoolLife3D=open;
+window.openSchoolGameAfterLogin=open;
+window.sipat3DExitGame=closeGame;
+window.sipat3DOpenPanel=()=>{$('s3dPanel').classList.add('open');s3dPanelTab(currentTab)};
+window.sipat3DClosePanel=()=>$('s3dPanel').classList.remove('open');
+window.sipat3DOpenLocations=()=>{renderLocations();$('s3dLocationModal').classList.add('open')};
+window.sipat3DCloseLocations=()=>$('s3dLocationModal').classList.remove('open');
+
+function s3dPanelTab(tab){currentTab=tab;document.querySelectorAll('.s3d-tab').forEach(x=>x.classList.remove('active'));$('tab'+({world:'World',online:'Online',tasks:'Tasks',karaoke:'Karaoke',monitor:'Monitor'}[tab]||'World')).classList.add('active');
+ if(tab==='world')renderWorldTab();if(tab==='online')renderOnlineTab();if(tab==='tasks')renderTasksTab();if(tab==='karaoke')renderKaraokeTab();if(tab==='monitor')renderMonitorTab();}
+window.s3dPanelTab=s3dPanelTab;
+
+function renderWorldTab(){
+ const u=me();const isStaff=u&&(u.role==='Guru'||u.role==='Admin');
+ $('s3dPanelContent').innerHTML=`<div class="s3d-card"><span class="s3d-badge">REAL-TIME</span><h3>Aktivitas Dunia Sekolah</h3><p style="font-size:10px;color:#64748b">Pilih lokasi lalu aktivitas. Pergerakan, lokasi, aktivitas, poin, dan tugas disimpan otomatis.</p><div class="s3d-grid2">${LOCATIONS.map(l=>`<button class="s3d-location-btn" onclick="s3dEnterLocation('${l.id}')">${l.icon} ${l.name}<small style="display:block;color:#64748b;margin-top:3px">${l.activity}</small></button>`).join('')}</div></div>
+ <div class="s3d-card"><h3>🎯 Aktivitas di ${esc(selectedLocation)}</h3><div class="s3d-grid2">${(ACTIVITY_OPTIONS[LOCATIONS.find(l=>l.name===selectedLocation)?.id]||['Berjalan']).map(a=>`<button class="s3d-location-btn" onclick="s3dStartActivity('${esc(a)}')">${esc(a)}</button>`).join('')}</div></div>
+ ${isStaff?`<div class="s3d-card"><h3>👀 Mode Staff</h3><p style="font-size:10px;color:#64748b">Admin/Guru menggunakan panel ini untuk memantau kehadiran online, memvalidasi tugas, dan memberi penilaian.</p></div>`:''}`;
+}
+function renderLocations(){ $('s3dLocationGrid').innerHTML=LOCATIONS.map(l=>`<button class="s3d-location-btn" onclick="s3dEnterLocation('${l.id}')">${l.icon} ${l.name}<small style="display:block;color:#64748b;margin-top:3px">${l.activity}</small></button>`).join('') }
+window.s3dEnterLocation=function(id){
+ const l=LOCATIONS.find(x=>x.id===id);if(!l)return;selectedLocation=l.name;$('s3dLocationName').textContent=l.name;$('s3dLocationModal').classList.remove('open');
+ localAvatar.group.position.set(l.x,0,l.z+5);lastSent={x:l.x,z:l.z+5};presenceRef?.update({x:lastSent.x,z:lastSent.z,location:l.name,activity:'',lastSeen:firebase.database.ServerValue.TIMESTAMP});
+ logEvent('location_enter',{location:l.id,locationName:l.name});addPoints(1);toast('📍 Masuk: '+l.name);if(currentTab==='world')renderWorldTab();
+};
+window.s3dStartActivity=function(activity){
+ localAvatar.group.userData.activity=activity;presenceRef?.update({activity,location:selectedLocation,lastSeen:firebase.database.ServerValue.TIMESTAMP});
+ logEvent('activity_start',{location:selectedLocation,activity});addPoints(2);toast('▶ '+activity+' di '+selectedLocation);
+ if(selectedLocation==='Panggung Sekolah' || selectedLocation==='Panggung') {s3dOpenKaraoke();return}
+ setTimeout(()=>{if(presenceRef)presenceRef.update({activity:'',lastSeen:firebase.database.ServerValue.TIMESTAMP});logEvent('activity_finish',{location:selectedLocation,activity});addPoints(3);toast('✅ Aktivitas selesai +3 poin')},2500);
+};
+
+function renderOnlineTab(){
+ const entries=[...remoteAvatars.entries()].map(([k,a])=>({k,...a.group.userData}));
+ entries.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')));
+ $('s3dPanelContent').innerHTML=`<div class="s3d-card"><h3>🟢 Pengguna Online (${entries.length+1})</h3><div class="s3d-card" style="border-color:#bbf7d0"><b>⭐ ${esc(me()?.nama||me()?.username||'Saya')}</b><small style="display:block">Anda • ${esc(me()?.role||'Siswa')} • ${esc(selectedLocation)}</small></div>${entries.length?entries.map(e=>`<div class="s3d-card"><div class="s3d-card-row"><div><b>${esc(e.name||e.username||'Pengguna')}</b><small style="display:block">${esc(e.role||'')} ${e.kelas?'• Kelas '+esc(e.kelas):''}</small><small style="display:block">📍 ${esc(e.location||'Dunia sekolah')} ${e.activity?'• ▶ '+esc(e.activity):''}</small></div><span class="s3d-online-dot"></span></div></div>`).join(''):'<p style="font-size:10px;color:#64748b">Belum ada pengguna lain yang sedang membuka game.</p>'}</div>`;
+}
+function taskKeyForMe(){return tasksRef().orderByChild('studentId').equalTo(uid())}
+function renderTasksTab(){
+ const u=me();if(!u)return;
+ taskKeyForMe().limitToLast(10).once('value').then(s=>{
+  const tasks=[];s.forEach(x=>tasks.push({id:x.key,...x.val()}));tasks.reverse();
+  const staff=u.role==='Guru'||u.role==='Admin';
+  let html=`<div class="s3d-card"><h3>📋 ${staff?'Tugas & Validasi Siswa':'Tugas Saya'}</h3>`;
+  if(!tasks.length&&!staff)html+=`<p style="font-size:10px;color:#64748b">Belum ada tugas pembinaan.</p>`;
+  tasks.forEach(t=>{html+=`<div class="s3d-task-box ${t.status==='validated'?'done':''}"><div class="s3d-card-row"><b>${esc(t.type)} × ${esc(t.count)}</b><span class="s3d-badge">${esc(t.status||'assigned')}</span></div><small>Dari: ${esc(t.teacherName||'Guru')} • ${new Date(t.createdAt||Date.now()).toLocaleString('id-ID')}</small>${t.status==='assigned'&&uid()===t.studentId?`<button class="s3d-btn green" style="margin-top:8px" onclick="s3dMarkTaskDone('${esc(t.id)}')">✅ Tandai Selesai</button>`:''}${staff?`<div style="margin-top:8px"><small>Siswa: ${esc(t.studentName||t.studentId)}</small> ${t.status==='done'?`<button class="s3d-btn green" onclick="s3dValidateTask('${esc(t.id)}')">✓ Validasi</button>`:''}</div>`:''}</div>`});
+  if(staff)html+=`<button class="s3d-btn amber" style="width:100%;margin-top:8px" onclick="s3dPanelTab('online')">Pilih siswa online untuk memberi tugas</button>`;
+  html+='</div>';$('s3dPanelContent').innerHTML=html;
+ });
+}
+window.s3dMarkTaskDone=function(id){if(!me())return;tasksRef().child(id).update({status:'done',doneAt:firebase.database.ServerValue.TIMESTAMP});logEvent('task_done',{taskId:id});addPoints(5);toast('✅ Tugas ditandai selesai +5 poin');renderTasksTab()};
+window.s3dValidateTask=function(id){if(!['Guru','Admin'].includes(me()?.role))return;tasksRef().child(id).update({status:'validated',validatedAt:firebase.database.ServerValue.TIMESTAMP,validatedBy:uid()});logEvent('task_validated',{taskId:id});toast('✓ Tugas divalidasi');renderTasksTab()};
+
+function renderKaraokeTab(){$('s3dPanelContent').innerHTML=`<div class="s3d-card"><h3>🎤 Panggung & Karaoke</h3><p style="font-size:10px;color:#64748b">Mikrofon hanya diproses lokal. YouTube diputar melalui iframe.</p><button class="s3d-btn" onclick="s3dOpenKaraoke()">🎤 Buka Karaoke</button></div>`}
+function s3dOpenKaraoke(){$('s3dKaraokeModal').classList.add('open');logEvent('stage_open',{location:selectedLocation})}
+window.s3dOpenKaraoke=s3dOpenKaraoke;
+function s3dCloseKaraoke(){$('s3dKaraokeModal').classList.remove('open');}
+window.s3dCloseKaraoke=s3dCloseKaraoke;
+function youtubeId(url){
+ const m=String(url||'').match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([A-Za-z0-9_-]{6,})/);return m?m[1]:'';
+}
+window.s3dPlayYoutube=function(){const id=youtubeId($('s3dYoutubeUrl').value);if(!id)return alert('URL YouTube tidak dikenali.');$('s3dYoutubeFrame').src='https://www.youtube.com/embed/'+id+'?autoplay=1&rel=0';logEvent('karaoke_song',{youtubeId:id});toast('▶ Lagu YouTube diputar')};
+window.s3dToggleMic=async function(){
+ if(micStream){stopMic();return}
+ try{micStream=await navigator.mediaDevices.getUserMedia({audio:true});audioCtx=new (window.AudioContext||window.webkitAudioContext)();analyser=audioCtx.createAnalyser();analyser.fftSize=256;audioCtx.createMediaStreamSource(micStream).connect(analyser);$('s3dMicStatus').textContent='aktif di perangkat';meterMic();logEvent('microphone_on');toast('🎙️ Mikrofon aktif secara lokal')}
+ catch(e){alert('Mikrofon tidak dapat digunakan. Pastikan izin mikrofon diberikan dan halaman dijalankan melalui HTTPS/localhost.')}
+};
+function meterMic(){if(!analyser)return;const data=new Uint8Array(analyser.frequencyBinCount);analyser.getByteTimeDomainData(data);let sum=0;for(const v of data){const n=(v-128)/128;sum+=n*n}const rms=Math.sqrt(sum/data.length);$('s3dMicMeter').style.width=Math.min(100,rms*250)+'%';micRAF=requestAnimationFrame(meterMic)}
+function stopMic(){micStream?.getTracks().forEach(t=>t.stop());micStream=null;analyser=null;audioCtx?.close().catch(()=>{});audioCtx=null;if(micRAF)cancelAnimationFrame(micRAF);micRAF=null;if($('s3dMicStatus'))$('s3dMicStatus').textContent='tidak aktif';if($('s3dMicMeter'))$('s3dMicMeter').style.width='0%';logEvent('microphone_off')}
+
+function renderMonitorTab(){
+ const u=me();if(!['Guru','Admin'].includes(u?.role)){ $('s3dPanelContent').innerHTML='<div class="s3d-card"><b>🔒 Akses staff saja.</b><p style="font-size:10px;color:#64748b">Dashboard monitoring hanya tersedia untuk Admin dan Guru.</p></div>';return}
+ const online=[...remoteAvatars.values()].map(a=>a.group.userData);
+ $('s3dPanelContent').innerHTML=`<div class="s3d-card"><h3>📊 Monitoring Real-time</h3><p style="font-size:10px;color:#64748b">Pantau pengguna yang sedang berada di dunia sekolah. Data aktivitas dicatat otomatis ke Firebase.</p>${online.length?online.map(e=>`<div class="s3d-card-row" style="padding:7px 0;border-top:1px solid #e2e8f0"><div><b>${esc(e.name||e.username)}</b><small style="display:block">${esc(e.role)} • 📍 ${esc(e.location||'-')} ${e.activity?'• '+esc(e.activity):''}</small></div><span class="s3d-online-dot"></span></div>`).join(''):'<small>Belum ada siswa/guru lain online di game.</small>'}</div>
+ <div class="s3d-card"><h3>⭐ Penilaian Aktivitas</h3><div class="s3d-grid2"><input id="s3dGradeStudent" class="s3d-input" placeholder="Username siswa"><input id="s3dGradeValue" class="s3d-input" type="number" min="0" max="100" placeholder="Nilai 0-100"></div><input id="s3dGradeNote" class="s3d-input" style="margin-top:7px" placeholder="Catatan penilaian"><button class="s3d-btn green" style="width:100%;margin-top:7px" onclick="s3dSaveGrade()">💾 Simpan Penilaian</button></div>`;
+}
+window.s3dSaveGrade=function(){
+ if(!['Guru','Admin'].includes(me()?.role))return;
+ const student=$('s3dGradeStudent').value.trim(),value=Math.max(0,Math.min(100,Number($('s3dGradeValue').value))),note=$('s3dGradeNote').value.trim();
+ if(!student||!Number.isFinite(value))return alert('Isi username siswa dan nilai.');
+ const id=student.replace(/[.#$[\]/]/g,'_')+'_'+(usersByUsername(student)?.role||'Siswa');
+ gameRef().child('grades').child(id).push({studentUsername:student,value,note,teacher:uid(),teacherName:me()?.nama||me()?.username||'',createdAt:firebase.database.ServerValue.TIMESTAMP});
+ logEvent('grade',{studentUsername:student,value,note});toast('⭐ Penilaian tersimpan ke Firebase');
+};
+function usersByUsername(username){
+ try{return (JSON.parse(localStorage.getItem('users')||'[]')||[]).find(x=>String(x.username)===String(username))||null}catch(e){return null}
+}
+
+function renderOnlineSelectionForStaff(){
+ const u=me();if(!['Guru','Admin'].includes(u?.role))return;
+ const online=[...remoteAvatars.values()].map(a=>a.group.userData);
+ if(!online.length){$('s3dPanelContent').insertAdjacentHTML('beforeend','<div class="s3d-card"><small>Belum ada siswa lain online.</small></div>');return}
+ const html=`<div class="s3d-card"><h3>🏃 Pilih Siswa Online</h3>${online.filter(x=>x.role==='Siswa').map(e=>`<div class="s3d-card-row" style="margin:6px 0"><div><b>${esc(e.name||e.username)}</b><small style="display:block">📍 ${esc(e.location||'-')}</small></div><button class="s3d-btn amber" onclick="s3dOpenTaskCreator('${esc(e.key)}')">Tugas</button></div>`).join('')}</div>`;
+ $('s3dPanelContent').insertAdjacentHTML('beforeend',html);
+}
+window.s3dOpenTaskCreator=function(id){$('s3dPunishTarget').value=id;const a=remoteAvatars.get(id)?.group.userData;if(a) toast('Target: '+(a.name||a.username));$('s3dPunishModal').classList.add('open')};
+window.s3dCloseTaskCreator=()=>$('s3dPunishModal').classList.remove('open');
+window.s3dAssignTask=function(){
+ const u=me();if(!['Guru','Admin'].includes(u?.role))return;
+ const id=$('s3dPunishTarget').value;const target=remoteAvatars.get(id)?.group.userData;if(!target)return alert('Siswa sudah offline.');
+ const count=Math.max(1,Math.min(20,Number($('s3dPunishCount').value)||5));const type=$('s3dPunishType').value;
+ const task={studentId:id,studentName:target.name||target.username||'',type,count,status:'assigned',teacherId:uid(),teacherName:u.nama||u.username||'Guru',createdAt:firebase.database.ServerValue.TIMESTAMP};
+ tasksRef().push(task).then(()=>{logEvent('task_assigned',{studentId:id,type,count});$('s3dPunishModal').classList.remove('open');toast('📨 Tugas dikirim ke '+task.studentName);renderTasksTab()});
+};
+
+// Tambahkan validasi tugas staff setelah daftar online.
+const oldOnline=renderOnlineTab;
+renderOnlineTab=function(){
+ oldOnline();
+ setTimeout(()=>renderOnlineSelectionForStaff(),0);
+};
+
+// Realtime task refresh.
+tasksRef().on('value',()=>{if(openGame&&currentTab==='tasks')renderTasksTab()});
+eventsRef().on('child_added',()=>{if(openGame&&currentTab==='monitor')renderMonitorTab()});
+
+document.addEventListener('DOMContentLoaded',()=>{
+ renderLocations();
+});
 })();
 </script>
-
 </body>
 </html>
