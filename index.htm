@@ -473,6 +473,53 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
  @media (orientation:portrait) and (max-width:900px){body.sky-game-fullscreen #skyRotateHint{display:block;position:fixed;inset:0;z-index:10000;background:linear-gradient(180deg,#0ea5e9,#38bdf8);color:#fff;font-weight:1000;text-align:center;padding-top:28vh;font-size:28px;text-shadow:0 3px 8px rgba(15,23,42,.35);pointer-events:none;}}
  .sky-low-data{font-size:10px;color:#64748b;margin-top:3px;}
  @media (prefers-reduced-motion: reduce){#skyCanvas{scroll-behavior:auto}.sky-game-shell *{animation:none!important;transition:none!important;}}
+
+/* ===== SKY BATTLE 2026: RESPONSIVE + LOW-LAG + OPEN MIC ===== */
+.sky-audio-controls{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+}
+.sky-mic-btn{
+  border:2px solid #fff;color:#fff;background:linear-gradient(135deg,#0f766e,#10b981);
+  border-radius:999px!important;padding:7px 11px;font-size:11px;font-weight:1000;
+  box-shadow:0 6px 16px rgba(15,23,42,.25);cursor:pointer;touch-action:manipulation;
+}
+.sky-mic-btn.off{background:linear-gradient(135deg,#475569,#64748b)}
+.sky-mic-btn.live{background:linear-gradient(135deg,#dc2626,#f97316);animation:skyMicPulse 1.4s ease-in-out infinite}
+@keyframes skyMicPulse{50%{transform:scale(1.04);box-shadow:0 0 0 6px rgba(239,68,68,.15)}}
+.sky-mic-status{font-size:9px;font-weight:900;color:#e2e8f0;max-width:190px}
+.sky-boss-alert{
+  position:absolute;z-index:35;left:50%;top:72px;transform:translateX(-50%) scale(.8);
+  padding:10px 18px;border:3px solid #fff;border-radius:18px;
+  background:linear-gradient(135deg,#7f1d1d,#dc2626);color:#fff;
+  font-size:clamp(12px,2vw,20px);font-weight:1000;text-align:center;
+  text-shadow:0 2px 5px #000;box-shadow:0 12px 30px rgba(127,29,29,.5);
+  opacity:0;pointer-events:none;transition:opacity .18s,transform .18s;
+}
+.sky-boss-alert.show{opacity:1;transform:translateX(-50%) scale(1)}
+.sky-boss-bar{
+  position:absolute;z-index:34;left:50%;top:122px;transform:translateX(-50%);
+  width:min(520px,72vw);height:10px;border:2px solid #fff;border-radius:99px;
+  background:rgba(15,23,42,.65);overflow:hidden;pointer-events:none;display:none;
+}
+.sky-boss-bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ef4444,#f59e0b,#ef4444)}
+.sky-voice-list{
+  position:absolute;z-index:22;left:12px;top:58px;display:flex;gap:4px;flex-wrap:wrap;
+  max-width:min(42vw,300px);pointer-events:none;
+}
+.sky-voice-pill{
+  padding:4px 7px;border-radius:999px;background:rgba(2,6,23,.58);color:#fff;
+  border:1px solid rgba(255,255,255,.28);font-size:9px;font-weight:900;
+}
+@media(max-width:640px){
+  .sky-audio-controls{gap:4px}
+  .sky-mic-btn{padding:6px 9px;font-size:9px}
+  .sky-mic-status{display:none}
+  .sky-boss-alert{top:60px;width:min(92vw,420px)}
+  .sky-boss-bar{top:102px;width:72vw;height:8px}
+  .sky-voice-list{top:54px;max-width:50vw}
+}
+@media(prefers-reduced-motion:reduce){.sky-mic-btn.live{animation:none}}
+
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -1539,9 +1586,16 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
     <div class="sky-topbar">
       <div class="sky-stat"><span>✈️ SKY BATTLE</span><span id="skyRoleBadge" class="sky-chip">Memuat...</span></div>
       <div class="sky-stat"><span>💰 <b id="skyPoints">0</b> Poin</span><span class="sky-chip">☠️ <b id="skyKills">0</b> Musuh</span><span class="sky-chip">🌐 <b id="skyPlayers">1</b> Pemain</span></div>
+      <div class="sky-audio-controls">
+        <button id="skyMicBtn" class="sky-mic-btn off" type="button" onclick="toggleSkyMic()" title="Aktif/nonaktifkan mikrofon">🎙️ Mic OFF</button>
+        <span id="skyMicStatus" class="sky-mic-status">Klik Mic untuk bicara dengan pemain online</span>
+      </div>
     </div>
     <div style="position:relative">
       <canvas id="skyCanvas"></canvas>
+      <div id="skyBossAlert" class="sky-boss-alert">🚨 ALARM! ALIEN BESAR DATANG! 🚨<br><small>Semua siswa, bersiap!</small></div>
+      <div id="skyBossBar" class="sky-boss-bar"><i></i></div>
+      <div id="skyVoiceList" class="sky-voice-list"></div>
       <div class="sky-overlay">
         <div class="sky-title">☁️ Misi Langit SIPAT</div>
         <div class="sky-help">Semua pemain satu arena. Tembakan, efek, dan kehancuran terlihat realtime. Musuh membidik siswa secara acak. 🤝 Gunakan Bantuan untuk memulihkan teman.</div>
@@ -4236,7 +4290,7 @@ function initGuruViews() {
     {type:'duck',name:'Bebek Terbang',hp:1,speed:1.45,points:20,color:'#facc15',size:20,rate:0.018,shape:'duck'},
     {type:'bird',name:'Burung Terbang',hp:1,speed:2.5,points:30,color:'#0f172a',size:18,rate:0.02,shape:'bird'},
     {type:'elite',name:'Jet Elite',hp:5,speed:2.35,points:90,color:'#7c3aed',size:31,rate:0.006,shape:'jetElite'},
-    {type:'boss',name:'Jet Boss',hp:10,speed:1.55,points:200,color:'#be123c',size:46,rate:0.0017,shape:'boss'}
+    {type:'boss',name:'Alien Colossus',hp:26,speed:0.72,points:600,color:'#7c3aed',size:66,rate:0.0007,shape:'alienBoss',fire:1350,bulletSpeed:3.5,damage:6}
   ];  let gs=null;
   window.skyGame=window.skyGame||{};
   const $=id=>document.getElementById(id);
@@ -4294,17 +4348,66 @@ function initGuruViews() {
   }
   function weaponLabel(){const p=getProfile(); if(p.weaponUntil && p.weaponUntil>Date.now()) return p.weapon.toUpperCase(); return 'PELURU'}
   function notify(msg){const e=$('skyMessage');if(e)e.textContent=msg}
-  // ===== AUDIO SENJATA =====
-  let audioCtx=null;
-  function ensureAudio(){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended')audioCtx.resume();}catch(e){}}
-  function weaponSound(type,remote=false){
+  // ===== AUDIO GAME: PESAWAT, ALARM, NAGA GURU KELAS 4 =====
+  let audioCtx=null, engineAudioTimer=0, dragonRoarTimer=0;
+  function ensureAudio(){
+    try{
+      audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+      if(audioCtx.state==='suspended')audioCtx.resume();
+    }catch(e){}
+  }
+  function tone(freq1,freq2,duration=.14,type='sine',gain=.05){
     ensureAudio(); if(!audioCtx)return;
     const now=audioCtx.currentTime, o=audioCtx.createOscillator(), g=audioCtx.createGain();
-    const map={normal:[520,150,'square',.045],laser:[1100,280,'sawtooth',.055],electric:[760,180,'triangle',.06],missile:[180,70,'sawtooth',.075],support:[420,820,'sine',.045],freeze:[900,1450,'sine',.06],burn:[180,95,'sawtooth',.06]};
-    const a=map[type]||map.normal; o.type=a[2]; o.frequency.setValueAtTime(a[0],now); o.frequency.exponentialRampToValueAtTime(Math.max(40,a[1]),now+.11);
-    g.gain.setValueAtTime(a[3],now); g.gain.exponentialRampToValueAtTime(.001,now+.13); o.connect(g);g.connect(audioCtx.destination);o.start(now);o.stop(now+.14);
+    o.type=type; o.frequency.setValueAtTime(Math.max(30,freq1),now);
+    if(freq2!==freq1)o.frequency.exponentialRampToValueAtTime(Math.max(30,freq2),now+duration*.8);
+    g.gain.setValueAtTime(gain,now);g.gain.exponentialRampToValueAtTime(.001,now+duration);
+    o.connect(g);g.connect(audioCtx.destination);o.start(now);o.stop(now+duration+.02);
+  }
+  function weaponSound(type,remote=false){
+    const map={
+      normal:[520,150,'square',.045,.13],laser:[1100,280,'sawtooth',.055,.14],
+      electric:[760,180,'triangle',.06,.15],missile:[180,70,'sawtooth',.075,.18],
+      support:[420,820,'sine',.045,.22],freeze:[900,1450,'sine',.06,.18],
+      burn:[180,95,'sawtooth',.06,.18]
+    };
+    const a=map[type]||map.normal; tone(a[0],a[1],a[4],a[2],a[3]);
+  }
+  function planeEngineSound(){
+    ensureAudio(); if(!audioCtx)return;
+    const now=audioCtx.currentTime, o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    const dragon=roleSpecial()==='guru4';
+    o.type=dragon?'sawtooth':'triangle';
+    o.frequency.setValueAtTime(dragon?82:58,now);
+    o.frequency.exponentialRampToValueAtTime(dragon?48:42,now+.38);
+    g.gain.setValueAtTime(dragon?.035:.018,now);g.gain.exponentialRampToValueAtTime(.001,now+.42);
+    o.connect(g);g.connect(audioCtx.destination);o.start(now);o.stop(now+.44);
+  }
+  function dragonRoar(){
+    if(roleSpecial()!=='guru4')return;
+    ensureAudio();if(!audioCtx)return;
+    const now=audioCtx.currentTime;
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain(),lfo=audioCtx.createOscillator(),lg=audioCtx.createGain();
+    o.type='sawtooth';o.frequency.setValueAtTime(170,now);o.frequency.exponentialRampToValueAtTime(58,now+.85);
+    lfo.frequency.value=7;lg.gain.value=70;lfo.connect(lg);lg.connect(o.frequency);
+    g.gain.setValueAtTime(.001,now);g.gain.linearRampToValueAtTime(.09,now+.08);g.gain.exponentialRampToValueAtTime(.001,now+1.05);
+    o.connect(g);g.connect(audioCtx.destination);lfo.start(now);o.start(now);lfo.stop(now+1.1);o.stop(now+1.1);
+    notify('🐉 Naga Guru Kelas 4 mengaum!');
+  }
+  function bossAlarm(){
+    ensureAudio();if(!audioCtx)return;
+    const now=audioCtx.currentTime;
+    for(let i=0;i<6;i++){
+      const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+      o.type='square';o.frequency.setValueAtTime(i%2?880:520,now+i*.22);
+      g.gain.setValueAtTime(.001,now+i*.22);g.gain.linearRampToValueAtTime(.09,now+i*.22+.03);g.gain.exponentialRampToValueAtTime(.001,now+i*.22+.18);
+      o.connect(g);g.connect(audioCtx.destination);o.start(now+i*.22);o.stop(now+i*.22+.2);
+    }
+    const el=$('skyBossAlert'); if(el){el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),5200);}
+    notify('🚨 ALARM! ALIEN COLOSSUS MUNCUL!');
   }
   function broadcastEvent(type,payload={}){
+
     if(!gs?.eventsRef||!currentUser)return;
     const ev={type,by:profileKey(),role:currentUser.role||'Siswa',nama:currentUser.nama||currentUser.username||'Pemain',ts:firebase.database.ServerValue.TIMESTAMP,...payload};
     gs.eventsRef.push(ev).catch(()=>{});
@@ -4365,7 +4468,9 @@ function initGuruViews() {
     if(!gs||!gs.canvas)return;
     const r=gs.canvas.getBoundingClientRect();
     // Batasi resolusi canvas agar ringan di HP/laptop dan hemat GPU.
-    const d=Math.min(window.devicePixelRatio||1, 1);
+    const mobile=window.innerWidth<=700 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const d=mobile ? 0.9 : Math.min(window.devicePixelRatio||1,1);
+    gs.pixelRatio=d;
     gs.canvas.width=Math.max(1,Math.floor(r.width*d));
     gs.canvas.height=Math.max(1,Math.floor(r.height*d));
     gs.ctx.setTransform(d,0,0,d,0,0);
@@ -4449,9 +4554,10 @@ function initGuruViews() {
     const ey=Math.max(-gs.arenaH*.5+120,Math.min(gs.arenaH*.5-120,(gs.camY||0)-gs.h*.75-Math.random()*180));
     const e={...pool,x:ex,y:ey,ang:0,hp:pool.hp,maxHp:pool.hp,phase:Math.random()*6.28,
       lastFire:Date.now()+900+Math.random()*1400,fire:pool.fire||1700,
-      bulletSpeed:Math.min(4.2,pool.bulletSpeed||4.2),damage:Math.min(5,pool.damage||1),
-      bulletColor:pool.bulletColor||'#ef4444',targetId:null};
+      bulletSpeed:Math.min(4.2,pool.bulletSpeed||4.2),damage:Math.min(6,pool.damage||1),
+      bulletColor:pool.bulletColor||'#ef4444',targetId:null,boss:pool.type==='boss'};
     gs.enemies.push(e);
+    if(e.boss) bossAlarm();
   }
   function bullet(x,y,dx,dy,type,damage=1,color='#fef08a'){
     if(!gs)return;
@@ -4533,6 +4639,8 @@ function initGuruViews() {
   }
   function update(dt){
     if(!gs||gs.paused)return; const p=gs.player, pl=p.plane;
+    if(Date.now()-(gs.lastEngineSound||0)>1800){ gs.lastEngineSound=Date.now(); planeEngineSound(); }
+    if(roleSpecial()==='guru4' && Date.now()-(gs.lastDragonRoar||0)>22000){ gs.lastDragonRoar=Date.now(); dragonRoar(); }
     // Gerakan memakai akselerasi + perlambatan, sehingga analog/keyboard terasa halus
     // dan kecepatan mengikuti seberapa jauh analog ditekan, bukan langsung melesat.
     let ax=gs.keys.left?-1:gs.keys.right?1:gs.joy.x, ay=gs.keys.up?-1:gs.keys.down?1:gs.joy.y;
@@ -4623,6 +4731,12 @@ function initGuruViews() {
     });
     gs.boxes=gs.boxes.filter(b=>{if(Math.hypot(b.x-p.x,b.y-p.y)<42){collectBox();return false}return b.y<gs.h+50});
     gs.bullets=gs.bullets.filter(b=>b.x>-gs.arenaW*.5-120&&b.x<gs.arenaW*.5+120&&b.y>-gs.arenaH*.5-120&&b.y<gs.arenaH*.5+120&&b.life<2200);
+    // Bersihkan pesawat yang sudah tidak benar-benar online. Heartbeat > 8 detik dianggap stale.
+    const staleCutoff=Date.now()-8000;
+    Object.keys(gs.remotePlayers||{}).forEach(id=>{
+      const r=gs.remotePlayers[id];
+      if(!r || (r.updatedAt && Number(r.updatedAt)<staleCutoff)) delete gs.remotePlayers[id];
+    });
     // Gerakan pemain lain dibuat halus agar pesawat tidak melompat-lompat saat snapshot Firebase datang.
     Object.values(gs.remotePlayers||{}).forEach(r=>{
       const tx=Number(r.x)||50,ty=Number(r.y)||80;
@@ -4632,7 +4746,7 @@ function initGuruViews() {
   }
   function drawCloud(ctx,x,y,s){ctx.fillStyle='rgba(255,255,255,.82)';ctx.beginPath();ctx.arc(x,y,s*.5,0,Math.PI*2);ctx.arc(x+s*.35,y-s*.15,s*.38,0,Math.PI*2);ctx.arc(x-s*.35,y-s*.1,s*.42,0,Math.PI*2);ctx.fill();}
   function drawPlane(ctx,p){
-    const x=p.x,y=p.y,pl=p.plane,scale=pl.big||1;
+    const x=p.x,y=p.y,pl=p.plane,fit=Math.max(.62,Math.min(1,Math.min((ctx.canvas.clientWidth||900)/900,(ctx.canvas.clientHeight||620)/620)*1.15)),scale=(pl.big||1)*fit;
     ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);ctx.globalAlpha=p.inv>0?0.55:1;
     // Siluet berbeda sesuai harga pesawat: semakin mahal semakin besar dan kompleks.
     ctx.shadowBlur=0;
@@ -4715,7 +4829,19 @@ function initGuruViews() {
   }
   function drawEnemy(ctx,e){
     const s=e.size; ctx.save();ctx.translate(e.x,e.y);ctx.fillStyle=e.color;ctx.strokeStyle='#0f172a';ctx.lineWidth=2;
-    if(e.shape==='duck'){
+    if(e.shape==='alienBoss'){
+      const t=Date.now()/280;
+      ctx.shadowColor='#a78bfa';ctx.shadowBlur=20;
+      ctx.fillStyle='#4c1d95';ctx.strokeStyle='#ede9fe';ctx.lineWidth=3;
+      ctx.beginPath();ctx.ellipse(0,0,s*1.15,s*.88,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#7c3aed';ctx.beginPath();ctx.ellipse(0,-s*.55,s*.7,s*.58,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#020617';ctx.beginPath();ctx.ellipse(-s*.25,-s*.58,s*.16,s*.25,0,0,Math.PI*2);ctx.ellipse(s*.25,-s*.58,s*.16,s*.25,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#22d3ee';ctx.shadowColor='#22d3ee';ctx.shadowBlur=18;
+      ctx.beginPath();ctx.arc(-s*.25,-s*.58,5+Math.sin(t)*1.5,0,Math.PI*2);ctx.arc(s*.25,-s*.58,5+Math.sin(t)*1.5,0,Math.PI*2);ctx.fill();
+      ctx.shadowBlur=8;ctx.strokeStyle='#c4b5fd';ctx.lineWidth=4;
+      for(let i=0;i<8;i++){const a=i*Math.PI/4+t*.18;ctx.beginPath();ctx.moveTo(Math.cos(a)*s*.85,Math.sin(a)*s*.62);ctx.lineTo(Math.cos(a)*(s*1.35+Math.sin(t+i)*8),Math.sin(a)*(s*1.0+Math.sin(t+i)*8));ctx.stroke();}
+      ctx.fillStyle='#f5f3ff';ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.shadowColor='#020617';ctx.shadowBlur=6;ctx.fillText('👽 ALIEN COLOSSUS',0,s*1.72);
+    } else if(e.shape==='duck'){
       ctx.fillStyle='#facc15';ctx.beginPath();ctx.ellipse(0,4,s*.85,s*.62,0,0,Math.PI*2);ctx.fill();ctx.stroke();
       ctx.fillStyle='#fde68a';ctx.beginPath();ctx.arc(0,-s*.48,s*.48,0,Math.PI*2);ctx.fill();ctx.stroke();
       ctx.fillStyle='#f97316';ctx.beginPath();ctx.moveTo(s*.38,-s*.48);ctx.lineTo(s*.85,-s*.34);ctx.lineTo(s*.38,-s*.2);ctx.closePath();ctx.fill();
@@ -4749,7 +4875,7 @@ function initGuruViews() {
     c.save(); c.translate(-gs.camX+w*.5,-gs.camY+h*.55);
     // Lantai/grid arena membuat arah dan luas perang terlihat saat kamera bergerak.
     c.save(); c.strokeStyle='rgba(15,23,42,.12)';c.lineWidth=1;
-    const grid=320;
+    const grid=(gs.w<700?480:320);
     for(let x=-gs.arenaW*.5;x<=gs.arenaW*.5;x+=grid){c.beginPath();c.moveTo(x,-gs.arenaH*.5);c.lineTo(x,gs.arenaH*.5);c.stroke();}
     for(let y=-gs.arenaH*.5;y<=gs.arenaH*.5;y+=grid){c.beginPath();c.moveTo(-gs.arenaW*.5,y);c.lineTo(gs.arenaW*.5,y);c.stroke();}
     c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=8;c.strokeRect(-gs.arenaW*.5,-gs.arenaH*.5,gs.arenaW,gs.arenaH);
@@ -4758,6 +4884,12 @@ function initGuruViews() {
     gs.bullets.forEach(b=>{c.save();c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=b.type==='laser'?8:4;c.shadowColor=b.color;c.shadowBlur=b.type==='laser'?14:6;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*.25,b.y-b.dy*.25);c.stroke();c.restore();});
     gs.enemyBullets.forEach(b=>{c.save();c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=4;c.shadowColor=b.color;c.shadowBlur=9;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*1.8,b.y-b.dy*1.8);c.stroke();c.beginPath();c.arc(b.x,b.y,3.5,0,Math.PI*2);c.fill();c.restore();});
     gs.remoteBullets.forEach(b=>{c.save();c.strokeStyle=b.color;c.fillStyle=b.color;c.lineWidth=b.type==='laser'?7:4;c.shadowColor=b.color;c.shadowBlur=14;c.beginPath();c.moveTo(b.x,b.y);c.lineTo(b.x-b.dx*1.7,b.y-b.dy*1.7);c.stroke();c.restore();});
+    const boss=gs.enemies.find(e=>e.boss);
+    const bossBar=$('skyBossBar');
+    if(bossBar){
+      bossBar.style.display=boss?'block':'none';
+      if(boss) bossBar.querySelector('i').style.width=Math.max(0,Math.min(100,(boss.hp/boss.maxHp)*100))+'%';
+    }
     gs.enemies.forEach(e=>drawEnemy(c,e));drawPlane(c,gs.player);
     if(gs.player){c.save();c.fillStyle='rgba(15,23,42,.65)';c.fillRect(gs.player.x-28,gs.player.y+58,56,6);c.fillStyle='#22c55e';c.fillRect(gs.player.x-28,gs.player.y+58,56*((gs.player.hp??100)/100),6);c.font='bold 11px sans-serif';c.textAlign='center';c.fillStyle='#0f172a';c.fillText('HP '+Math.round(gs.player.hp??100)+'%',gs.player.x,gs.player.y+77);c.restore();}
     if(gs.remotePlayers) {
@@ -4766,6 +4898,7 @@ function initGuruViews() {
         // Pesawat siswa hanya muncul bila data akun memiliki role Siswa + nama akun.
         .filter(r=>{
           if(!r || r.id===profileKey() || r.x==null || r.y==null) return false;
+          if(r.updatedAt && Number(r.updatedAt)<Date.now()-8000) return false;
           if(r.specialRole==='guru4' || r.specialRole==='admin') return true;
           const nm=String(r.nama||r.username||'').trim();
           return r.role==='Siswa' && nm && nm.toLowerCase()!=='pemain';
@@ -4822,8 +4955,9 @@ function initGuruViews() {
     if(!gs)return;
     const raw=Math.min(50, ts-gs.prev||16); gs.prev=ts;
     gs.acc=(gs.acc||0)+raw;
-    // Game berjalan sekitar 30 FPS saat online agar hemat CPU/baterai.
-    if(gs.acc>=33){ const dt=Math.min(33,gs.acc); gs.acc=0; gs.t+=dt; update(dt); draw(); }
+    // Target 40 FPS: gerakan lebih halus tanpa memaksa CPU/GPU bekerja di 60 FPS.
+    const frameStep=(window.innerWidth<=700 || navigator.hardwareConcurrency<=4)?25:22;
+    if(gs.acc>=frameStep){ const dt=Math.min(frameStep,gs.acc); gs.acc=0; gs.t+=dt; update(dt); draw(); }
     gs.raf=requestAnimationFrame(loop);
   }
   function setupControls(){
@@ -5043,6 +5177,7 @@ function initGuruViews() {
   
   window.initSpaceGame=start;
   window.stopSpaceGame=function(){
+    if(typeof window.stopSkyVoice==='function') window.stopSkyVoice();
     if(typeof exitSkyFullscreen==='function') exitSkyFullscreen();
     if(!gs)return;
     try{saveSkySnapshot()}catch(e){}
@@ -5058,6 +5193,133 @@ function initGuruViews() {
 })();
 </script>
 
+
+
+<script id="sky-open-mic">
+(function(){
+  const VOICE_ROOT='skyBattleVoice';
+  const SIGNAL_ROOT='skyBattleSignals';
+  let voiceStream=null, voicePeers={}, voiceSignalRef=null, voicePresenceRef=null, voiceOn=false;
+  const voiceKey=()=>typeof profileFirebaseKey==='function'?profileFirebaseKey():'guest';
+  const voiceName=()=>currentUser?.nama||currentUser?.username||'Pemain';
+
+  function voiceStatus(text,live=false){
+    const b=document.getElementById('skyMicBtn'), st=document.getElementById('skyMicStatus');
+    if(b){
+      b.classList.toggle('off',!live); b.classList.toggle('live',live);
+      b.textContent=live?'🎙️ Mic ON':'🎙️ Mic OFF';
+    }
+    if(st) st.textContent=text;
+  }
+  function renderVoicePeers(){
+    const box=document.getElementById('skyVoiceList'); if(!box)return;
+    const names=Object.values(voicePeers).filter(x=>x.audio).map(x=>x.name||'Pemain');
+    box.innerHTML=names.map(n=>`<span class="sky-voice-pill">🔊 ${String(n).replace(/[&<>]/g,'')}</span>`).join('');
+  }
+  function makeAudio(stream,name){
+    const a=document.createElement('audio');a.autoplay=true;a.playsInline=true;a.controls=false;a.srcObject=stream;
+    a.dataset.voiceName=name||'Pemain';a.style.display='none';document.body.appendChild(a);
+    a.play().catch(()=>{});
+    return a;
+  }
+  function closeVoicePeer(id){
+    const p=voicePeers[id];if(!p)return;
+    try{p.pc?.close()}catch(e){}
+    try{p.audio?.remove()}catch(e){}
+    delete voicePeers[id];renderVoicePeers();
+  }
+  async function sendSignal(target,type,payload){
+    if(!voiceSignalRef||!target)return;
+    try{await voiceSignalRef.child(target).push({from:voiceKey(),name:voiceName(),type,payload,ts:firebase.database.ServerValue.TIMESTAMP});}catch(e){}
+  }
+  async function createPeer(id,name,initiator){
+    if(!voiceStream || voicePeers[id]?.pc)return voicePeers[id]?.pc;
+    const pc=new RTCPeerConnection({iceServers:[
+      {urls:'stun:stun.l.google.com:19302'},
+      {urls:'stun:stun1.l.google.com:19302'}
+    ]});
+    const rec={pc,name:name||'Pemain',audio:null};voicePeers[id]=rec;
+    voiceStream.getTracks().forEach(t=>pc.addTrack(t,voiceStream));
+    pc.onicecandidate=e=>{if(e.candidate)sendSignal(id,'ice',e.candidate.toJSON?e.candidate.toJSON():e.candidate)};
+    pc.ontrack=e=>{
+      if(!rec.audio)rec.audio=makeAudio(e.streams[0],rec.name);
+      else rec.audio.srcObject=e.streams[0];
+      renderVoicePeers();
+    };
+    pc.onconnectionstatechange=()=>{
+      if(['failed','closed','disconnected'].includes(pc.connectionState) && voicePeers[id]===rec) closeVoicePeer(id);
+    };
+    if(initiator){
+      const offer=await pc.createOffer({offerToReceiveAudio:true});await pc.setLocalDescription(offer);
+      await sendSignal(id,'offer',{type:pc.localDescription.type,sdp:pc.localDescription.sdp});
+    }
+    return pc;
+  }
+  async function handleSignal(snap){
+    const m=snap.val();if(!m||m.from===voiceKey()||!voiceOn)return;
+    const from=m.from,name=m.name||'Pemain';
+    try{
+      if(m.type==='offer'){
+        const pc=await createPeer(from,name,false);
+        await pc.setRemoteDescription(new RTCSessionDescription(m.payload));
+        const answer=await pc.createAnswer({offerToReceiveAudio:true});await pc.setLocalDescription(answer);
+        await sendSignal(from,'answer',{type:pc.localDescription.type,sdp:pc.localDescription.sdp});
+      }else if(m.type==='answer'){
+        const rec=voicePeers[from];if(rec?.pc && rec.pc.signalingState!=='stable')await rec.pc.setRemoteDescription(new RTCSessionDescription(m.payload));
+      }else if(m.type==='ice'){
+        const rec=voicePeers[from];if(rec?.pc && m.payload)await rec.pc.addIceCandidate(new RTCIceCandidate(m.payload));
+      }
+    }catch(e){console.warn('Open Mic:',e)}
+    try{snap.ref.remove()}catch(e){}
+  }
+  async function connectToOnlinePlayers(){
+    if(!voiceOn||!voiceStream||typeof gs==='undefined'||!gs?.remotePlayers)return;
+    for(const [id,v] of Object.entries(gs.remotePlayers)){
+      if(id===profileKey() || !v || !v.updatedAt)continue;
+      // Hanya satu sisi yang membuat offer, mencegah dua koneksi ganda.
+      if(String(voiceKey())<String(id)) await createPeer(id,v.nama||v.username||'Pemain',true);
+    }
+  }
+  async function startVoice(){
+    if(!currentUser)return;
+    if(!navigator.mediaDevices?.getUserMedia){
+      voiceStatus('Browser ini tidak mendukung mikrofon.',false);return;
+    }
+    if(!window.isSecureContext && location.hostname!=='localhost'){
+      voiceStatus('Mic membutuhkan HTTPS.',false);return;
+    }
+    try{
+      voiceStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},video:false});
+      voiceOn=true;
+      voiceSignalRef=firebase.database().ref(SIGNAL_ROOT).child(voiceKey());
+      voicePresenceRef=firebase.database().ref(VOICE_ROOT).child(voiceKey());
+      voicePresenceRef.set({id:voiceKey(),name:voiceName(),updatedAt:firebase.database.ServerValue.TIMESTAMP});
+      voicePresenceRef.onDisconnect().remove();
+      voiceSignalRef.on('child_added',handleSignal);
+      voiceStatus('Mic aktif • bicara dengan pemain online',true);
+      await connectToOnlinePlayers();
+      notify('🎙️ Open Mic aktif. Bicara seperti biasa!');
+    }catch(e){
+      voiceOn=false;
+      voiceStatus(e?.name==='NotAllowedError'?'Izin mikrofon ditolak.':'Mic gagal aktif.',false);
+    }
+  }
+  function stopVoice(){
+    voiceOn=false;
+    try{voiceSignalRef?.off('child_added',handleSignal)}catch(e){}
+    try{voicePresenceRef?.remove()}catch(e){}
+    voiceSignalRef=null;voicePresenceRef=null;
+    Object.keys(voicePeers).forEach(closeVoicePeer);
+    try{voiceStream?.getTracks().forEach(t=>t.stop())}catch(e){}
+    voiceStream=null;voiceStatus('Mic mati',false);
+  }
+  window.toggleSkyMic=function(){voiceOn?stopVoice():startVoice()};
+  window.stopSkyVoice=stopVoice;
+  window.startSkyVoice=startVoice;
+  // Poll ringan untuk pemain baru; tidak mengganggu loop game.
+  setInterval(()=>{if(voiceOn)connectToOnlinePlayers()},2500);
+})();
+</script>
 
 <script id="sky-game-persist">
 (function(){
