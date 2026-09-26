@@ -473,6 +473,32 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
  @media (orientation:portrait) and (max-width:900px){body.sky-game-fullscreen #skyRotateHint{display:block;position:fixed;inset:0;z-index:10000;background:linear-gradient(180deg,#0ea5e9,#38bdf8);color:#fff;font-weight:1000;text-align:center;padding-top:28vh;font-size:28px;text-shadow:0 3px 8px rgba(15,23,42,.35);pointer-events:none;}}
  .sky-low-data{font-size:10px;color:#64748b;margin-top:3px;}
  @media (prefers-reduced-motion: reduce){#skyCanvas{scroll-behavior:auto}.sky-game-shell *{animation:none!important;transition:none!important;}}
+
+        /* ===== SCHOOL RPG GAME VISIBILITY / MOBILE FIX ===== */
+        #secSkyBattle.school-rpg-force-visible {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            position: relative !important;
+            width: 100vw !important;
+            min-height: 100vh !important;
+        }
+
+        html.sky-game-fullscreen,
+        body.sky-game-fullscreen {
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 100% !important;
+            margin: 0 !important;
+            overflow: hidden !important;
+        }
+
+        @media (max-width: 900px) and (orientation: portrait) {
+            #secSkyBattle.school-rpg-force-visible {
+                min-height: 100dvh !important;
+            }
+        }
+
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -2087,7 +2113,77 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
             if(gameHint) gameHint.textContent='Klik roket untuk masuk';
         }
 
-        function showDashboard(role) {
+        
+        /* ===== AUTO OPEN SCHOOL RPG AFTER LOGIN ===== */
+        async function openSchoolGameAfterLogin() {
+            if (!currentUser) return;
+
+            const gameSection = document.getElementById('secSkyBattle');
+            if (!gameSection) {
+                console.error('Area game #secSkyBattle tidak ditemukan.');
+                return;
+            }
+
+            // Sembunyikan halaman login/panel kerja dan tampilkan game.
+            document.getElementById('secLogin')?.classList.add('hidden');
+            ['secAdmin','secGuru','secSiswa'].forEach(id => {
+                document.getElementById(id)?.classList.add('hidden');
+            });
+
+            gameSection.classList.remove('hidden');
+            gameSection.classList.add('school-rpg-force-visible');
+            document.body.classList.add('sky-home-mode');
+            document.body.classList.remove('sky-panel-mode');
+
+            // Update tombol role/panel bila tersedia.
+            if (typeof updateRoleRocketButton === 'function') {
+                updateRoleRocketButton(currentUser.role);
+            }
+
+            // Jalankan engine game secara aman.
+            try {
+                if (typeof initSpaceGame === 'function') {
+                    initSpaceGame();
+                } else if (typeof initSchoolGame === 'function') {
+                    initSchoolGame();
+                }
+            } catch (err) {
+                console.error('Gagal menjalankan game:', err);
+            }
+
+            // Fullscreen hanya dicoba setelah aksi login pengguna.
+            try {
+                if (typeof enterSkyFullscreen === 'function') {
+                    await enterSkyFullscreen();
+                } else if (!document.fullscreenElement &&
+                           document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen({navigationUI:'hide'});
+                }
+            } catch (err) {
+                console.warn('Fullscreen diblokir browser:', err);
+            }
+
+            // Mobile: landscape jika browser mendukung.
+            try {
+                if (screen.orientation?.lock) {
+                    await screen.orientation.lock('landscape');
+                }
+            } catch (err) {
+                // Tidak semua browser/HP mengizinkan orientation.lock.
+            }
+
+            // Beri waktu canvas menghitung ukuran layar.
+            setTimeout(() => {
+                try {
+                    if (typeof resize === 'function') resize();
+                    if (typeof window.dispatchEvent === 'function') {
+                        window.dispatchEvent(new Event('resize'));
+                    }
+                } catch (e) {}
+            }, 150);
+        }
+
+function showDashboard(role) {
             document.getElementById('secLogin').classList.add('hidden');
             document.getElementById('userInfo').classList.remove('hidden');
             const chatWidget = document.getElementById('chatWidget');
@@ -2125,7 +2221,10 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
             requestAnimationFrame(() => {
                 document.getElementById('secSkyBattle')?.scrollIntoView({behavior:'auto', block:'start'});
             });
-        }
+        
+            // Setelah dashboard siap, semua role langsung masuk ke game.
+            setTimeout(() => openSchoolGameAfterLogin(), 80);
+}
 
         // Panel kerja dibuka hanya ketika tombol 🚀 ditekan. Inisialisasi berat ditunda
         // sampai panel benar-benar dibutuhkan sehingga login tetap ringan.
@@ -2136,6 +2235,7 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
             document.body.classList.remove('sky-home-mode');
             document.body.classList.add('sky-panel-mode');
             document.getElementById('secSkyBattle')?.classList.add('hidden');
+            document.getElementById('secSkyBattle')?.classList.remove('school-rpg-force-visible');
             const role=currentUser.role;
             const target=role==='Admin'?'secAdmin':role==='Guru'?'secGuru':'secSiswa';
             ['secAdmin','secGuru','secSiswa'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));
@@ -2176,6 +2276,7 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
             document.body.classList.remove('sky-panel-mode');
             ['secAdmin','secGuru','secSiswa'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));
             document.getElementById('secSkyBattle')?.classList.remove('hidden');
+            document.getElementById('secSkyBattle')?.classList.add('school-rpg-force-visible');
             if(currentUser) updateRoleRocketButton(currentUser.role);
             if(typeof initSpaceGame==='function') initSpaceGame();
             requestAnimationFrame(()=>document.getElementById('secSkyBattle')?.scrollIntoView({behavior:'smooth',block:'start'}));
