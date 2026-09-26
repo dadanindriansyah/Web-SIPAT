@@ -499,6 +499,131 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
             }
         }
 
+
+/* ===== SCHOOL RPG 3D/D4 ACTIVITY MODE ===== */
+#schoolRpg3DOverlay{
+  position:fixed; inset:0; z-index:9998; display:none;
+  background:linear-gradient(180deg,#8ed8ff 0%,#dff7ff 52%,#78c850 52%,#4e9e42 100%);
+  overflow:hidden; font-family:Arial,sans-serif;
+}
+#schoolRpg3DOverlay.active{display:block}
+.rpg3d-top{
+  position:absolute;left:14px;right:14px;top:12px;z-index:10;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  pointer-events:none;
+}
+.rpg-name{
+  pointer-events:auto;background:rgba(15,23,42,.86);color:#fff;
+  padding:9px 14px;border-radius:14px;font-weight:800;
+  box-shadow:0 5px 16px rgba(0,0,0,.22)
+}
+.rpg-name small{display:block;color:#cbd5e1;font-weight:500;font-size:11px}
+.rpg-logout{
+  pointer-events:auto;border:0;border-radius:12px;padding:9px 13px;
+  background:#ef4444;color:#fff;font-weight:800;cursor:pointer
+}
+.rpg-world{
+  position:absolute;inset:0;overflow:hidden;
+  perspective:900px;
+}
+.rpg-ground{
+  position:absolute;left:-15%;right:-15%;bottom:-18%;height:70%;
+  transform:rotateX(58deg);
+  transform-origin:center bottom;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px),
+    linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),
+    #4f9f43;
+  background-size:70px 70px;
+  box-shadow:inset 0 25px 80px rgba(0,0,0,.15);
+}
+.rpg-building{
+  position:absolute;width:240px;height:140px;background:#fff7ed;
+  border:7px solid #b45309;border-radius:8px;
+  left:50%;top:34%;transform:translate(-50%,-50%) translateZ(30px);
+  box-shadow:0 25px 40px rgba(0,0,0,.25);
+}
+.rpg-building:before{
+  content:"SEKOLAH";position:absolute;left:50%;top:10px;
+  transform:translateX(-50%);font-weight:900;color:#1e3a8a;
+}
+.rpg-roof{
+  position:absolute;left:-28px;right:-28px;top:-58px;height:70px;
+  background:#dc2626;clip-path:polygon(50% 0,100% 100%,0 100%);
+}
+.rpg-door{
+  position:absolute;width:44px;height:72px;bottom:0;left:98px;
+  background:#7c2d12;border:4px solid #431407;border-bottom:0
+}
+.rpg-window{
+  position:absolute;width:42px;height:42px;top:50px;background:#93c5fd;
+  border:4px solid #1e3a8a
+}
+.rpg-window.w1{left:22px}.rpg-window.w2{right:22px}
+.rpg-character{
+  position:absolute;left:50%;top:66%;width:54px;height:80px;
+  transform:translate(-50%,-50%);z-index:6;transition:.18s;
+}
+.rpg-character .head{
+  width:30px;height:30px;border-radius:50%;background:#f2c6a0;
+  margin:auto;border:2px solid rgba(0,0,0,.25)
+}
+.rpg-character .body{
+  width:46px;height:42px;margin:0 auto;border-radius:8px 8px 5px 5px;
+  background:#fff;border:3px solid #dc2626;box-shadow:0 6px 8px rgba(0,0,0,.2)
+}
+.rpg-character.guru .body,.rpg-character.admin .body{background:#111827;border-color:#374151}
+.rpg-character .label{
+  position:absolute;top:-25px;left:50%;transform:translateX(-50%);
+  white-space:nowrap;background:rgba(15,23,42,.9);color:#fff;
+  padding:3px 7px;border-radius:8px;font-size:10px;font-weight:800
+}
+.rpg-activities{
+  position:absolute;left:50%;bottom:18px;transform:translateX(-50%);
+  z-index:20;display:flex;flex-wrap:wrap;justify-content:center;gap:8px;
+  width:min(94vw,900px)
+}
+.rpg-act{
+  border:0;border-radius:13px;padding:10px 12px;background:rgba(15,23,42,.9);
+  color:#fff;font-weight:800;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.2)
+}
+.rpg-act:hover{transform:translateY(-2px);background:#1d4ed8}
+.rpg-scene{
+  position:absolute;left:50%;top:58%;transform:translate(-50%,-50%);
+  z-index:12;width:min(92vw,720px);min-height:230px;display:none;
+  padding:22px;border-radius:20px;background:rgba(255,255,255,.96);
+  box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center
+}
+.rpg-scene.active{display:block}
+.rpg-scene h2{margin:0 0 8px;color:#1e3a8a}
+.rpg-scene button{margin:5px;padding:9px 12px;border:0;border-radius:10px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer}
+.rpg-chat{
+  position:absolute;right:14px;bottom:95px;z-index:25;width:min(300px,82vw);
+  background:rgba(15,23,42,.9);color:#fff;border-radius:15px;padding:10px
+}
+.rpg-chat input{width:100%;box-sizing:border-box;border:0;border-radius:8px;padding:8px;margin-top:6px}
+.rpg-chat button{margin-top:6px;border:0;border-radius:8px;padding:7px 10px;background:#22c55e;color:#fff;font-weight:800}
+.rpg-effects{position:absolute;inset:0;pointer-events:none;z-index:30}
+.rpg-effect{
+  position:absolute;left:50%;top:55%;transform:translate(-50%,-50%) scale(.3);
+  opacity:0;font-size:90px;font-weight:900;
+}
+.rpg-effect.show{animation:rpgEffect .85s ease-out forwards}
+@keyframes rpgEffect{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-10deg)}
+  25%{opacity:1;transform:translate(-50%,-50%) scale(1.1) rotate(4deg)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.6) rotate(0)}
+}
+.rpg-music{margin-top:10px}
+.rpg-music input{width:100%;box-sizing:border-box;padding:9px;border:1px solid #cbd5e1;border-radius:9px}
+.rpg-music iframe{width:100%;height:170px;border:0;border-radius:10px;margin-top:8px}
+@media(max-width:700px){
+  .rpg-activities{bottom:8px}
+  .rpg-act{font-size:11px;padding:8px 9px}
+  .rpg-building{top:31%;transform:translate(-50%,-50%) scale(.8)}
+  .rpg-chat{bottom:78px}
+}
+
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -2224,6 +2349,7 @@ function showDashboard(role) {
         
             // Setelah dashboard siap, semua role langsung masuk ke game.
             setTimeout(() => openSchoolGameAfterLogin(), 80);
+            setTimeout(() => { if (typeof openSchoolRpg3D === 'function') openSchoolRpg3D(); }, 160);
 }
 
         // Panel kerja dibuka hanya ketika tombol 🚀 ditekan. Inisialisasi berat ditunda
@@ -5582,6 +5708,265 @@ window.logout=function(){
  if(typeof oldLogout==="function")return oldLogout.apply(this,arguments);
 };
 document.addEventListener("visibilitychange",()=>{if(document.hidden)try{saveState()}catch(e){}});
+})();
+</script>
+
+
+<!-- ===== SCHOOL RPG 3D/D4 OVERLAY ===== -->
+<div id="schoolRpg3DOverlay">
+  <div class="rpg3d-top">
+    <div class="rpg-name" id="rpgUserName">👤 Memuat...
+      <small id="rpgUserRole">Role</small>
+    </div>
+    <button class="rpg-logout" id="rpgBackPanel">☰ Panel</button>
+  </div>
+
+  <div class="rpg-world">
+    <div class="rpg-ground"></div>
+    <div class="rpg-building">
+      <div class="rpg-roof"></div><div class="rpg-window w1"></div>
+      <div class="rpg-window w2"></div><div class="rpg-door"></div>
+    </div>
+    <div class="rpg-character" id="rpgCharacter">
+      <div class="label" id="rpgCharLabel">Siswa</div>
+      <div class="head"></div><div class="body"></div>
+    </div>
+  </div>
+
+  <div class="rpg-effects" id="rpgEffects">
+    <div class="rpg-effect" id="rpgEffect">❄️</div>
+  </div>
+
+  <div class="rpg-activities">
+    <button class="rpg-act" data-act="kelas">📚 Kelas</button>
+    <button class="rpg-act" data-act="sampah">🧹 Sampah</button>
+    <button class="rpg-act" data-act="upacara">🇮🇩 Upacara</button>
+    <button class="rpg-act" data-act="bertani">🌱 Bertani</button>
+    <button class="rpg-act" data-act="panggung">🎤 Panggung</button>
+    <button class="rpg-act" data-act="olahraga">⚽ Olahraga</button>
+    <button class="rpg-act" data-act="sepeda">🚲 Sepeda</button>
+    <button class="rpg-act" data-act="jajan">🍜 Jajan</button>
+  </div>
+
+  <div class="rpg-scene" id="rpgScene"></div>
+
+  <div class="rpg-chat">
+    💬 <b>Chat</b>
+    <input id="rpgChatInput" placeholder="Tulis pesan...">
+    <button id="rpgChatSend">Kirim</button>
+    <button id="rpgMicBtn">🎙️ Mic</button>
+  </div>
+</div>
+
+
+<script>
+/* ===== SCHOOL RPG 3D/D4 ENGINE ===== */
+(function(){
+  const $ = id => document.getElementById(id);
+  let rpgMicStream = null;
+  let rpgChatMessages = [];
+
+  function rpgCurrentUser(){
+    return (typeof currentUser !== 'undefined' && currentUser) ? currentUser : null;
+  }
+
+  function isGuruKelas4(){
+    const u = rpgCurrentUser();
+    if(!u || u.role !== 'Guru') return false;
+    const kelas = String(u.kelas || u.Kelas || '').trim().toLowerCase();
+    const jenis = String(u.jenisGuru || u.JenisGuru || '').toLowerCase();
+    return kelas === '4' || kelas.includes('kelas 4') ||
+           jenis.includes('kelas 4');
+  }
+
+  function showRpgEffect(icon, text){
+    const el = $('rpgEffect');
+    if(!el) return;
+    el.textContent = icon + ' ' + text;
+    el.classList.remove('show');
+    void el.offsetWidth;
+    el.classList.add('show');
+  }
+
+  function openActivity(act){
+    const u = rpgCurrentUser();
+    if(!u) return;
+    const scene = $('rpgScene');
+    if(!scene) return;
+
+    const names = {
+      kelas:['📚 Ruang Kelas','Belajar, berdiskusi dan berbicara dengan teman.'],
+      sampah:['🧹 Bersih-Bersih','Cari sampah di lingkungan sekolah dan kumpulkan.'],
+      upacara:['🇮🇩 Upacara Bendera','Masuk ke lapangan dan ikuti kegiatan upacara.'],
+      bertani:['🌱 Kebun Sekolah','Tanam, siram, dan rawat tanaman.'],
+      panggung:['🎤 Panggung Karaoke','Naik ke panggung. Mic dapat digunakan untuk bernyanyi.'],
+      olahraga:['⚽ Lapangan Olahraga','Pilih permainan olahraga yang ingin dilakukan.'],
+      sepeda:['🚲 Area Sepeda','Berkeliling menggunakan sepeda.'],
+      jajan:['🍜 Kantin','Pilih makanan/minuman dan istirahat.']
+    };
+    const [title,desc] = names[act] || ['Aktivitas','Silakan bermain.'];
+
+    let extra = '';
+    if(act === 'panggung'){
+      extra = `
+        <div class="rpg-music">
+          <b>🎵 Karaoke YouTube</b>
+          <input id="rpgYoutubeUrl" placeholder="Tempel URL YouTube di sini">
+          <button id="rpgYoutubePlay">▶️ Putar</button>
+          <div id="rpgYoutubePlayer"></div>
+        </div>`;
+    }
+
+    if(u.role === 'Guru' && isGuruKelas4()){
+      extra += `
+        <hr style="margin:12px 0">
+        <b>👨‍🏫 Kontrol Guru Kelas 4</b><br>
+        <button onclick="schoolRpgGuruEffect('freeze')">❄️ Beku</button>
+        <button onclick="schoolRpgGuruEffect('fire')">🔥 Api</button>
+        <button onclick="schoolRpgGuruEffect('pushup')">💪 Push Up</button>
+        <button onclick="schoolRpgGuruEffect('squat')">🦵 Skotjam</button>`;
+    }
+
+    scene.innerHTML = `<h2>${title}</h2><p>${desc}</p>${extra}
+      <button onclick="schoolRpgCloseActivity()">✕ Tutup</button>`;
+    scene.classList.add('active');
+
+    if(act === 'panggung'){
+      const btn = $('rpgYoutubePlay');
+      if(btn) btn.onclick = schoolRpgPlayYoutube;
+    }
+
+    try{
+      if(typeof saveAppData === 'function'){
+        const key = 'schoolRpgActivities';
+        const old = JSON.parse(localStorage.getItem(key) || '[]');
+        old.push({username:u.username,nama:u.nama,role:u.role,activity:act,time:new Date().toISOString()});
+        saveAppData(key, JSON.stringify(old.slice(-500)));
+      }
+    }catch(e){}
+  }
+
+  window.schoolRpgCloseActivity = function(){
+    $('rpgScene')?.classList.remove('active');
+  };
+
+  window.schoolRpgGuruEffect = function(type){
+    if(!isGuruKelas4()) return alert('Fitur ini khusus Guru Kelas 4.');
+    const map = {
+      freeze:['❄️','BEKU!'],
+      fire:['🔥','API!'],
+      pushup:['💪','PUSH UP!'],
+      squat:['🦵','SKOTJAM!']
+    };
+    const [icon,text] = map[type] || ['✨','AKSI!'];
+    showRpgEffect(icon,text);
+
+    const u=rpgCurrentUser();
+    try{
+      if(typeof saveAppData === 'function'){
+        const key='schoolRpgDiscipline';
+        const old=JSON.parse(localStorage.getItem(key)||'[]');
+        old.push({guru:u?.nama,username:u?.username,type,time:new Date().toISOString()});
+        saveAppData(key,JSON.stringify(old.slice(-500)));
+      }
+    }catch(e){}
+  };
+
+  function youtubeId(url){
+    const m=String(url||'').match(
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([A-Za-z0-9_-]{6,})/
+    );
+    return m ? m[1] : '';
+  }
+
+  window.schoolRpgPlayYoutube = function(){
+    const url=$('rpgYoutubeUrl')?.value.trim();
+    const id=youtubeId(url);
+    if(!id) return alert('Masukkan URL YouTube yang valid.');
+    $('rpgYoutubePlayer').innerHTML =
+      `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0"
+       allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+  };
+
+  async function toggleMic(){
+    const btn=$('rpgMicBtn');
+    if(rpgMicStream){
+      rpgMicStream.getTracks().forEach(t=>t.stop());
+      rpgMicStream=null;
+      if(btn) btn.textContent='🎙️ Mic';
+      return;
+    }
+    try{
+      rpgMicStream=await navigator.mediaDevices.getUserMedia({audio:true});
+      if(btn) btn.textContent='🔴 Mic Aktif';
+    }catch(e){
+      alert('Mic tidak dapat digunakan. Izinkan akses mikrofon pada browser.');
+    }
+  }
+
+  function sendChat(){
+    const input=$('rpgChatInput');
+    const text=input?.value.trim();
+    const u=rpgCurrentUser();
+    if(!text || !u) return;
+    rpgChatMessages.push({nama:u.nama||u.username,text,time:Date.now()});
+    rpgChatMessages=rpgChatMessages.slice(-100);
+    try{
+      if(typeof saveAppData==='function'){
+        saveAppData('schoolRpgChat',JSON.stringify(rpgChatMessages));
+      }
+    }catch(e){}
+    input.value='';
+    showRpgEffect('💬','Pesan terkirim');
+  }
+
+  window.openSchoolRpg3D = async function(){
+    const u=rpgCurrentUser();
+    if(!u) return;
+    const overlay=$('schoolRpg3DOverlay');
+    if(!overlay) return;
+    overlay.classList.add('active');
+
+    $('rpgUserName').childNodes[0].textContent='👤 '+(u.nama||u.username)+' ';
+    $('rpgUserRole').textContent=(u.role||'Pengguna')+(u.kelas?' • Kelas '+u.kelas:'');
+    $('rpgCharLabel').textContent=u.nama||u.username;
+
+    const ch=$('rpgCharacter');
+    ch?.classList.remove('guru','admin');
+    if(u.role==='Guru') ch?.classList.add('guru');
+    if(u.role==='Admin') ch?.classList.add('admin');
+
+    try{
+      if(document.documentElement.requestFullscreen && !document.fullscreenElement)
+        await document.documentElement.requestFullscreen({navigationUI:'hide'});
+    }catch(e){}
+    try{
+      if(screen.orientation?.lock) await screen.orientation.lock('landscape');
+    }catch(e){}
+  };
+
+  window.closeSchoolRpg3D = function(){
+    $('schoolRpg3DOverlay')?.classList.remove('active');
+    if(rpgMicStream){
+      rpgMicStream.getTracks().forEach(t=>t.stop());
+      rpgMicStream=null;
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    document.querySelectorAll('.rpg-act').forEach(b=>{
+      b.addEventListener('click',()=>openActivity(b.dataset.act));
+    });
+    $('rpgMicBtn')?.addEventListener('click',toggleMic);
+    $('rpgChatSend')?.addEventListener('click',sendChat);
+    $('rpgChatInput')?.addEventListener('keydown',e=>{
+      if(e.key==='Enter') sendChat();
+    });
+    $('rpgBackPanel')?.addEventListener('click',()=>{
+      closeSchoolRpg3D();
+      if(typeof openRolePanel==='function') openRolePanel();
+    });
+  });
 })();
 </script>
 
