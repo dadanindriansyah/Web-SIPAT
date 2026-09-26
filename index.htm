@@ -509,6 +509,44 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
 }
 </style>
 
+
+<style id="school-rpg-style">
+.school-rpg-shell{position:relative;overflow:hidden;border-radius:28px;background:#87ceeb;border:4px solid #fff;box-shadow:0 20px 55px rgba(15,23,42,.18)}
+.school-rpg-topbar{position:relative;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:10px 14px;background:linear-gradient(135deg,#14532d,#166534);color:#fff}
+.rpg-brand{display:flex;align-items:center;gap:8px;font-size:14px}.rpg-brand span{font-size:10px;background:#facc15;color:#713f12;padding:5px 9px;border-radius:999px}
+.rpg-stats{display:flex;gap:6px;flex-wrap:wrap}.rpg-stats span{font-size:10px;background:rgba(255,255,255,.13);padding:5px 8px;border-radius:999px}
+.school-rpg-stage{position:relative;height:min(76vh,760px);min-height:520px;background:#9bdc7a}
+#skyCanvas{width:100%;height:100%;display:block;touch-action:none;cursor:default}
+.rpg-location-label{position:absolute;top:12px;left:14px;z-index:8;color:#fff;text-shadow:0 2px 4px #14532d;font-size:14px;font-weight:1000}
+.rpg-announcement{position:absolute;z-index:5;right:22px;top:105px;width:190px;padding:10px;border:4px solid #854d0e;border-radius:12px;background:#fef3c7;color:#713f12;box-shadow:0 8px 0 rgba(120,53,15,.35),0 12px 25px rgba(0,0,0,.18);transform:rotate(-2deg)}
+.rpg-announcement small{display:block;font-size:9px;margin-top:4px;line-height:1.3}
+.rpg-action-panel{position:absolute;z-index:20;left:50%;bottom:22px;transform:translateX(-50%);min-width:270px;max-width:calc(100% - 24px);display:none;background:rgba(255,255,255,.97);padding:10px;border-radius:18px;box-shadow:0 15px 35px rgba(15,23,42,.25);border:2px solid #bfdbfe;text-align:center}
+.rpg-action-panel.open{display:block}.rpg-action-panel button{margin:3px;padding:8px 11px;border:0;border-radius:12px!important;background:#2563eb;color:#fff;font-weight:900;font-size:10px;cursor:pointer}
+.rpg-action-panel button.alt{background:#16a34a}.rpg-action-panel button.warn{background:#f59e0b;color:#422006}
+.rpg-hud-help{position:absolute;z-index:8;left:14px;bottom:16px;max-width:240px;padding:8px 10px;border-radius:13px;background:rgba(15,23,42,.7);color:#fff;font-size:9px;line-height:1.45}
+.rpg-mic-panel{position:absolute;z-index:25;right:14px;bottom:14px;display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.rpg-mic-panel button{border:2px solid #fff;border-radius:14px!important;padding:8px 10px;background:#2563eb;color:#fff;font-weight:1000;font-size:10px;box-shadow:0 5px 15px rgba(0,0,0,.2)}
+#rpgMicBtn.on{background:#dc2626}.rpg-mic-panel span{font-size:9px;color:#fff;background:rgba(15,23,42,.65);padding:6px 8px;border-radius:10px}
+.rpg-chat-box,.rpg-monitor-panel,.rpg-schedule-panel{position:absolute;z-index:40;display:none;background:#fff;border:2px solid #bfdbfe;border-radius:18px;overflow:hidden;box-shadow:0 20px 50px rgba(15,23,42,.35)}
+.rpg-chat-box.open,.rpg-monitor-panel.open,.rpg-schedule-panel.open{display:flex;flex-direction:column}
+.rpg-chat-box{right:14px;bottom:80px;width:min(360px,calc(100% - 28px));height:310px}
+.rpg-chat-head,.rpg-monitor-head{padding:9px 11px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;display:flex;justify-content:space-between;align-items:center;font-size:11px}
+.rpg-chat-head button,.rpg-monitor-head button{border:0;background:transparent;color:#fff;font-weight:900}
+.rpg-chat-messages{flex:1;overflow:auto;padding:8px;background:#eff6ff}.rpg-chat-msg{padding:6px 8px;margin:5px 0;border-radius:10px;background:#fff;border:1px solid #dbeafe;font-size:10px}.rpg-chat-msg.me{margin-left:20px;background:#2563eb;color:#fff}
+.rpg-chat-msg b{display:block;font-size:9px}.rpg-chat-form{display:flex;gap:5px;padding:7px;border-top:1px solid #dbeafe}.rpg-chat-form input{flex:1;min-width:0;border:1px solid #cbd5e1;padding:7px;border-radius:10px!important}.rpg-chat-form button{width:35px;border:0;border-radius:10px!important;background:#2563eb;color:#fff}
+.rpg-monitor-panel{left:14px;top:55px;width:min(390px,calc(100% - 28px));max-height:72%;}.rpg-monitor-panel>div:last-child{padding:8px;overflow:auto}
+.rpg-student-row{padding:8px;margin:5px 0;border-radius:10px;background:#f8fafc;border:1px solid #e2e8f0;font-size:10px}.rpg-student-row strong{font-size:11px}.rpg-progress{height:7px;background:#e2e8f0;border-radius:9px;overflow:hidden;margin-top:4px}.rpg-progress i{display:block;height:100%;background:#22c55e}
+.rpg-schedule-panel{right:14px;top:55px;width:min(280px,calc(100% - 28px));padding:11px;color:#0f172a;font-size:10px}.rpg-schedule-item{padding:7px;border-bottom:1px solid #e2e8f0}.rpg-schedule-item.active{background:#dcfce7;border-radius:9px;font-weight:900}
+.rpg-touch-controls{position:absolute;z-index:22;inset:0;pointer-events:none}.rpg-joystick{position:absolute;left:15px;bottom:15px;width:112px;height:112px;border-radius:50%;background:rgba(15,23,42,.22);border:3px solid rgba(255,255,255,.8);pointer-events:auto;touch-action:none}.rpg-knob{position:absolute;width:50px;height:50px;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;background:#fff;border:3px solid #60a5fa;box-shadow:0 5px 14px rgba(0,0,0,.25)}
+.rpg-touch-actions{position:absolute;right:12px;bottom:12px;display:flex;gap:7px;pointer-events:auto}.rpg-touch-actions button{width:52px;height:52px;border:3px solid #fff;border-radius:50%!important;background:#2563eb;color:#fff;font-size:20px;box-shadow:0 7px 18px rgba(0,0,0,.25)}
+.rpg-notice{position:absolute;z-index:50;top:48px;left:50%;transform:translateX(-50%);display:none;max-width:75%;padding:9px 13px;border-radius:13px;background:rgba(15,23,42,.9);color:#fff;font-size:11px;font-weight:900;text-align:center}
+.rpg-notice.show{display:block}
+.rpg-guru4-controls{display:none;position:absolute;z-index:35;left:50%;top:52px;transform:translateX(-50%);gap:5px;align-items:center;flex-wrap:wrap;justify-content:center;padding:7px 9px;background:rgba(15,23,42,.9);border:2px solid #fff;border-radius:14px;color:#fff;font-size:9px}.rpg-guru4-controls button{border:0;border-radius:10px!important;padding:7px 9px;color:#fff;font-weight:900;font-size:9px}.rpg-guru4-controls button:nth-child(2){background:#0284c7}.rpg-guru4-controls button:nth-child(3){background:#ea580c}.rpg-guru4-controls button:nth-child(4){background:#be123c}.rpg-guru4-controls button:nth-child(5){background:#7c3aed}
+.rpg-bottom-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;background:#fff;border-top:1px solid #dbeafe}.rpg-bottom-bar small{font-size:9px;color:#64748b}.rpg-bottom-buttons{display:flex;gap:6px;flex-wrap:wrap}.rpg-bottom-buttons button{border:0;padding:8px 10px;border-radius:11px!important;background:#2563eb;color:#fff;font-size:10px;font-weight:900}
+@media(max-width:700px){.school-rpg-stage{height:68vh;min-height:440px}.rpg-hud-help{display:none}.rpg-location-label{font-size:10px}.rpg-announcement{right:8px;top:70px;width:150px;font-size:10px}.rpg-mic-panel{right:8px;bottom:76px}.rpg-touch-controls{display:block}.rpg-bottom-bar{padding-bottom:8px}.rpg-bottom-buttons button{font-size:9px;padding:7px}.rpg-stats span:nth-child(3){max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
+@media(min-width:701px){.rpg-touch-controls{display:block}.rpg-joystick{opacity:.6}.rpg-touch-actions{opacity:.75}}
+</style>
+
 </head>
 <body class="bg-slate-100 font-sans min-h-screen text-slate-800">
 
@@ -1532,96 +1570,104 @@ body.sky-panel-mode #schoolFeatureDock #skyBackToGame{display:inline-flex}
 
 
     
-<!-- ===== MULTIPLAYER SKY BATTLE ===== -->
+
+<!-- ===== SIPAT SCHOOL LIFE RPG ===== -->
 <section id="secSkyBattle" class="hidden no-print">
-  <div id="skyRotateHint">📱↔️<div style="margin-top:12px">Putar HP ke posisi <b>LANDSCAPE</b><br><span style="font-size:12px;font-weight:600;opacity:.8">Game akan memenuhi layar secara otomatis.</span></div></div>
-  <div class="sky-game-shell">
-    <div class="sky-topbar">
-      <div class="sky-stat"><span>✈️ SKY BATTLE</span><span id="skyRoleBadge" class="sky-chip">Memuat...</span></div>
-      <div class="sky-stat"><span>💰 <b id="skyPoints">0</b> Poin</span><span class="sky-chip">☠️ <b id="skyKills">0</b> Musuh</span><span class="sky-chip">🌐 <b id="skyPlayers">1</b> Pemain</span></div>
-    </div>
-    <div style="position:relative">
-      <canvas id="skyCanvas"></canvas>
-      <div class="sky-overlay">
-        <div class="sky-title">☁️ Misi Langit SIPAT</div>
-        <div class="sky-help">Semua pemain satu arena. Tembakan, efek, dan kehancuran terlihat realtime. Musuh membidik siswa secara acak. 🤝 Gunakan Bantuan untuk memulihkan teman.</div>
+  <div class="school-rpg-shell">
+    <div class="school-rpg-topbar">
+      <div class="rpg-brand">🏫 <b>SIPAT SCHOOL LIFE</b><span id="rpgRoleBadge">Siswa</span></div>
+      <div class="rpg-stats">
+        <span>🕘 <b id="rpgClock">07:00</b></span>
+        <span>⭐ <b id="rpgPoints">0</b></span>
+        <span>📋 <b id="rpgTaskText">Belum ada tugas</b></span>
+        <span>👥 <b id="rpgOnline">1</b></span>
       </div>
-      <button id="skyRoleRocketBtn" class="sky-role-rocket role-siswa" onclick="openRolePanel()" title="Buka panel kerja sesuai akun" aria-label="Buka panel kerja sesuai akun">
-        <span class="rocket-icon">🚀</span>
-        <span class="rocket-text"><b id="skyRoleRocketText">Panel Siswa</b><small id="skyRoleRocketHint">Buka panel kerja</small></span>
-      </button>
-      <div id="skySpecialControls" class="sky-special-controls">
-        <button id="skyGuruFreezeBtn" class="sky-special-btn freeze" onclick="guruFreezePower()" title="Membekukan musuh dan seluruh pesawat siswa yang sedang login">❄️ Bekukan</button>
-        <button id="skyGuruBurnBtn" class="sky-special-btn burn" onclick="guruBurnPower()" title="Membakar musuh dan seluruh pesawat siswa yang sedang login">🔥 Bakar</button>
-        <button id="skyPrankBtn" class="sky-special-btn prank" onclick="usePrankPower()" title="Gunakan item prank dari kotak misteri">🎭 Prank</button>
-        <div id="skyTeacherTeleportWrap" class="sky-kick-wrap" style="display:none">
-          <select id="skyTeleportTarget" class="sky-kick-select" aria-label="Pilih siswa tujuan teleport">
-            <option value="">📍 Pilih siswa...</option>
-          </select>
-          <button id="skyTeleportBtn" class="sky-special-btn" style="background:#0ea5e9;color:#fff" onclick="teleportGuruToStudent()" title="Teleport pesawat guru ke dekat pesawat siswa">📍 Teleport</button>
-        </div>
-        <div id="skyTeacherKickWrap" class="sky-kick-wrap">
-          <select id="skyKickTarget" class="sky-kick-select" aria-label="Pilih pesawat siswa yang akan dikeluarkan">
-            <option value="">👨‍🏫 Pilih siswa...</option>
-          </select>
-          <button id="skyKickBtn" class="sky-special-btn kick" onclick="kickSelectedSkyStudent()" title="Keluarkan pesawat siswa dari arena dan paksa login ulang">🚪 Keluarkan</button>
-        </div>
-      </div>
-      <div id="skyGameChat" class="sky-game-chat">
-        <div class="sky-game-chat-head">
-          <b>💬 Chat Game</b>
-          <button type="button" onclick="toggleSkyGameChat(false)" aria-label="Tutup chat">✕</button>
-        </div>
-        <div id="skyGameChatMessages" class="sky-game-chat-messages"></div>
-        <form class="sky-game-chat-form" onsubmit="sendSkyGameChat(event)">
-          <input id="skyGameChatInput" maxlength="500" autocomplete="off" placeholder="Tulis pesan untuk semua pemain...">
-          <button type="submit">➤</button>
-        </form>
-      </div>
-      <button id="skyGameChatToggle" class="sky-game-chat-toggle" onclick="toggleSkyGameChat()" title="Chat khusus di game">💬</button>
-      <div class="sky-controls">
-        <div id="skyJoystick" class="sky-joystick" aria-label="Analog gerak"><div id="skyKnob" class="sky-knob"></div></div>
-        <div class="sky-fire-wrap">
-          <button id="skyShopBtn" class="sky-shop-game-btn" title="Beli pesawat">🛒</button>
-          <button id="skySupportBtn" class="sky-support" title="Bantu teman: pulihkan HP dan beri perisai">🤝</button>
-          <button id="skyBoxBtn" class="sky-box" title="Kotak misteri">🎁</button>
-          <button id="skyFireBtn" class="sky-fire" title="Tembak">🔥</button>
-        </div>
-      </div>
-      <div class="sky-bottom-info">
-        <div id="skyWeapon" class="sky-weapon">Senjata: PELURU</div>
-        <div id="skyMessage" class="sky-message">Gerakkan analog dan tekan 🔥 untuk menembak.</div>
-      </div>
-    </div>
-    <div id="skyShopModal" class="sky-shop-modal" aria-hidden="true">
-      <div class="sky-shop-modal-card">
-        <div class="sky-shop-modal-head"><div><b>🛒 TOKO PESAWAT</b><small>Beli dengan poin hasil menghancurkan musuh</small></div><button onclick="closeSkyShop()">✕</button></div>
-        <div class="sky-shop-points">💰 Poin kamu: <b id="skyShopPoints">0</b></div>
-        <div id="skyShopGridGame" class="sky-shop-grid"></div>
-      </div>
-    </div>
-    <div class="sky-shop">
-      <div class="sky-shop-head">
-        <div><h3 class="font-black text-slate-800">🚀 Hanggar Pesawat</h3><p class="text-xs text-slate-500">Pesawat baru dibeli dengan poin hasil mengalahkan pesawat komputer.</p><div class="sky-mobile-note">HP: gunakan analog + tombol 🔥. Laptop: WASD / panah + Spasi.</div></div>
-        <div id="skyLeaderMini">Poin tersimpan otomatis di cloud.</div>
-      </div>
-      <div id="skyShopGrid" class="sky-shop-grid"></div>
     </div>
 
-    <!-- TOMBOL PANEL KERJA: SELALU BERADA DI BAWAH AREA GAME -->
-    <div id="schoolFeatureDock" class="no-print" aria-label="Menu panel kerja akun">
-      <div class="rocket-panel-caption">
-        <span class="rocket-panel-icon">🚀</span>
-        <span><b>Panel Kerja</b><small id="rocketPanelHint">Masuk ke panel sesuai akun</small></span>
+    <div class="school-rpg-stage">
+      <canvas id="skyCanvas"></canvas>
+
+      <div class="rpg-location-label">🌳 KAMPUS SD SIPAT • Bermain Peran • Belajar • Bersosialisasi</div>
+
+      <div id="rpgAnnouncement" class="rpg-announcement">
+        <b>📢 PAPAN PENGUMUMAN</b>
+        <small>🚀 Panel Admin • Panel Guru • Panel Siswa</small>
       </div>
-      <button id="roleRocketBtn" class="rocket-panel-btn" onclick="openRolePanel()" title="Buka panel kerja sesuai akun">
-        🚀 <span id="dockRole">Panel Kerja</span>
+
+      <button id="skyRoleRocketBtn" class="sky-role-rocket role-siswa" onclick="openRolePanel()" title="Buka panel kerja sesuai akun">
+        <span class="rocket-icon">🚀</span>
+        <span class="rocket-text"><b id="skyRoleRocketText">Panel Siswa</b><small id="skyRoleRocketHint">Klik untuk masuk</small></span>
       </button>
-      <button id="skyBackToGame" onclick="showGameHome()">✈️ Kembali Game</button>
+
+      <div id="rpgActionPanel" class="rpg-action-panel">
+        <div id="rpgActionTitle">🎮 Pilih aktivitas</div>
+        <div id="rpgActionButtons"></div>
+      </div>
+
+      <div class="rpg-hud-help">
+        <b>🎮 Kontrol</b><br>
+        HP: joystick / sentuh layar<br>
+        Laptop: WASD / tombol panah<br>
+        Dekati meja, lapangan, kebun, panggung, tempat sampah, dan gerbang untuk berinteraksi.
+      </div>
+
+      <div id="rpgMicPanel" class="rpg-mic-panel">
+        <button id="rpgMicBtn" onclick="toggleRPGMic()">🎙️ Mic OFF</button>
+        <span id="rpgMicStatus">Mic siap digunakan</span>
+        <button onclick="toggleRPGChat()">💬 Chat</button>
+      </div>
+
+      <div id="rpgChatBox" class="rpg-chat-box">
+        <div class="rpg-chat-head"><b>💬 Diskusi Kelas / Sekolah</b><button onclick="toggleRPGChat(false)">✕</button></div>
+        <div id="rpgChatMessages" class="rpg-chat-messages"></div>
+        <form onsubmit="sendRPGChat(event)" class="rpg-chat-form">
+          <input id="rpgChatInput" maxlength="300" placeholder="Tulis pesan...">
+          <button>➤</button>
+        </form>
+      </div>
+
+      <div class="rpg-touch-controls">
+        <div id="rpgJoystick" class="rpg-joystick"><div id="rpgKnob" class="rpg-knob"></div></div>
+        <div class="rpg-touch-actions">
+          <button onclick="rpgInteract()">🤝</button>
+          <button onclick="toggleRPGChat()">💬</button>
+          <button onclick="toggleRPGMic()">🎙️</button>
+        </div>
+      </div>
+
+      <div id="rpgMonitorPanel" class="rpg-monitor-panel">
+        <div class="rpg-monitor-head">
+          <b>👀 Pemantauan Aktivitas</b><button onclick="toggleRPGMonitor(false)">✕</button>
+        </div>
+        <div id="rpgMonitorList"></div>
+      </div>
+
+      <div id="rpgSchedulePanel" class="rpg-schedule-panel">
+        <b>📅 Jadwal Hari Ini</b>
+        <div id="rpgScheduleList"></div>
+      </div>
+
+      <div id="rpgNotice" class="rpg-notice"></div>
+    </div>
+
+    <div id="rpgGuru4Controls" class="rpg-guru4-controls">
+      <b>❄️🔥 Guru Kelas 4</b>
+      <button onclick="rpgGuruPower('freeze')">❄️ Bekukan</button>
+      <button onclick="rpgGuruPower('fire')">🔥 Semburkan Api</button>
+      <button onclick="rpgGuruPunish('pushup')">💪 Push Up</button>
+      <button onclick="rpgGuruPunish('squat')">🦵 Skotjam</button>
+    </div>
+    <div class="rpg-bottom-bar">
+      <div><b>🏫 Lingkungan Sekolah</b><small> Kelas • Lapangan • Kebun • Panggung • Kantin • Parkir Sepeda</small></div>
+      <div class="rpg-bottom-buttons">
+        <button onclick="toggleRPGSchedule()">📅 Jadwal</button>
+        <button id="rpgMonitorBtn" onclick="toggleRPGMonitor()">👀 Pantau</button>
+        <button onclick="openRolePanel()">🚀 Panel Kerja</button>
+        <button onclick="showGameHome()">🏫 Game</button>
+      </div>
     </div>
   </div>
 </section>
-
 <!-- CHAT UMUM: TERBACA OLEH SEMUA PENGGUNA -->
     <div id="chatWidget" class="hidden no-print">
         <div id="chatPanel" class="hidden">
@@ -5096,6 +5142,345 @@ function initGuruViews() {
     document.getElementById('secSkyBattle')?.scrollIntoView({behavior:'auto',block:'start'});
     try{ window.restoreSkyGameState?.(); }catch(e){}
   };
+})();
+</script>
+
+
+<script id="school-rpg-engine">
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+let rpg=null, rpgMicStream=null, rpgPeers={}, rpgVoiceListeners={};
+const RPG_PATH="schoolRPG";
+const TASKS=[
+ {id:"class",label:"Belajar & Diskusi di Kelas",icon:"📚",start:7*60,end:8*60,zone:"classroom",points:20},
+ {id:"clean",label:"Memungut Sampah",icon:"🧹",start:8*60,end:9*60,zone:"trash",points:15},
+ {id:"ceremony",label:"Upacara Bendera",icon:"🇮🇩",start:9*60,end:9*60+40,zone:"field",points:25},
+ {id:"farm",label:"Bertani di Kebun",icon:"🌱",start:9*60+40,end:10*60+20,zone:"farm",points:20},
+ {id:"break",label:"Istirahat • Sepeda / Jalan / Jajan",icon:"🚲",start:10*60+20,end:11*60,zone:"canteen",points:5},
+ {id:"sing",label:"Bernyanyi di Panggung • WAJIB MIC",icon:"🎤",start:11*60,end:11*60+40,zone:"stage",points:30},
+ {id:"sport",label:"Olahraga",icon:"⚽",start:11*60+40,end:12*60+20,zone:"sport",points:25},
+ {id:"class2",label:"Diskusi & Refleksi Kelas",icon:"🗣️",start:12*60+20,end:13*60,zone:"classroom",points:20}
+];
+const WORLD={w:1500,h:900};
+const CLASS={x:105,y:100,w:350,h:230};
+const FRONTDESK={x:370,y:180,w:55,h:85};
+function profileKey(){return String(currentUser?.username||currentUser?.nama||"anon").replace(/[.#$/[\]]/g,"_")}
+function schoolRPGRef(){return firebase.database().ref(RPG_PATH)}
+function rpgNotice(t){const e=$("rpgNotice");if(!e)return;e.textContent=t;e.classList.add("show");clearTimeout(rpgNotice.t);rpgNotice.t=setTimeout(()=>e.classList.remove("show"),2800)}
+function getState(){try{return JSON.parse(localStorage.getItem("schoolRPGState_"+profileKey())||"{}")}catch(e){return {}}}
+function saveState(extra={}){
+ if(!currentUser)return;
+ const old=getState(), p=rpg?.player||{};
+ const st={...old,...extra,x:p.x,y:p.y,points:p.points||0,completed:p.completed||{},taskHistory:p.taskHistory||[],transport:p.transport||"jalan",leader:p.leader||false,mic:!!rpg?.mic,lastZone:rpg?.zone||"halaman",updatedAt:Date.now()};
+ localStorage.setItem("schoolRPGState_"+profileKey(),JSON.stringify(st));
+ try{schoolRPGRef().child("states").child(profileKey()).set({...st,nama:currentUser.nama||currentUser.username,role:currentUser.role,kelas:currentUser.kelas||"-"});}catch(e){}
+}
+function nowMinutes(){
+ const d=new Date(); return d.getHours()*60+d.getMinutes();
+}
+function currentTask(){
+ const n=nowMinutes();
+ return TASKS.find(t=>n>=t.start&&n<t.end)||null;
+}
+function isInside(x,y,z){return x>=z.x&&x<=z.x+z.w&&y>=z.y&&y<=z.y+z.h}
+function zoneFor(x,y){
+ if(isInside(x,y,CLASS))return"classroom";
+ if(x>590&&x<830&&y>100&&y<360)return"field";
+ if(x>930&&x<1190&&y>130&&y<380)return"farm";
+ if(x>1150&&x<1430&&y>470&&y<680)return"stage";
+ if(x>570&&x<900&&y>500&&y<760)return"sport";
+ if(x>100&&x<430&&y>480&&y<690)return"canteen";
+ if(x>430&&x<560&&y>400&&y<530)return"trash";
+ return"yard";
+}
+function activeTransport(){return rpg?.player?.transport||"jalan"}
+function taskAllowed(t){
+ if(!t)return false;
+ const z=zoneFor(rpg.player.x,rpg.player.y);
+ return z===t.zone;
+}
+function finishTask(t){
+ if(!t||!rpg)return;
+ if(!taskAllowed(t))return rpgNotice("📍 Datang dulu ke lokasi tugas: "+t.label);
+ if(t.id==="sing"&&!rpg.mic)return rpgNotice("🎤 Bernyanyi wajib menyalakan MIC.");
+ const key=new Date().toISOString().slice(0,10)+"_"+t.id;
+ if(rpg.player.completed[key])return rpgNotice("✅ Tugas ini sudah selesai hari ini.");
+ rpg.player.completed[key]=true;rpg.player.points+=t.points;rpg.player.taskHistory.unshift({id:t.id,label:t.label,at:Date.now(),score:t.points});
+ rpg.player.taskHistory=rpg.player.taskHistory.slice(0,80);
+ saveState();rpgNotice("🎉 "+t.icon+" "+t.label+" selesai! +"+t.points+" poin");
+ renderHUD();
+}
+function becomeLeader(){
+ if(!rpg||currentUser?.role!=="Siswa")return;
+ if(isInside(rpg.player.x,rpg.player.y,FRONTDESK)){
+   rpg.player.leader=true;rpgNotice("👩‍🏫 Kamu memimpin kelas! Akun tetap Siswa, tetapi avatar berubah menjadi Guru.");
+ }else{rpg.player.leader=false;rpgNotice("📚 Dekati meja paling depan untuk memimpin kelas.");}
+ saveState();renderHUD();
+}
+function rpgInteract(){
+ if(!rpg)return;
+ const t=currentTask();
+ if(t)finishTask(t);
+ else if(isInside(rpg.player.x,rpg.player.y,CLASS))becomeLeader();
+ else if(zoneFor(rpg.player.x,rpg.player.y)==="canteen"){rpg.player.transport=rpg.player.transport==="sepeda"?"jalan":"sepeda";saveState();rpgNotice("🚲 Transportasi: "+rpg.player.transport)}
+ else rpgNotice("👋 Tidak ada aktivitas terjadwal di lokasi ini.");
+}
+function drawWorld(ctx,cw,ch){
+ const sx=cw/WORLD.w, sy=ch/WORLD.h, s=Math.min(sx,sy);
+ ctx.save();ctx.scale(sx,sy);
+ ctx.fillStyle="#91d46f";ctx.fillRect(0,0,WORLD.w,WORLD.h);
+ // roads
+ ctx.fillStyle="#d6c7a1";ctx.fillRect(0,400,WORLD.w,110);ctx.fillRect(500,0,100,900);
+ ctx.fillStyle="#c4b28c";ctx.fillRect(0,435,WORLD.w,38);ctx.fillRect(530,0,40,900);
+ // classroom
+ ctx.fillStyle="#fef3c7";ctx.fillRect(CLASS.x,CLASS.y,CLASS.w,CLASS.h);ctx.strokeStyle="#92400e";ctx.lineWidth=8;ctx.strokeRect(CLASS.x,CLASS.y,CLASS.w,CLASS.h);
+ ctx.fillStyle="#60a5fa";ctx.fillRect(130,120,120,45);ctx.fillStyle="#0f172a";ctx.font="bold 18px Arial";ctx.fillText("KELAS 4",145,148);
+ ctx.fillStyle="#94a3b8";for(let y=175;y<285;y+=45)for(let x=135;x<405;x+=75){ctx.fillRect(x,y,45,24)}
+ ctx.fillStyle="#78350f";ctx.fillRect(FRONTDESK.x,FRONTDESK.y,FRONTDESK.w,FRONTDESK.h);ctx.fillStyle="#fff";ctx.font="bold 11px Arial";ctx.fillText("MEJA GURU",357,275);
+ // field
+ ctx.fillStyle="#4ade80";ctx.fillRect(610,115,230,245);ctx.strokeStyle="#fff";ctx.lineWidth=5;ctx.strokeRect(625,130,200,215);ctx.beginPath();ctx.arc(725,237,42,0,Math.PI*2);ctx.stroke();ctx.fillStyle="#166534";ctx.font="bold 18px Arial";ctx.fillText("LAPANGAN",665,95);
+ // farm
+ ctx.fillStyle="#a3e635";ctx.fillRect(940,135,230,250);ctx.strokeStyle="#854d0e";ctx.lineWidth=5;ctx.strokeRect(940,135,230,250);for(let y=165;y<360;y+=42){ctx.strokeStyle="#65a30d";ctx.beginPath();ctx.moveTo(960,y);ctx.lineTo(1150,y);ctx.stroke()}ctx.fillStyle="#365314";ctx.font="bold 18px Arial";ctx.fillText("KEBUN SEKOLAH",950,120);
+ // stage
+ ctx.fillStyle="#fda4af";ctx.fillRect(1170,480,260,150);ctx.fillStyle="#7f1d1d";ctx.fillRect(1180,470,240,25);ctx.fillStyle="#fff";ctx.font="bold 20px Arial";ctx.fillText("🎤 PANGGUNG",1230,555);
+ // canteen
+ ctx.fillStyle="#fde68a";ctx.fillRect(130,500,260,170);ctx.strokeStyle="#92400e";ctx.strokeRect(130,500,260,170);ctx.fillStyle="#78350f";ctx.font="bold 18px Arial";ctx.fillText("🍜 KANTIN",215,535);
+ // trash bins
+ for(let i=0;i<4;i++){ctx.fillStyle="#2563eb";ctx.fillRect(455+i*28,450,18,30)}ctx.fillStyle="#1e3a8a";ctx.font="bold 14px Arial";ctx.fillText("♻️ TEMPAT SAMPAH",420,430);
+ // sports
+ ctx.fillStyle="#bfdbfe";ctx.fillRect(600,550,300,190);ctx.strokeStyle="#1d4ed8";ctx.lineWidth=5;ctx.strokeRect(600,550,300,190);ctx.fillStyle="#1e3a8a";ctx.font="bold 18px Arial";ctx.fillText("🏃 OLAHRAGA",685,770);
+ // gate and bikes
+ ctx.fillStyle="#64748b";ctx.fillRect(20,760,250,70);ctx.fillStyle="#fff";ctx.font="bold 18px Arial";ctx.fillText("🚲 PARKIR SEPEDA",45,802);ctx.fillStyle="#475569";ctx.fillRect(1300,35,160,65);ctx.fillStyle="#fff";ctx.fillText("🚪 GERBANG",1320,75);
+ // trees
+ for(const [x,y] of [[45,80],[470,90],[870,80],[1230,90],[400,740],[1030,760],[1450,430],[40,360]]){ctx.fillStyle="#7c4a21";ctx.fillRect(x-6,y+20,12,35);ctx.fillStyle="#15803d";ctx.beginPath();ctx.arc(x,y,32,0,Math.PI*2);ctx.fill();ctx.fillStyle="#22c55e";ctx.beginPath();ctx.arc(x-18,y+8,20,0,Math.PI*2);ctx.arc(x+20,y+8,20,0,Math.PI*2);ctx.fill();}
+ // announcement board intentionally tucked behind tree/obstacle near top-right
+ ctx.fillStyle="#854d0e";ctx.fillRect(1320,170,105,85);ctx.fillStyle="#fef3c7";ctx.fillRect(1328,178,89,68);ctx.fillStyle="#713f12";ctx.font="bold 10px Arial";ctx.fillText("PENGUMUMAN",1335,196);ctx.font="8px Arial";ctx.fillText("Panel kerja ada",1335,213);ctx.fillText("di tombol 🚀",1335,228);
+ ctx.restore();
+}
+function drawPlayer(ctx){
+ const p=rpg.player; const cw=rpg.canvas.width,ch=rpg.canvas.height;const sx=cw/WORLD.w,sy=ch/WORLD.h;
+ const x=p.x*sx,y=p.y*sy, scale=Math.min(sx,sy)*1.2;
+ ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+ const isTeacher=p.leader||currentUser?.role==="Guru"||currentUser?.role==="Admin";
+ ctx.fillStyle=isTeacher?"#111827":(currentUser?.jenisKelamin==="Perempuan"?"#ef4444":"#dc2626");ctx.fillRect(-14,-10,28,30);
+ ctx.fillStyle="#f5c7a1";ctx.beginPath();ctx.arc(0,-22,11,0,Math.PI*2);ctx.fill();
+ if(isTeacher){ctx.fillStyle="#111827";ctx.fillRect(-16,-8,32,8);ctx.fillStyle="#f8fafc";ctx.fillRect(-12,2,24,4)}
+ else{ctx.fillStyle="#ef4444";ctx.fillRect(-15,-10,30,8)}
+ ctx.fillStyle="#111827";ctx.fillRect(-11,20,8,10);ctx.fillRect(3,20,8,10);
+ ctx.fillStyle="#fff";ctx.font="bold 9px Arial";ctx.textAlign="center";ctx.fillText((currentUser?.nama||"Siswa").slice(0,16),0,-39);
+ if(rpg.mic){ctx.fillStyle="#22c55e";ctx.beginPath();ctx.arc(19,-25,5,0,Math.PI*2);ctx.fill()}
+ ctx.restore();
+}
+function renderHUD(){
+ const p=rpg?.player;if(!p)return;
+ $("rpgPoints").textContent=p.points||0;
+ $("rpgClock").textContent=new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+ $("rpgRoleBadge").textContent=currentUser?.role==="Guru"?"👨‍🏫 Guru":currentUser?.role==="Admin"?"🧑‍💼 Admin":p.leader?"👩‍🏫 Siswa • Pemimpin Kelas":"🎒 Siswa";
+ const t=currentTask();$("rpgTaskText").textContent=t?t.label:"Jam bebas / istirahat";
+ $("rpgOnline").textContent=rpg?.onlineCount||1;
+}
+function actionButtons(){
+ const wrap=$("rpgActionButtons");if(!wrap||!rpg)return;
+ const t=currentTask();let html="";
+ if(t)html+=`<button onclick="finishRPGCurrentTask()">${t.icon} Kerjakan: ${t.label}</button>`;
+ if(zoneFor(rpg.player.x,rpg.player.y)==="classroom"&&currentUser?.role==="Siswa")html+=`<button class="alt" onclick="becomeLeader()">👩‍🏫 Pimpin di Meja Depan</button>`;
+ if(zoneFor(rpg.player.x,rpg.player.y)==="canteen")html+=`<button class="warn" onclick="setRPGTransport('sepeda')">🚲 Naik Sepeda</button><button class="alt" onclick="setRPGTransport('jalan')">🚶 Jalan Kaki</button><button class="warn" onclick="rpgNotice('🍜 Jajan selesai! Tetap kembali sesuai jadwal.')">🍜 Jajan</button>`;
+ $("rpgActionPanel").classList.toggle("open",!!html);wrap.innerHTML=html;
+}
+window.finishRPGCurrentTask=()=>finishTask(currentTask());
+window.becomeLeader=becomeLeader;
+window.setRPGTransport=function(x){if(rpg){rpg.player.transport=x;saveState();rpgNotice("🚦 Transportasi dipilih: "+x);actionButtons()}};
+function updateMovement(){
+ const p=rpg.player,j=rpg.joy,k=rpg.keys;
+ let dx=j.x+(k.right?1:0)-(k.left?1:0),dy=j.y+(k.down?1:0)-(k.up?1:0);
+ const len=Math.hypot(dx,dy)||1; if(Math.hypot(dx,dy)>1){dx/=len;dy/=len}
+ const speed=p.transport==="sepeda"?5.2:3.4;
+ p.x=Math.max(25,Math.min(WORLD.w-25,p.x+dx*speed));p.y=Math.max(25,Math.min(WORLD.h-25,p.y+dy*speed));
+}
+function loop(){
+ if(!rpg)return;
+ updateMovement();
+ const z=zoneFor(rpg.player.x,rpg.player.y);if(z!==rpg.zone){rpg.zone=z;saveState();rpgNotice("📍 "+z.toUpperCase())}
+ const ctx=rpg.ctx,cw=rpg.canvas.width,ch=rpg.canvas.height;
+ ctx.clearRect(0,0,cw,ch);drawWorld(ctx,cw,ch);drawPlayer(ctx);
+ renderHUD();actionButtons();publishPresence();
+ rpg.raf=requestAnimationFrame(loop);
+}
+function resizeRPG(){
+ if(!rpg)return;const rect=rpg.canvas.getBoundingClientRect(),d=Math.min(window.devicePixelRatio||1,1.5);
+ rpg.canvas.width=Math.floor(rect.width*d);rpg.canvas.height=Math.floor(rect.height*d);
+}
+function setupJoystick(){
+ const j=$("rpgJoystick"),k=$("rpgKnob");if(!j)return;
+ const move=e=>{const r=j.getBoundingClientRect(),x=(e.clientX-r.left-r.width/2)/(r.width*.38),y=(e.clientY-r.top-r.height/2)/(r.height*.38),l=Math.hypot(x,y),a=l>1?1/l:1;rpg.joy={x:x*a,y:y*a};k.style.transform=`translate(calc(-50% + ${rpg.joy.x*35}px),calc(-50% + ${rpg.joy.y*35}px))`};
+ const end=()=>{if(rpg)rpg.joy={x:0,y:0};if(k)k.style.transform="translate(-50%,-50%)"};
+ j.onpointerdown=e=>{j.setPointerCapture(e.pointerId);move(e)};j.onpointermove=e=>{if(e.buttons)move(e)};j.onpointerup=end;j.onpointercancel=end;
+}
+function setupKeys(){
+ addEventListener("keydown",e=>{if(!rpg)return;const k=e.key.toLowerCase();if(["arrowleft","a"].includes(k))rpg.keys.left=true;if(["arrowright","d"].includes(k))rpg.keys.right=true;if(["arrowup","w"].includes(k))rpg.keys.up=true;if(["arrowdown","s"].includes(k))rpg.keys.down=true});
+ addEventListener("keyup",e=>{if(!rpg)return;const k=e.key.toLowerCase();if(["arrowleft","a"].includes(k))rpg.keys.left=false;if(["arrowright","d"].includes(k))rpg.keys.right=false;if(["arrowup","w"].includes(k))rpg.keys.up=false;if(["arrowdown","s"].includes(k))rpg.keys.down=false});
+}
+async function toggleRPGMic(){
+ if(!currentUser)return;
+ if(rpgMicStream){
+   rpgMicStream.getTracks().forEach(t=>t.stop());rpgMicStream=null;rpg.mic=false;
+   $("rpgMicBtn").textContent="🎙️ Mic OFF";$("rpgMicBtn").classList.remove("on");$("rpgMicStatus").textContent="Mic dimatikan";
+   Object.values(rpgPeers).forEach(pc=>pc.getSenders().forEach(s=>{if(s.track?.kind==="audio")s.replaceTrack(null)}));
+ }else{
+   try{
+     rpgMicStream=await navigator.mediaDevices.getUserMedia({audio:true});
+     rpg.mic=true;$("rpgMicBtn").textContent="🔴 Mic ON";$("rpgMicBtn").classList.add("on");$("rpgMicStatus").textContent="Mic aktif • diskusi suara";
+     connectVoiceMesh();
+   }catch(e){rpgNotice("🎙️ Izin mic ditolak/tidak tersedia. Gunakan HTTPS/localhost dan izinkan mikrofon.")}
+ }
+ saveState();
+}
+window.toggleRPGMic=toggleRPGMic;
+function publishPresence(){
+ if(!rpg||!currentUser||!firebase?.apps?.length)return;
+ const data={id:profileKey(),nama:currentUser.nama||currentUser.username,role:currentUser.role,kelas:currentUser.kelas||"-",jenisKelamin:currentUser.jenisKelamin||currentUser.jenisKelaminSiswa||"",x:rpg.player.x,y:rpg.player.y,zone:rpg.zone,mic:!!rpg.mic,leader:!!rpg.player.leader,task:currentTask()?.id||"",points:rpg.player.points||0,updatedAt:firebase.database.ServerValue.TIMESTAMP};
+ rpg.presRef?.update(data);
+}
+function startPresence(){
+ const ref=schoolRPGRef().child("online").child(profileKey());rpg.presRef=ref;ref.onDisconnect().remove();ref.set({id:profileKey(),nama:currentUser.nama||currentUser.username,role:currentUser.role,kelas:currentUser.kelas||"-",x:rpg.player.x,y:rpg.player.y,mic:false,updatedAt:firebase.database.ServerValue.TIMESTAMP});
+ rpg.onlineRef=schoolRPGRef().child("online");
+ rpg.onlineRef.on("value",snap=>{const v=snap.val()||{};rpg.remote=v;rpg.onlineCount=Object.keys(v).length;renderMonitor(v);syncVoicePeers(v);});
+}
+function renderMonitor(v){
+ const list=$("rpgMonitorList");if(!list)return;
+ const allowed=currentUser?.role==="Admin"||currentUser?.role==="Guru";$("rpgMonitorBtn").style.display=allowed?"inline-block":"none";const g4=$("rpgGuru4Controls");if(g4)g4.style.display=(currentUser?.role==="Guru"&&String(currentUser?.kelas||"")==="4")?"flex":"none";if(!allowed)return;
+ list.innerHTML=Object.values(v).filter(x=>x.role==="Siswa").map(s=>`<div class="rpg-student-row"><strong>🎒 ${esc(s.nama)}</strong> • Kelas ${esc(s.kelas||"-")}<br>📍 ${esc(s.zone||"halaman")} • ${s.mic?"🎙️ MIC ON":"🔇 mic"} ${s.leader?"• 👩‍🏫 memimpin":""}<div class="rpg-progress"><i style="width:${Math.min(100,Number(s.points||0)/3)}%"></i></div>⭐ ${Number(s.points||0)} poin
+ <div style="display:flex;gap:4px;margin-top:5px"><input id="rpgScore_${esc(s.id)}" type="number" min="0" max="100" placeholder="Nilai 0-100" style="width:90px;padding:4px;border:1px solid #cbd5e1;border-radius:8px"><input id="rpgNote_${esc(s.id)}" placeholder="Catatan guru" style="flex:1;padding:4px;border:1px solid #cbd5e1;border-radius:8px"><button onclick="rpgAssess('${esc(s.id)}')" style="border:0;background:#16a34a;color:#fff;border-radius:8px;padding:4px 7px;font-size:9px;font-weight:900">Simpan</button></div></div>`).join("")||"<small>Belum ada siswa online.</small>";
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+window.toggleRPGMonitor=function(force){const e=$("rpgMonitorPanel");if(!e)return;e.classList.toggle("open",force===undefined?!e.classList.contains("open"):!!force)}
+window.toggleRPGSchedule=function(force){const e=$("rpgSchedulePanel");if(!e)return;e.classList.toggle("open",force===undefined?!e.classList.contains("open"):!!force);renderSchedule()}
+function renderSchedule(){const box=$("rpgScheduleList");if(!box)return;const n=nowMinutes();box.innerHTML=TASKS.map(t=>`<div class="rpg-schedule-item ${n>=t.start&&n<t.end?"active":""}">${t.icon} ${t.start.toString().padStart(4,"0").replace(/(..)$/,"$1")}–${t.end.toString().padStart(4,"0").replace(/(..)$/,"$1")} • ${t.label}</div>`).join("").replace(/(\d{2})(\d{2})/g,"$1:$2")}
+function toggleRPGChat(force){
+ const e=$("rpgChatBox");if(!e)return;e.classList.toggle("open",force===undefined?!e.classList.contains("open"):!!force);if(e.classList.contains("open"))renderRPGChat();
+}
+window.toggleRPGChat=toggleRPGChat;
+function chatRef(){return schoolRPGRef().child("chat")}
+function renderRPGChat(){
+ const box=$("rpgChatMessages");if(!box)return;
+ chatRef().limitToLast(60).once("value").then(s=>{const arr=Object.values(s.val()||{});box.innerHTML=arr.map(m=>`<div class="rpg-chat-msg ${m.by===profileKey()?"me":""}"><b>${esc(m.nama)} • ${esc(m.role)}</b>${esc(m.text)}</div>`).join("")||"<small>Belum ada diskusi.</small>";box.scrollTop=box.scrollHeight});
+}
+window.sendRPGChat=function(e){e.preventDefault();if(!currentUser)return;const i=$("rpgChatInput"),t=i.value.trim();if(!t)return;chatRef().push({by:profileKey(),nama:currentUser.nama||currentUser.username,role:currentUser.role,text:t.slice(0,300),ts:firebase.database.ServerValue.TIMESTAMP});i.value=""};
+function setupChatListener(){chatRef().limitToLast(60).on("value",()=>{if($("rpgChatBox")?.classList.contains("open"))renderRPGChat()})}
+function setupVoiceSignals(){
+ const sig=schoolRPGRef().child("voice").child(profileKey());sig.onDisconnect().remove();
+ sig.on("child_added",async snap=>{const data=snap.val();if(!data)return;await handleSignal(data);snap.ref.remove()});
+ rpg.voiceSig=sig;
+}
+function makePC(peerId){
+ if(rpgPeers[peerId])return rpgPeers[peerId];
+ const pc=new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"}]});
+ rpgPeers[peerId]=pc;
+ if(rpgMicStream)rpgMicStream.getTracks().forEach(t=>pc.addTrack(t,rpgMicStream));
+ pc.onicecandidate=e=>{if(e.candidate)schoolRPGRef().child("voice").child(peerId).push({type:"candidate",from:profileKey(),candidate:e.candidate.toJSON()})};
+ pc.ontrack=e=>{let a=document.getElementById("rpg-audio-"+peerId);if(!a){a=document.createElement("audio");a.id="rpg-audio-"+peerId;a.autoplay=true;a.playsInline=true;a.style.display="none";document.body.appendChild(a)}a.srcObject=e.streams[0]};
+ pc.onconnectionstatechange=()=>{if(["failed","closed","disconnected"].includes(pc.connectionState)){try{pc.close()}catch(e){}delete rpgPeers[peerId]}};
+ return pc;
+}
+async function connectVoiceMesh(){
+ if(!rpg?.onlineRef||!rpg.mic)return;
+ const snap=await rpg.onlineRef.once("value"),v=snap.val()||{};
+ for(const [id,u] of Object.entries(v)){
+   if(id===profileKey()||!u.mic||u.kelas!==currentUser.kelas)continue;
+   if(profileKey()<id){
+     const pc=makePC(id),offer=await pc.createOffer();await pc.setLocalDescription(offer);
+     await schoolRPGRef().child("voice").child(id).push({type:"offer",from:profileKey(),offer:{type:offer.type,sdp:offer.sdp}});
+   }
+ }
+}
+async function handleSignal(d){
+ if(!d.from||d.from===profileKey())return;
+ const pc=makePC(d.from);
+ if(d.type==="offer"){await pc.setRemoteDescription(d.offer);const ans=await pc.createAnswer();await pc.setLocalDescription(ans);await schoolRPGRef().child("voice").child(d.from).push({type:"answer",from:profileKey(),answer:{type:ans.type,sdp:ans.sdp}})}
+ else if(d.type==="answer"){await pc.setRemoteDescription(d.answer)}
+ else if(d.type==="candidate"){try{await pc.addIceCandidate(d.candidate)}catch(e){}}
+}
+function syncVoicePeers(v){
+ if(!rpg?.mic)return;
+ Object.entries(v).forEach(([id,u])=>{if(id!==profileKey()&&u.mic&&u.kelas===currentUser.kelas&&!rpgPeers[id])connectVoiceMesh()});
+}
+function cleanupVoice(){
+ Object.values(rpgPeers).forEach(pc=>{try{pc.close()}catch(e){}});rpgPeers={};
+ if(rpgVoiceListeners)Object.values(rpgVoiceListeners).forEach(x=>{try{x.off()}catch(e){}});
+ document.querySelectorAll("audio[id^='rpg-audio-']").forEach(a=>a.remove());
+ if(rpgMicStream){rpgMicStream.getTracks().forEach(t=>t.stop());rpgMicStream=null}
+}
+window.rpgAssess=function(studentId){
+ if(!currentUser||!["Admin","Guru"].includes(currentUser.role))return;
+ const score=Math.max(0,Math.min(100,Number($("rpgScore_"+studentId)?.value||0)));
+ const note=($("rpgNote_"+studentId)?.value||"").trim().slice(0,300);
+ const date=new Date().toISOString().slice(0,10);
+ schoolRPGRef().child("assessments").child(date).child(studentId).set({score,note,by:currentUser.nama||currentUser.username,role:currentUser.role,ts:firebase.database.ServerValue.TIMESTAMP});
+ rpgNotice("📝 Penilaian aktivitas siswa tersimpan.");
+};
+function rpgNearestStudent(){
+ let best=null,dist=Infinity;Object.entries(rpg?.remote||{}).forEach(([id,v])=>{if(v.role!=="Siswa")return;const d=Math.hypot(Number(v.x)-rpg.player.x,Number(v.y)-rpg.player.y);if(d<dist){dist=d;best=[id,v]}});return best;
+}
+window.rpgGuruPower=function(type){
+ if(currentUser?.role!=="Guru"||String(currentUser.kelas||"")!=="4")return rpgNotice("⚠️ Fitur ini khusus Guru Kelas 4.");
+ const target=rpgNearestStudent();if(!target)return rpgNotice("👩‍🏫 Tidak ada siswa di sekitar.");
+ schoolRPGRef().child("effects").push({type,target:target[0],by:profileKey(),teacher:currentUser.nama||currentUser.username,ts:firebase.database.ServerValue.TIMESTAMP});
+ rpgNotice(type==="freeze"?"❄️ Lingkaran es menyembur ke siswa.":"🔥 Api menyembur ke siswa.");
+};
+window.rpgGuruPunish=function(type){
+ if(currentUser?.role!=="Guru"||String(currentUser.kelas||"")!=="4")return rpgNotice("⚠️ Fitur ini khusus Guru Kelas 4.");
+ const target=rpgNearestStudent();if(!target)return rpgNotice("👩‍🏫 Dekati siswa yang akan diberi tugas disiplin.");
+ schoolRPGRef().child("effects").push({type:"punish",punish:type,target:target[0],by:profileKey(),teacher:currentUser.nama||currentUser.username,ts:firebase.database.ServerValue.TIMESTAMP});
+ rpgNotice(type==="pushup"?"💪 Siswa mendapat tugas push up.":"🦵 Siswa mendapat tugas skotjam.");
+};
+function setupRPGEffects(){
+ schoolRPGRef().child("effects").limitToLast(100).on("child_added",snap=>{
+  const e=snap.val();if(!e||e.target!==profileKey()||e.by===profileKey())return;
+  if(e.type==="freeze")rpgNotice("❄️ Guru Kelas 4 memberikan efek ES. Berhenti sejenak dan ikuti arahan guru.");
+  else if(e.type==="fire")rpgNotice("🔥 Guru Kelas 4 memberikan efek API. Ikuti arahan guru.");
+  else if(e.type==="punish"){rpg.punishment={type:e.punish,until:Date.now()+7000};rpgNotice(e.punish==="pushup"?"💪 Hukuman edukatif: lakukan PUSH UP sesuai arahan guru.":"🦵 Hukuman edukatif: lakukan SKOTJAM sesuai arahan guru.");}
+ });
+}
+function initRPG(){
+ if(!currentUser)return;
+ if(rpg){resizeRPG();return}
+ const canvas=$("skyCanvas"),saved=getState();
+ const p={x:Number(saved.x)||260,y:Number(saved.y)||340,points:Number(saved.points)||0,completed:saved.completed||{},taskHistory:saved.taskHistory||[],transport:saved.transport||"jalan",leader:false};
+ rpg={canvas,ctx:canvas.getContext("2d"),player:p,keys:{},joy:{x:0,y:0},zone:zoneFor(p.x,p.y),mic:false,onlineCount:1,raf:0};
+ resizeRPG();setupJoystick();setupKeys();startPresence();setupVoiceSignals();setupChatListener();setupRPGEffects();renderSchedule();
+ $("rpgMonitorBtn").style.display=(currentUser.role==="Admin"||currentUser.role==="Guru")?"inline-block":"none";
+ updateRoleRocketButton(currentUser.role);
+ if(saved.mic)rpgNotice("💾 Posisi, poin, dan tugas terakhir dipulihkan otomatis.");
+ window.addEventListener("resize",resizeRPG);
+ rpg.persist=setInterval(()=>saveState(),4000);
+ rpg.raf=requestAnimationFrame(loop);
+}
+function stopRPG(){
+ if(!rpg)return;
+ saveState();clearInterval(rpg.persist);cancelAnimationFrame(rpg.raf);cleanupVoice();
+ try{rpg.onlineRef?.off()}catch(e){}try{rpg.presRef?.remove()}catch(e){}try{schoolRPGRef().child("voice").child(profileKey()).remove()}catch(e){}
+ rpg=null;
+}
+window.initSpaceGame=initRPG;
+window.stopSpaceGame=stopRPG;
+window.saveSchoolRPGState=saveState;
+window.rpgInteract=rpgInteract;
+window.toggleRPGChat=toggleRPGChat;
+window.showGameHome=function(){
+ if(!currentUser)return;
+ document.body.classList.add("sky-home-mode");document.body.classList.remove("sky-panel-mode");
+ ["secAdmin","secGuru","secSiswa"].forEach(id=>$(id)?.classList.add("hidden"));
+ $("secSkyBattle")?.classList.remove("hidden");updateRoleRocketButton(currentUser.role);initRPG();
+ $("secSkyBattle")?.scrollIntoView({behavior:"smooth",block:"start"});
+};
+window.returnToSkyGame=window.showGameHome;
+const oldLogout=window.logout;
+window.logout=function(){
+ try{saveState()}catch(e){}try{stopRPG()}catch(e){}
+ if(typeof oldLogout==="function")return oldLogout.apply(this,arguments);
+};
+document.addEventListener("visibilitychange",()=>{if(document.hidden)try{saveState()}catch(e){}});
 })();
 </script>
 
