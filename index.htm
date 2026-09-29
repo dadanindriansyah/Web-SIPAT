@@ -3615,5 +3615,62 @@ function initGuruViews() {
     applyGuruAccess();
 }
     </script>
+
+<!-- FITUR TAMBAHAN AKUN GURU -->
+<script>
+function saveGuruFeature(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
+function loadGuruFeature(key,def){ try{return JSON.parse(localStorage.getItem(key))??def;}catch(e){return def;} }
+
+function simpanDaftarSiswaEdit(){
+ const v=document.getElementById('guruDaftarSiswaEdit')?.value||'';
+ saveGuruFeature('guru_daftar_siswa',v); alert('Daftar siswa tersimpan');
+}
+function simpanJurnalHarian(){
+ const v=document.getElementById('guruJurnalHarian')?.value||'';
+ saveGuruFeature('guru_jurnal_harian',v); alert('Jurnal harian tersimpan');
+}
+function simpanJadwalPelajaran(){
+ const v=document.getElementById('guruJadwalPelajaran')?.value||'';
+ saveGuruFeature('guru_jadwal',v); alert('Jadwal pelajaran tersimpan');
+}
+function simpanKKTP(){
+ const v=document.getElementById('guruKKTP')?.value||'';
+ saveGuruFeature('guru_kktp',v); alert('KKTP tersimpan');
+}
+function uploadKKTPFile(input){
+ const f=input.files[0]; if(!f) return;
+ document.getElementById('namaFileKKTP').innerText=f.name;
+}
+document.addEventListener('DOMContentLoaded',()=>{
+ const wrap=document.createElement('div');
+ wrap.innerHTML=`
+ <div id="tabDaftarSiswa" class="guru-content hidden no-print bg-white p-6 rounded-2xl shadow border border-slate-200">
+ <h3>Daftar Nama Siswa (Edit)</h3>
+ <textarea id="guruDaftarSiswaEdit" class="w-full border p-2" rows="10"></textarea>
+ <button onclick="simpanDaftarSiswaEdit()">Simpan</button></div>
+
+ <div id="tabJurnal" class="guru-content hidden no-print bg-white p-6 rounded-2xl shadow border border-slate-200">
+ <h3>Jurnal Harian</h3>
+ <textarea id="guruJurnalHarian" class="w-full border p-2" rows="10"></textarea>
+ <button onclick="simpanJurnalHarian()">Simpan</button></div>
+
+ <div id="tabJadwal" class="guru-content hidden no-print bg-white p-6 rounded-2xl shadow border border-slate-200">
+ <h3>Jadwal Pelajaran</h3>
+ <textarea id="guruJadwalPelajaran" class="w-full border p-2" rows="10"></textarea>
+ <button onclick="simpanJadwalPelajaran()">Simpan</button></div>
+
+ <div id="tabKKTP" class="guru-content hidden no-print bg-white p-6 rounded-2xl shadow border border-slate-200">
+ <h3>KKTP</h3>
+ <input type="file" onchange="uploadKKTPFile(this)">
+ <div id="namaFileKKTP"></div>
+ <textarea id="guruKKTP" class="w-full border p-2" rows="10"></textarea>
+ <button onclick="simpanKKTP()">Simpan</button></div>`;
+ document.body.appendChild(wrap);
+ ['guruDaftarSiswaEdit','guruJurnalHarian','guruJadwalPelajaran','guruKKTP'].forEach(id=>{
+   const map={guruDaftarSiswaEdit:'guru_daftar_siswa',guruJurnalHarian:'guru_jurnal_harian',guruJadwalPelajaran:'guru_jadwal',guruKKTP:'guru_kktp'};
+   setTimeout(()=>{let el=document.getElementById(id); if(el) el.value=loadGuruFeature(map[id],'');},500);
+ });
+});
+</script>
 </body>
 </html>
