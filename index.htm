@@ -1088,7 +1088,7 @@
                     <div id="warnPotongan" class="hidden text-rose-600 bg-rose-50 border border-rose-200 text-xs font-semibold p-3 rounded-lg mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-circle-exclamation text-base"></i> Transaksi pengeluaran otomatis dipotong pajak/administrasi sebesar 10% dari nominal penarikan!
                     </div>
-                    <button onclick="submitTabungan()" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-emerald-700">
+                    <button onclick="submitTabungan(event)" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-emerald-700">
                         <i class="fa-solid fa-receipt"></i> Jalankan Transaksi
                     </button>
                 </div>
@@ -2863,8 +2863,37 @@ function submitAbsensi() {
             document.getElementById('warnPotongan').classList.toggle('hidden', jns !== 'Keluar');
         }
 
+        function getTabunganData() {
+            const raw = localStorage.getItem('tabungan');
+            if (!raw) return [];
+            try {
+                const data = JSON.parse(raw);
+                return Array.isArray(data) ? data : [];
+            } catch (e) {
+                console.warn('Data tabungan rusak, menggunakan data kosong.', e);
+                return [];
+            }
+        }
+
+        // Penyimpanan khusus Tabungan: hanya menyentuh key 'tabungan'.
+        // Tidak mengubah data nilai, absensi, bintang, jurnal, jadwal, dll.
+        function saveTabunganData(tabunganList) {
+            const safeList = Array.isArray(tabunganList) ? tabunganList : [];
+            const serialized = JSON.stringify(safeList);
+            localStorage.setItem('tabungan', serialized);
+            showCloudStatus('online');
+
+            if (!firebaseReady || applyingFirebaseData) return;
+            dbRef.child('tabungan').set(toFirebaseValue('tabungan', serialized))
+                .then(() => showCloudStatus('online'))
+                .catch(err => {
+                    console.error('Gagal menyimpan data Tabungan:', err);
+                    showCloudStatus('offline', 'Data Tabungan tersimpan lokal, Firebase belum tersambung.');
+                });
+        }
+
         function getSiswaSaldo(username) {
-            const tabunganList = (JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.username === username);
+            const tabunganList = getTabunganData().filter(t => t.username === username);
             let saldo = 0;
             tabunganList.forEach(t => {
                 if (t.jenis === 'Masuk') saldo += t.nominalBersih;
@@ -2873,33 +2902,46 @@ function submitAbsensi() {
             return saldo;
         }
 
-        function submitTabungan() {
+        function submitTabungan(event) {
+            // Pastikan tombol transaksi hanya menjalankan fitur Tabungan.
+            if (event) { event.preventDefault(); event.stopPropagation(); }
+            if (window.__savingTabungan) return;
+            window.__savingTabungan = true;
+
             const username = document.getElementById('tabunganSiswa').value;
             const jenis = document.getElementById('tabunganJenis').value;
             const nominalKotor = parseFloat(document.getElementById('tabunganJumlah').value);
             const date = document.getElementById('tabunganDate').value;
 
-            if(!username || isNaN(nominalKotor) || nominalKotor <= 0 || !date) return alert("Isi data!");
-            let tabungan = JSON.parse(localStorage.getItem('tabungan')) || [];
+            if(!username || isNaN(nominalKotor) || nominalKotor <= 0 || !date) {
+                window.__savingTabungan = false;
+                return alert("Isi data!");
+            }
+            let tabungan = getTabunganData();
             const sObj = getSiswaSekelas().find(s => s.username === username);
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
 
             let nominalBersih = nominalKotor; let potongan = 0;
             if (jenis === 'Keluar') {
                 potongan = nominalKotor * 0.10; nominalBersih = nominalKotor - potongan;
-                if (getSiswaSaldo(username) < nominalKotor) return alert("Saldo tidak mencukupi!");
+                if (getSiswaSaldo(username) < nominalKotor) {
+                    window.__savingTabungan = false;
+                    return alert("Saldo tidak mencukupi!");
+                }
             }
             tabungan.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: currentUser.kelas, jenis, nominalAsli: nominalKotor, nominalBersih, potongan, date, tapel: profile.tapel || "-" });
-            saveAppData('tabungan', JSON.stringify(tabungan));
+            saveTabunganData(tabungan);
             renderTabunganGuru();
-            showSaveToast("Transaksi tersimpan");
+            showSaveToast("Transaksi Tabungan tersimpan");
+            window.__savingTabungan = false;
         }
 
-        function deleteTabungan(id) {
+        function deleteTabungan(id, event) {
+            if (event) { event.preventDefault(); event.stopPropagation(); }
             if(confirm("Hapus transaksi ini?")) {
-                let tabungan = JSON.parse(localStorage.getItem('tabungan')) || [];
-                tabungan = tabungan.filter(t => t.id !== id);
-                saveAppData('tabungan', JSON.stringify(tabungan));
+                let tabungan = getTabunganData();
+                tabungan = tabungan.filter(t => String(t.id) !== String(id));
+                saveTabunganData(tabungan);
                 renderTabunganGuru();
             }
         }
@@ -3043,7 +3085,7 @@ function submitAbsensi() {
                                     <td class="p-3.5 text-rose-600 font-semibold">Rp ${t.potongan.toLocaleString('id-ID')}</td>
                                     <td class="p-3.5 text-emerald-600 font-bold">Rp ${t.nominalBersih.toLocaleString('id-ID')}</td>
                                     <td class="p-3.5 text-right">
-                                        <button onclick="deleteTabungan(${t.id})" class="text-rose-500 hover:text-rose-700">
+                                        <button onclick="deleteTabungan(${t.id}, event)" class="text-rose-500 hover:text-rose-700">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </td>
