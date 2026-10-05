@@ -245,7 +245,7 @@
                         <i class="fa-solid fa-circle-user"></i> Loading...
                     </span>
                     <span id="cloudStatus" class="text-xs font-bold px-3 py-1.5 rounded-full bg-sky-100 text-sky-700">☁️ Menghubungkan...</span>
-                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-4 py-1.5 rounded-full transition shadow-md">
+                    <button type="button" onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-4 py-1.5 rounded-full transition shadow-md">
                         <i class="fa-solid fa-right-from-bracket"></i> Keluar
                     </button>
                 </div>
@@ -291,7 +291,7 @@
                             <label class="block text-sm font-black text-blue-900 mb-2 ml-1">Kata Sandi</label>
                             <input type="password" id="loginPass" class="block w-full px-5 py-4 bg-white rounded-2xl border-2 border-blue-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100 outline-none transition-all text-slate-700 placeholder:text-slate-300 font-medium" placeholder="••••••••">
                         </div>
-                        <button onclick="handleLogin()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-black py-4 rounded-2xl transition-all shadow-[0_5px_0_#D97706] active:shadow-none active:translate-y-[5px] mt-2 text-lg">
+                        <button type="button" onclick="handleLogin()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-black py-4 rounded-2xl transition-all shadow-[0_5px_0_#D97706] active:shadow-none active:translate-y-[5px] mt-2 text-lg">
                             Masuk Aja, Biar Seru !!
                         </button>
                     </div>
@@ -308,7 +308,7 @@
                 </div>
                 <div class="flex items-center gap-3 flex-wrap justify-end">
                     <div id="adminDataTools" class="admin-only flex items-center gap-2 bg-white/10 p-1.5 rounded-xl border border-white/20">
-                        <button onclick="backupSeluruhData()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg transition shadow flex items-center gap-1.5 whitespace-nowrap">
+                        <button type="button" onclick="backupSeluruhData()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg transition shadow flex items-center gap-1.5 whitespace-nowrap">
                             <i class="fa-solid fa-cloud-arrow-down"></i> Backup Data
                         </button>
                         <label class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-3 py-2 rounded-lg cursor-pointer transition shadow flex items-center gap-1.5 whitespace-nowrap">
@@ -316,13 +316,13 @@
                             <input type="file" id="fileRestore" class="hidden" accept=".json" onchange="restoreSeluruhData(event)">
                         </label>
                     </div>
-                    <button onclick="clearAllSystemData()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-black px-4 py-2 rounded-xl border-b-4 border-red-950 active:border-b-0 active:mt-0.5 transition-all shadow-md whitespace-nowrap">
+                    <button type="button" onclick="clearAllSystemData()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-black px-4 py-2 rounded-xl border-b-4 border-red-950 active:border-b-0 active:mt-0.5 transition-all shadow-md whitespace-nowrap">
                         <i class="fa-solid fa-triangle-exclamation text-yellow-300"></i> Kosongkan Semua Data
                     </button>
                     <div class="flex gap-2 bg-indigo-900/40 p-1.5 rounded-xl border border-indigo-400/20 flex-wrap justify-end">
-                        <button onclick="switchAdminTab('tabAdmProfil')" class="adm-tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-white text-indigo-700 transition">🏫 Profil & Metadata</button>
-                        <button onclick="switchAdminTab('tabAdmGuruSiswa')" class="adm-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-indigo-100 hover:bg-indigo-800/50 transition">👥 Akun & Pengguna</button>
-                        <button onclick="switchAdminTab('tabAdmRekap')" class="adm-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-indigo-100 hover:bg-indigo-800/50 transition">📊 Rekap & Unduh</button>
+                        <button type="button" onclick="switchAdminTab('tabAdmProfil')" class="adm-tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-white text-indigo-700 transition">🏫 Profil & Metadata</button>
+                        <button type="button" onclick="switchAdminTab('tabAdmGuruSiswa')" class="adm-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-indigo-100 hover:bg-indigo-800/50 transition">👥 Akun & Pengguna</button>
+                        <button type="button" onclick="switchAdminTab('tabAdmRekap')" class="adm-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-indigo-100 hover:bg-indigo-800/50 transition">📊 Rekap & Unduh</button>
                     </div>
                 </div>
             </div>
@@ -393,7 +393,7 @@
                             </div>
                         </div>
                     </div>
-                    <button onclick="saveSchoolProfile()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition">
+                    <button type="button" onclick="saveSchoolProfile()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition">
                         <i class="fa-solid fa-floppy-disk"></i> Simpan Profil Sekolah
                     </button>
                 </div>
@@ -404,7 +404,7 @@
                         <h3 class="text-lg font-bold border-b pb-3 mb-4 text-indigo-600 flex justify-between items-center gap-2 flex-wrap">
                             <span><i class="fa-solid fa-book-bookmark"></i> Daftar Mata Pelajaran</span>
                             <div class="flex gap-2">
-                                <button onclick="downloadTemplateMetadata('mapel')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 font-semibold transition">
+                                <button type="button" onclick="downloadTemplateMetadata('mapel')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 font-semibold transition">
                                     <i class="fa-solid fa-download"></i> Template
                                 </button>
                                 <label class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer flex items-center gap-1">
@@ -415,7 +415,7 @@
                         </h3>
                         <div class="flex gap-2 mb-4">
                             <input type="text" id="newMapel" class="flex-grow border border-slate-300 rounded-lg p-2 text-sm" placeholder="Nama Mapel Baru">
-                            <button onclick="addMapelManual()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 font-semibold"><i class="fa-solid fa-plus"></i></button>
+                            <button type="button" onclick="addMapelManual()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 font-semibold"><i class="fa-solid fa-plus"></i></button>
                         </div>
                         <div class="max-h-60 overflow-y-auto border rounded-xl divide-y text-sm">
                             <table class="w-full text-left">
@@ -430,7 +430,7 @@
                         <h3 class="text-lg font-bold border-b pb-3 mb-4 text-indigo-600 flex justify-between items-center gap-2 flex-wrap">
                             <span><i class="fa-solid fa-medal"></i> Daftar Ekstrakurikuler</span>
                             <div class="flex gap-2">
-                                <button onclick="downloadTemplateMetadata('ekskul')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 font-semibold transition">
+                                <button type="button" onclick="downloadTemplateMetadata('ekskul')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 font-semibold transition">
                                     <i class="fa-solid fa-download"></i> Template
                                 </button>
                                 <label class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer flex items-center gap-1">
@@ -441,7 +441,7 @@
                         </h3>
                         <div class="flex gap-2 mb-4">
                             <input type="text" id="newEkskul" class="flex-grow border border-slate-300 rounded-lg p-2 text-sm" placeholder="Nama Ekskul Baru">
-                            <button onclick="addEkskulManual()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 font-semibold"><i class="fa-solid fa-plus"></i></button>
+                            <button type="button" onclick="addEkskulManual()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 font-semibold"><i class="fa-solid fa-plus"></i></button>
                         </div>
                         <div class="max-h-60 overflow-y-auto border rounded-xl divide-y text-sm">
                             <table class="w-full text-left">
@@ -462,7 +462,7 @@
                             <label class="block text-xs font-bold text-slate-500 uppercase">Ubah Password Admin</label>
                             <input type="password" id="newAdminPass" class="mt-1 block w-full rounded-lg border border-slate-300 p-2 text-sm" placeholder="Masukkan Password Baru">
                         </div>
-                        <button onclick="changeAdminPass()" class="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2 rounded-lg text-sm font-semibold transition">Ubah Password</button>
+                        <button type="button" onclick="changeAdminPass()" class="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2 rounded-lg text-sm font-semibold transition">Ubah Password</button>
                     </div>
                 </div>
 
@@ -472,7 +472,7 @@
                         <div class="flex justify-between items-center mb-4 border-b pb-3 flex-wrap gap-2">
                             <h3 class="font-extrabold text-indigo-700 text-lg" id="titleFormGuru"><i class="fa-solid fa-chalkboard-user"></i> Manajemen Guru</h3>
                             <div class="flex gap-2">
-                                <button onclick="downloadTemplateUsers('Guru')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 font-semibold transition">
+                                <button type="button" onclick="downloadTemplateUsers('Guru')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 font-semibold transition">
                                     <i class="fa-solid fa-download"></i> Template Excel
                                 </button>
                                 <label class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer flex items-center gap-1 font-semibold transition">
@@ -507,8 +507,8 @@
                                 </select>
                             </div>
                             <input type="text" id="guruTapel" placeholder="Tahun Pelajaran (contoh: 2026/2027)" class="border p-2 rounded text-xs col-span-2">
-                            <button id="btnSubmitGuru" onclick="addUserManual('Guru')" class="bg-indigo-600 text-white p-2 rounded text-xs font-semibold col-span-2 hover:bg-indigo-700">Tambah Guru Manual</button>
-                            <button id="btnCancelGuru" onclick="cancelEditUser('Guru')" class="hidden bg-slate-500 text-white p-2 rounded text-xs font-semibold col-span-2 hover:bg-slate-600">Batal Edit</button>
+                            <button type="button" id="btnSubmitGuru" onclick="addUserManual('Guru')" class="bg-indigo-600 text-white p-2 rounded text-xs font-semibold col-span-2 hover:bg-indigo-700">Tambah Guru Manual</button>
+                            <button type="button" id="btnCancelGuru" onclick="cancelEditUser('Guru')" class="hidden bg-slate-500 text-white p-2 rounded text-xs font-semibold col-span-2 hover:bg-slate-600">Batal Edit</button>
                         </div>
                         <div class="overflow-x-auto border rounded-xl max-h-60 overflow-y-auto">
                             <table class="w-full text-left text-xs">
@@ -527,7 +527,7 @@
                                     <select id="filterKelasSiswa" onchange="loadAdminUsers()" class="border p-2 rounded text-xs flex-grow">
                                         <option value="Semua">Semua Kelas</option>
                                     </select>
-                                    <button onclick="deleteStudentsByClass()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-bold">
+                                    <button type="button" onclick="deleteStudentsByClass()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs font-bold">
                                         <i class="fa-solid fa-trash-alt"></i> Hapus Semua di Kelas Ini
                                     </button>
                                 </div>
@@ -539,7 +539,7 @@
                                 </div>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="downloadTemplateUsers('Siswa')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 font-semibold transition">
+                                <button type="button" onclick="downloadTemplateUsers('Siswa')" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 font-semibold transition">
                                     <i class="fa-solid fa-download"></i> Template Excel
                                 </button>
                                 <label class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer flex items-center gap-1 font-semibold transition">
@@ -562,8 +562,8 @@
                                 </select>
                             </div>
                             <input type="text" id="siswaTapel" placeholder="Tahun Pelajaran (contoh: 2026/2027)" class="border p-2 rounded text-xs col-span-2">
-                            <button id="btnSubmitSiswa" onclick="addUserManual('Siswa')" class="bg-indigo-600 text-white p-2 rounded text-xs font-semibold col-span-2 hover:bg-indigo-700">Tambah Siswa Manual</button>
-                            <button id="btnCancelSiswa" onclick="cancelEditUser('Siswa')" class="hidden bg-slate-500 text-white p-2 rounded text-xs font-semibold col-span-2 hover:bg-slate-600">Batal Edit</button>
+                            <button type="button" id="btnSubmitSiswa" onclick="addUserManual('Siswa')" class="bg-indigo-600 text-white p-2 rounded text-xs font-semibold col-span-2 hover:bg-indigo-700">Tambah Siswa Manual</button>
+                            <button type="button" id="btnCancelSiswa" onclick="cancelEditUser('Siswa')" class="hidden bg-slate-500 text-white p-2 rounded text-xs font-semibold col-span-2 hover:bg-slate-600">Batal Edit</button>
                         </div>
                         <div class="overflow-x-auto border rounded-xl max-h-60 overflow-y-auto">
                             <table class="w-full text-left text-xs">
@@ -583,25 +583,25 @@
                         <span class="text-3xl">📅</span>
                         <h4 class="font-bold text-sm mt-2">Rekap Absensi</h4>
                         <p class="text-xs text-slate-500 mb-3">Seluruh kehadiran siswa</p>
-                        <button onclick="downloadGlobal('absensi')" class="w-full bg-indigo-600 text-white text-xs py-2 rounded-lg hover:bg-indigo-700">Download Excel</button>
+                        <button type="button" onclick="downloadGlobal('absensi')" class="w-full bg-indigo-600 text-white text-xs py-2 rounded-lg hover:bg-indigo-700">Download Excel</button>
                     </div>
                     <div class="border p-4 rounded-xl text-center shadow-sm">
                         <span class="text-3xl">📝</span>
                         <h4 class="font-bold text-sm mt-2">Rekap Nilai Mapel</h4>
                         <p class="text-xs text-slate-500 mb-3">Tugas, STS & SAS Akademik</p>
-                        <button onclick="downloadGlobal('nilai')" class="w-full bg-indigo-600 text-white text-xs py-2 rounded-lg hover:bg-indigo-700">Download Excel</button>
+                        <button type="button" onclick="downloadGlobal('nilai')" class="w-full bg-indigo-600 text-white text-xs py-2 rounded-lg hover:bg-indigo-700">Download Excel</button>
                     </div>
                     <div class="border p-4 rounded-xl text-center shadow-sm">
                         <span class="text-3xl">🏆</span>
                         <h4 class="font-bold text-sm mt-2">Rekap Nilai Ekskul</h4>
                         <p class="text-xs text-slate-500 mb-3">Penilaian non-akademik siswa</p>
-                        <button onclick="downloadGlobal('nilai_ekskul')" class="w-full bg-indigo-600 text-white text-xs py-2 rounded-lg hover:bg-indigo-700">Download Excel</button>
+                        <button type="button" onclick="downloadGlobal('nilai_ekskul')" class="w-full bg-indigo-600 text-white text-xs py-2 rounded-lg hover:bg-indigo-700">Download Excel</button>
                     </div>
                     <div class="border p-4 rounded-xl text-center shadow-sm">
                         <span class="text-3xl">💰</span>
                         <h4 class="font-bold text-sm mt-2">Rekap Tabungan</h4>
                         <p class="text-xs text-slate-500 mb-3">Aliran tabungan masuk/keluar</p>
-                        <button onclick="downloadGlobal('tabungan')" class="w-full bg-indigo-600 text-white text-xs py-2 rounded-lg hover:bg-indigo-700">Download Excel</button>
+                        <button type="button" onclick="downloadGlobal('tabungan')" class="w-full bg-indigo-600 text-white text-xs py-2 rounded-lg hover:bg-indigo-700">Download Excel</button>
                     </div>
                 </div>
             </div>
@@ -622,22 +622,22 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-4 flex-wrap">
-                    <button onclick="clearAllGuruData()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-black px-4 py-2.5 rounded-xl border-b-4 border-red-950 active:border-b-0 active:mt-1 transition-all shadow-md">
+                    <button type="button" onclick="clearAllGuruData()" class="bg-red-600 hover:bg-red-700 text-white text-xs font-black px-4 py-2.5 rounded-xl border-b-4 border-red-950 active:border-b-0 active:mt-1 transition-all shadow-md">
                         <i class="fa-solid fa-dumpster-fire text-yellow-300"></i> Kosongkan Semua Input Data
                     </button>
                     
                     <div class="flex gap-2 bg-emerald-900/40 p-1.5 rounded-xl border border-emerald-400/20 flex-wrap">
-                        <button onclick="switchGuruTab('tabAbsensi')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-white text-emerald-800 transition">📅 Absensi</button>
-                        <button onclick="switchGuruTab('tabNilai')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">📝 Nilai Mapel</button>
-                        <button onclick="switchGuruTab('tabLegger')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">📊 Legger & Ranking</button>
-                        <button onclick="switchGuruTab('tabEkskul')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">🏆 Nilai Ekskul</button>
-                        <button onclick="switchGuruTab('tabBintang')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">⭐ Bintang Perilaku</button>
-                        <button onclick="switchGuruTab('tabTabungan')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">💰 Tabungan</button>
-                        <button onclick="switchGuruTab('tabCetakDoc')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">🖨️ Cetak Raport / Buku Induk</button>
-<button onclick="switchGuruTab('tabDaftarSiswa')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100">👥 Daftar Nama Siswa</button>
-<button onclick="switchGuruTab('tabJurnal')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100">📔 Jurnal Harian</button>
-<button onclick="switchGuruTab('tabJadwal')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100">🗓️ Jadwal Pelajaran</button>
-<button onclick="switchGuruTab('tabKKTP')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100">🎯 KKTP</button>
+                        <button type="button" onclick="switchGuruTab('tabAbsensi')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold bg-white text-emerald-800 transition">📅 Absensi</button>
+                        <button type="button" onclick="switchGuruTab('tabNilai')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">📝 Nilai Mapel</button>
+                        <button type="button" onclick="switchGuruTab('tabLegger')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">📊 Legger & Ranking</button>
+                        <button type="button" onclick="switchGuruTab('tabEkskul')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">🏆 Nilai Ekskul</button>
+                        <button type="button" onclick="switchGuruTab('tabBintang')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">⭐ Bintang Perilaku</button>
+                        <button type="button" onclick="switchGuruTab('tabTabungan')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">💰 Tabungan</button>
+                        <button type="button" onclick="switchGuruTab('tabCetakDoc')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100 hover:bg-emerald-800/50 transition">🖨️ Cetak Raport / Buku Induk</button>
+<button type="button" onclick="switchGuruTab('tabDaftarSiswa')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100">👥 Daftar Nama Siswa</button>
+<button type="button" onclick="switchGuruTab('tabJurnal')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100">📔 Jurnal Harian</button>
+<button type="button" onclick="switchGuruTab('tabJadwal')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100">🗓️ Jadwal Pelajaran</button>
+<button type="button" onclick="switchGuruTab('tabKKTP')" class="guru-tab-btn px-4 py-2 rounded-lg text-sm font-bold text-emerald-100">🎯 KKTP</button>
 
                     </div>
                 </div>
@@ -677,7 +677,7 @@
                             </select>
                         </div>
                     </div>
-                    <button onclick="submitAbsensi()" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-emerald-700">
+                    <button type="button" onclick="submitAbsensi(event)" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-emerald-700">
                         <i class="fa-solid fa-circle-check"></i> Simpan Kehadiran
                     </button>
                 </div>
@@ -693,7 +693,7 @@
                     </div>
                     <div class="flex items-center gap-2 w-full md:w-auto">
                         <input type="text" id="searchRekapAbsenSiswa" onkeyup="renderRekapAbsenSiswa()" placeholder="Cari nama siswa..." class="w-full md:w-56 px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-500">
-                        <button onclick="exportTableToExcel('tblRekapAbsenSiswa', 'Rekap_Absen_Sakit_Izin_Alfa')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm flex items-center gap-2 whitespace-nowrap">
+                        <button type="button" onclick="exportTableToExcel('tblRekapAbsenSiswa', 'Rekap_Absen_Sakit_Izin_Alfa')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm flex items-center gap-2 whitespace-nowrap">
                             <i class="fa-solid fa-download"></i> Download Rekap Absen
                         </button>
                     </div>
@@ -721,10 +721,10 @@
                     <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-extrabold text-slate-700">Daftar Kehadiran Kelas</h3>
-                            <button onclick="exportTableToExcel('tblLogAbsen', 'Rekap_Presensi_Kelas')" class="bg-indigo-600 text-white text-xs px-3 py-1.5 rounded hover:bg-indigo-700 font-bold">
+                            <button type="button" onclick="exportTableToExcel('tblLogAbsen', 'Rekap_Presensi_Kelas')" class="bg-indigo-600 text-white text-xs px-3 py-1.5 rounded hover:bg-indigo-700 font-bold">
                                 <i class="fa-solid fa-download"></i> Download Rekap
                             </button>
-                            <button onclick="deleteAllAbsenGuru()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded hover:bg-rose-700 font-bold">
+                            <button type="button" onclick="deleteAllAbsenGuru()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5 rounded hover:bg-rose-700 font-bold">
                                 <i class="fa-solid fa-trash"></i> Hapus Data
                             </button>
                         </div>
@@ -785,7 +785,7 @@
                             <input type="number" id="nilaiAngka" min="0" max="100" class="mt-1 w-full border rounded-lg p-2 text-sm" placeholder="Nilai">
                         </div>
                     </div>
-                    <button onclick="submitNilai()" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-emerald-700">
+                    <button type="button" onclick="submitNilai(event)" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-emerald-700">
                         <i class="fa-solid fa-circle-check"></i> Simpan Penilaian
                     </button>
                 </div>
@@ -794,7 +794,7 @@
                     <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-extrabold text-slate-700">Log Nilai Akademik Kelas</h3>
-                            <button onclick="exportTableToExcel('tblLogNilai', 'Rekap_Nilai_Akademik')" class="bg-indigo-600 text-white text-xs px-3 py-1.5 rounded hover:bg-indigo-700 font-bold">
+                            <button type="button" onclick="exportTableToExcel('tblLogNilai', 'Rekap_Nilai_Akademik')" class="bg-indigo-600 text-white text-xs px-3 py-1.5 rounded hover:bg-indigo-700 font-bold">
                                 <i class="fa-solid fa-download"></i> Download Rekap
                             </button>
                         </div>
@@ -819,7 +819,7 @@
     <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
         <div class="flex justify-between items-center gap-3 flex-wrap">
             <div><h3 class="font-bold text-lg text-emerald-700">📔 Jurnal Harian Guru</h3><p class="text-xs text-slate-500 mt-1">Jurnal tersimpan berdasarkan kelas, tahun pelajaran, dan akun guru.</p></div>
-            <button onclick="exportTableToExcel('tblJurnalGuru','Jurnal_Harian_Guru')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold">⬇️ Unduh Excel</button>
+            <button type="button" onclick="exportTableToExcel('tblJurnalGuru','Jurnal_Harian_Guru')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold">⬇️ Unduh Excel</button>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
             <input type="date" id="jurnalTanggal" class="border p-2.5 rounded-lg text-sm">
@@ -828,7 +828,7 @@
             <input type="text" id="jurnalKegiatan" placeholder="Kegiatan Pembelajaran" class="border p-2.5 rounded-lg text-sm">
         </div>
         <textarea id="jurnalKeterangan" rows="3" placeholder="Keterangan / refleksi pembelajaran" class="mt-3 w-full border p-2.5 rounded-lg text-sm"></textarea>
-        <button onclick="submitJurnalGuru()" class="mt-3 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold">💾 Simpan Jurnal</button>
+        <button type="button" onclick="submitJurnalGuru(event)" class="mt-3 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold">💾 Simpan Jurnal</button>
     </div>
     <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
         <div class="overflow-x-auto"><table id="tblJurnalGuru" class="w-full text-left text-xs"><thead class="bg-slate-50"><tr><th class="p-3">Tanggal</th><th class="p-3">Mapel</th><th class="p-3">Materi</th><th class="p-3">Kegiatan</th><th class="p-3">Keterangan</th><th class="p-3">Guru</th><th class="p-3 text-right">Aksi</th></tr></thead><tbody id="bodyJurnalGuru" class="divide-y"></tbody></table></div>
@@ -878,13 +878,13 @@
 
 <div id="tabJadwal" class="guru-content hidden no-print space-y-6">
     <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
-        <div class="flex justify-between items-center gap-3 flex-wrap"><div><h3 class="font-bold text-lg text-emerald-700">🗓️ Jadwal Pelajaran</h3><p class="text-xs text-slate-500 mt-1">Jadwal tersimpan berdasarkan kelas, tahun pelajaran, dan akun guru.</p></div><button onclick="exportTableToExcel('tblJadwalGuru','Jadwal_Pelajaran')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold">⬇️ Unduh Excel</button></div>
+        <div class="flex justify-between items-center gap-3 flex-wrap"><div><h3 class="font-bold text-lg text-emerald-700">🗓️ Jadwal Pelajaran</h3><p class="text-xs text-slate-500 mt-1">Jadwal tersimpan berdasarkan kelas, tahun pelajaran, dan akun guru.</p></div><button type="button" onclick="exportTableToExcel('tblJadwalGuru','Jadwal_Pelajaran')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold">⬇️ Unduh Excel</button></div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mt-4">
             <select id="jadwalHari" class="border p-2.5 rounded-lg text-sm bg-white"><option>Senin</option><option>Selasa</option><option>Rabu</option><option>Kamis</option><option>Jumat</option><option>Sabtu</option></select>
             <input id="jadwalJam" placeholder="Jam, contoh 07.00-08.00" class="border p-2.5 rounded-lg text-sm">
             <select id="jadwalMapel" class="border p-2.5 rounded-lg text-sm bg-white"></select>
             <input id="jadwalGuru" placeholder="Guru / Pengajar" class="border p-2.5 rounded-lg text-sm">
-            <button id="btnSimpanJadwal" onclick="submitJadwalGuru()" class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg p-2.5 text-sm font-bold">💾 Simpan Jadwal</button>
+            <button type="button" id="btnSimpanJadwal" onclick="submitJadwalGuru(event)" class="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg p-2.5 text-sm font-bold">💾 Simpan Jadwal</button>
         </div>
     </div>
     <div class="bg-white p-6 rounded-2xl shadow border border-slate-200"><div class="overflow-x-auto"><table id="tblJadwalGuru" class="w-full text-left text-xs"><thead class="bg-slate-50"><tr><th class="p-3">Hari</th><th class="p-3">Jam</th><th class="p-3">Mapel</th><th class="p-3">Guru</th><th class="p-3">Kelas</th><th class="p-3 text-right">Aksi</th></tr></thead><tbody id="bodyJadwalGuru" class="divide-y"></tbody></table></div></div>
@@ -892,7 +892,7 @@
 
 <div id="tabKKTP" class="guru-content hidden no-print space-y-6">
     <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
-        <div class="flex justify-between items-center gap-3 flex-wrap"><div><h3 class="font-bold text-lg text-emerald-700">🎯 KKTP</h3><p class="text-xs text-slate-500 mt-1">KKTP terhubung otomatis dengan kelas dan tahun pelajaran guru.</p></div><div class="flex gap-2 flex-wrap"><button onclick="exportTableToExcel('tblKKTP','KKTP_Kelas')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold">⬇️ Unduh Excel</button><label class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-xs font-bold cursor-pointer">📤 Upload Excel<input type="file" class="hidden" accept=".xlsx,.xls,.csv" onchange="uploadKKTPGuru(event)"></label></div></div>
+        <div class="flex justify-between items-center gap-3 flex-wrap"><div><h3 class="font-bold text-lg text-emerald-700">🎯 KKTP</h3><p class="text-xs text-slate-500 mt-1">KKTP terhubung otomatis dengan kelas dan tahun pelajaran guru.</p></div><div class="flex gap-2 flex-wrap"><button type="button" onclick="exportTableToExcel('tblKKTP','KKTP_Kelas')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold">⬇️ Unduh Excel</button><label class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-xs font-bold cursor-pointer">📤 Upload Excel<input type="file" class="hidden" accept=".xlsx,.xls,.csv" onchange="uploadKKTPGuru(event)"></label></div></div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-4">
             <input id="kktpBab" placeholder="BAB 1 / BAB 2 / dst." class="border p-2.5 rounded-lg text-sm">
             <select id="kktpMapel" class="border p-2.5 rounded-lg text-sm bg-white"></select>
@@ -902,7 +902,7 @@
             <input id="kktpSangat" placeholder="Sangat Baik" class="border p-2.5 rounded-lg text-sm">
         </div>
         <textarea id="kktpKeterangan" rows="2" placeholder="Keterangan / indikator ketercapaian" class="mt-3 w-full border p-2.5 rounded-lg text-sm"></textarea>
-        <button onclick="submitKKTPGuru()" class="mt-3 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold">💾 Simpan KKTP</button>
+        <button type="button" onclick="submitKKTPGuru(event)" class="mt-3 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold">💾 Simpan KKTP</button>
     </div>
     <div class="bg-white p-6 rounded-2xl shadow border border-slate-200"><div class="overflow-x-auto"><table id="tblKKTP" class="w-full text-left text-xs"><thead class="bg-slate-50"><tr><th class="p-3">BAB</th><th class="p-3">Mapel</th><th class="p-3">Perlu Bimbingan</th><th class="p-3">Cukup</th><th class="p-3">Baik</th><th class="p-3">Sangat Baik</th><th class="p-3">Keterangan</th><th class="p-3">Input Oleh</th><th class="p-3 text-right">Aksi</th></tr></thead><tbody id="bodyKKTP" class="divide-y"></tbody></table></div></div>
 </div>
@@ -924,7 +924,7 @@
                                     <option value="2">Semester 2</option>
                                 </select>
                             </div>
-                            <button onclick="exportTableToExcel('tblLeggerReal', 'Legger_Nilai_dan_Ranking_Semester_' + document.getElementById('leggerSemester').value)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center gap-1 shadow transition">
+                            <button type="button" onclick="exportTableToExcel('tblLeggerReal', 'Legger_Nilai_dan_Ranking_Semester_' + document.getElementById('leggerSemester').value)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg flex items-center gap-1 shadow transition">
                                 <i class="fa-solid fa-file-excel"></i> Unduh Legger Excel
                             </button>
                         </div>
@@ -977,7 +977,7 @@
                             <input type="text" id="ekskulDesc" class="mt-1 w-full border rounded-lg p-2 text-sm" placeholder="Contoh: Aktif mengikuti latihan">
                         </div>
                     </div>
-                    <button onclick="submitNilaiEkskul()" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-emerald-700">
+                    <button type="button" onclick="submitNilaiEkskul(event)" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-emerald-700">
                         <i class="fa-solid fa-circle-check"></i> Simpan Nilai Ekskul
                     </button>
                 </div>
@@ -985,7 +985,7 @@
                 <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-extrabold text-slate-700">Log & Rekap Nilai Ekstrakurikuler Kelas</h3>
-                        <button onclick="exportTableToExcel('tblLogEkskul', 'Rekap_Nilai_Ekskul')" class="bg-indigo-600 text-white text-xs px-3 py-1.5 rounded hover:bg-indigo-700 font-bold">
+                        <button type="button" onclick="exportTableToExcel('tblLogEkskul', 'Rekap_Nilai_Ekskul')" class="bg-indigo-600 text-white text-xs px-3 py-1.5 rounded hover:bg-indigo-700 font-bold">
                             <i class="fa-solid fa-download"></i> Download Rekap
                         </button>
                     </div>
@@ -1030,7 +1030,7 @@
                             <input type="text" id="bintangDesc" class="mt-1 w-full border rounded-lg p-2.5 text-sm" placeholder="Contoh: Terlambat masuk kelas / Ribut">
                         </div>
                     </div>
-                    <button onclick="submitBintangGuru()" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition">
+                    <button type="button" onclick="submitBintangGuru(event)" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition">
                         <i class="fa-solid fa-star-half-stroke"></i> Simpan Catatan Bintang
                     </button>
                 </div>
@@ -1088,7 +1088,7 @@
                     <div id="warnPotongan" class="hidden text-rose-600 bg-rose-50 border border-rose-200 text-xs font-semibold p-3 rounded-lg mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-circle-exclamation text-base"></i> Transaksi pengeluaran otomatis dipotong pajak/administrasi sebesar 10% dari nominal penarikan!
                     </div>
-                    <button onclick="submitTabungan(event)" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-emerald-700">
+                    <button type="button" onclick="submitTabungan(event)" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-emerald-700">
                         <i class="fa-solid fa-receipt"></i> Jalankan Transaksi
                     </button>
                 </div>
@@ -1115,7 +1115,7 @@
                                     <input type="text" id="searchRekapSaldo" onkeyup="filterRekapSaldo()" placeholder="Cari nama atau NISN..." class="w-full md:w-64 pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:bg-white transition">
                                 </div>
                                 <div class="rekap-saldo-summary"><div class="rekap-saldo-badge text-emerald-700 bg-emerald-50 border-emerald-200">Masuk: <span id="totalUangMasukRekap">Rp 0</span></div><div class="rekap-saldo-badge text-rose-700 bg-rose-50 border-rose-200">Keluar: <span id="totalUangKeluarRekap">Rp 0</span></div></div>
-                                <button onclick="exportTableToExcel('tblRekapSaldoGuru', 'Rekap_Total_Saldo_Siswa')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm shadow-emerald-200 flex items-center gap-2 whitespace-nowrap">
+                                <button type="button" onclick="exportTableToExcel('tblRekapSaldoGuru', 'Rekap_Total_Saldo_Siswa')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm shadow-emerald-200 flex items-center gap-2 whitespace-nowrap">
                                     <i class="fa-solid fa-download"></i> Download Rekap
                                 </button>
                             </div>
@@ -1153,16 +1153,16 @@
                                 <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
                                     <label for="filterMutasiTanggal" class="text-xs font-bold text-slate-500 uppercase">Filter Tanggal:</label>
                                     <input type="date" id="filterMutasiTanggal" onchange="tampilkanSemuaRiwayatMutasi=false; renderTabunganGuru()" class="text-xs bg-transparent focus:outline-none font-semibold text-slate-700 cursor-pointer">
-                                    <button onclick="tampilkanSemuaRiwayatMutasi=false; document.getElementById('filterMutasiTanggal').value=''; renderTabunganGuru();" class="text-xs text-rose-500 hover:text-rose-700 ml-1 font-bold" title="Reset Filter">
+                                    <button type="button" onclick="tampilkanSemuaRiwayatMutasi=false; document.getElementById('filterMutasiTanggal').value=''; renderTabunganGuru();" class="text-xs text-rose-500 hover:text-rose-700 ml-1 font-bold" title="Reset Filter">
                                         <i class="fa-solid fa-xmark"></i>
                                     </button>
                                 </div>
-<button id="btnShowAllMutasi" onclick="toggleSemuaRiwayatMutasi()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm">
+<button type="button" id="btnShowAllMutasi" onclick="toggleSemuaRiwayatMutasi()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm">
     <i class="fa-solid fa-list"></i> Tampilkan Semua Riwayat
 </button>
 
                             </div>
-                            <button id="btnDownloadMutasi" onclick="exportTableToExcel('tblLogTabungan', 'Rekap_Keuangan_Tabungan')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm shadow-indigo-200 flex items-center gap-2">
+                            <button type="button" id="btnDownloadMutasi" onclick="exportTableToExcel('tblLogTabungan', 'Rekap_Keuangan_Tabungan')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm shadow-indigo-200 flex items-center gap-2">
                                 <i class="fa-solid fa-download"></i> Download Mutasi
                             </button>
                         </div>
@@ -1206,10 +1206,10 @@
                             </select>
                         </div>
                         <div class="flex items-end gap-2">
-                            <button onclick="prosesGenerateCetak('raport')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3 px-4 rounded-lg flex-grow transition">
+                            <button type="button" onclick="prosesGenerateCetak('raport')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3 px-4 rounded-lg flex-grow transition">
                                 <i class="fa-solid fa-file-invoice"></i> Buat Raport
                             </button>
-                            <button onclick="prosesGenerateCetak('bukuinduk')" class="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs py-3 px-4 rounded-lg flex-grow transition">
+                            <button type="button" onclick="prosesGenerateCetak('bukuinduk')" class="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs py-3 px-4 rounded-lg flex-grow transition">
                                 <i class="fa-solid fa-address-book"></i> Buat Buku Induk
                             </button>
                         </div>
@@ -1244,7 +1244,7 @@
             </div>
             <div class="bg-white p-6 rounded-2xl shadow border border-slate-200">
                 <h3 class="font-extrabold text-base text-slate-800 mb-2">🖼️ Download Hasil Belajar sebagai Gambar</h3><p class="text-xs text-slate-500 mb-4">Hasil belajar akan disimpan sebagai gambar PNG utuh. Seluruh isi dokumen ditampilkan dalam satu gambar dan otomatis menyesuaikan tinggi agar tulisan tidak terpotong.</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3"><button onclick="downloadSiswaImage('raport')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-sm"><i class="fa-solid fa-image"></i> Download Raport PNG</button><button onclick="downloadSiswaImage('bukuinduk')" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-xl text-sm"><i class="fa-solid fa-image"></i> Download Buku Induk PNG</button><button onclick="downloadSiswaImage('semua')" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-4 rounded-xl text-sm"><i class="fa-solid fa-images"></i> Download Semua Hasil PNG</button></div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3"><button type="button" onclick="downloadSiswaImage('raport')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl text-sm"><i class="fa-solid fa-image"></i> Download Raport PNG</button><button type="button" onclick="downloadSiswaImage('bukuinduk')" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-xl text-sm"><i class="fa-solid fa-image"></i> Download Buku Induk PNG</button><button type="button" onclick="downloadSiswaImage('semua')" class="bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-4 rounded-xl text-sm"><i class="fa-solid fa-images"></i> Download Semua Hasil PNG</button></div>
                 <div class="mt-4 flex items-center gap-3"><label class="text-xs font-bold text-slate-500">Semester Raport:</label><select id="siswaPdfSemester" class="border rounded-xl px-3 py-2 text-sm"><option value="1">Semester 1</option><option value="2">Semester 2</option></select></div>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -1800,12 +1800,12 @@
             const listMapel = document.getElementById('listMapel');
             listMapel.innerHTML = '';
             mapel.forEach((m, idx) => {
-                listMapel.innerHTML += `<tr><td class="p-2 font-semibold">${m.nama}</td><td class="p-2 text-right"><button onclick="deleteMetadata(${idx}, 'mapel')" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                listMapel.innerHTML += `<tr><td class="p-2 font-semibold">${m.nama}</td><td class="p-2 text-right"><button type="button" onclick="deleteMetadata(${idx}, 'mapel')" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
             const listEkskul = document.getElementById('listEkskul');
             listEkskul.innerHTML = '';
             ekskul.forEach((e, idx) => {
-                listEkskul.innerHTML += `<tr><td class="p-2 font-semibold">${e.nama}</td><td class="p-2 text-right"><button onclick="deleteMetadata(${idx}, 'ekskul')" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                listEkskul.innerHTML += `<tr><td class="p-2 font-semibold">${e.nama}</td><td class="p-2 text-right"><button type="button" onclick="deleteMetadata(${idx}, 'ekskul')" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
         }
 
@@ -1885,10 +1885,10 @@
             tblGuru.innerHTML=''; tblSiswa.innerHTML='';
             users.forEach((u,index)=>{
                 if(u.role==='Guru'){
-                    tblGuru.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.jenisGuru||'Guru Kelas'}</td><td class="p-2">${(u.jenisGuru==='Guru Mapel' ? ((u.kelasDiampu||[u.kelas]).join(', ')) : (u.kelas||'-'))}</td><td class="p-2">${(u.mapelDiampu||[]).join(', ')||'-'}</td><td class="p-2">${u.tapel||'-'}</td><td class="p-2 text-right flex justify-end gap-2"><button onclick="editUser('${u.username}','Guru')" class="text-amber-600"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                    tblGuru.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.jenisGuru||'Guru Kelas'}</td><td class="p-2">${(u.jenisGuru==='Guru Mapel' ? ((u.kelasDiampu||[u.kelas]).join(', ')) : (u.kelas||'-'))}</td><td class="p-2">${(u.mapelDiampu||[]).join(', ')||'-'}</td><td class="p-2">${u.tapel||'-'}</td><td class="p-2 text-right flex justify-end gap-2"><button type="button" onclick="editUser('${u.username}','Guru')" class="text-amber-600"><i class="fa-solid fa-pen-to-square"></i></button><button type="button" onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
                 } else if(u.role==='Siswa'){
                     const matchKelas=filterKelas==='Semua'||u.kelas===filterKelas; const matchSearch=(u.username||'').toLowerCase().includes(searchKeyword)||(u.nama||'').toLowerCase().includes(searchKeyword);
-                    if(matchKelas&&matchSearch) tblSiswa.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.kelas||'-'}</td><td class="p-2">${u.fase||'-'}</td><td class="p-2">${u.tapel||'-'}</td><td class="p-2 text-right flex justify-end gap-2"><button onclick="editUser('${u.username}','Siswa')" class="text-amber-600"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
+                    if(matchKelas&&matchSearch) tblSiswa.innerHTML += `<tr><td class="p-2 font-bold">${u.username}</td><td class="p-2">${u.nama}</td><td class="p-2">${u.kelas||'-'}</td><td class="p-2">${u.fase||'-'}</td><td class="p-2">${u.tapel||'-'}</td><td class="p-2 text-right flex justify-end gap-2"><button type="button" onclick="editUser('${u.username}','Siswa')" class="text-amber-600"><i class="fa-solid fa-pen-to-square"></i></button><button type="button" onclick="deleteUser(${index})" class="text-rose-600"><i class="fa-solid fa-trash-can"></i></button></td></tr>`;
                 }
             });
         }
@@ -2201,6 +2201,40 @@ function editGuruManagedSiswa(username){
     document.getElementById('manageSiswaFase').value=u.fase||inferFaseFromKelas(u.kelas)||'A';
     document.getElementById('btnSaveManageSiswa').textContent='Perbarui Data Siswa';
 }
+
+// ===== PENYIMPANAN TERPISAH PER FITUR GURU =====
+// Setiap fitur hanya boleh menulis ke storage key miliknya sendiri.
+const GURU_FEATURE_KEYS = Object.freeze({
+    users: 'users',
+    absensi: 'absensi',
+    nilai: 'nilai',
+    jurnal: 'jurnal',
+    jadwal: 'jadwal',
+    kktp: 'kktp',
+    nilai_ekskul: 'nilai_ekskul',
+    bintang: 'bintang',
+    tabungan: 'tabungan'
+});
+
+function saveGuruFeatureData(featureKey, data) {
+    const allowedKey = GURU_FEATURE_KEYS[featureKey];
+    if (!allowedKey || allowedKey !== featureKey) {
+        console.error('Penyimpanan fitur Guru ditolak:', featureKey);
+        return false;
+    }
+    const safeData = Array.isArray(data) ? data : data;
+    saveAppData(allowedKey, JSON.stringify(safeData));
+    return true;
+}
+
+function guardGuruButton(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    return true;
+}
+
 function saveGuruManagedSiswa(){
     if(!currentUser || currentUser.role!=='Guru') return;
     const username=String(document.getElementById('manageSiswaUsername')?.value||'').trim();
@@ -2483,17 +2517,17 @@ function getSiswaSekelas() {
                 data.push({id:Date.now(),tanggal,mapel,materi,kegiatan,keterangan,kelas:kelasJurnal,tapel,inputBy:currentUser.username,inputByType:currentUser.jenisGuru||'Guru Kelas',guruKelasUsername:guruKelasJurnal?.username||'',guruKelasNama:guruKelasJurnal?.nama||''});
                 showSaveToast('Jurnal harian tersimpan');
             }
-            saveAppData('jurnal',JSON.stringify(data)); editJurnalGuruId=null;
+            saveGuruFeatureData('jurnal', data); editJurnalGuruId=null;
             document.getElementById('jurnalMateri').value=''; document.getElementById('jurnalKegiatan').value=''; document.getElementById('jurnalKeterangan').value=''; document.getElementById('jurnalTanggal').value='';
             renderJurnalGuru();
         }
         function renderJurnalGuru(){
             populateJurnalKktpMapel(); const body=document.getElementById('bodyJurnalGuru'); if(!body)return; const tapel=currentUser?.tapel||getActiveTapel();
             const list=(JSON.parse(localStorage.getItem('jurnal'))||[]).filter(j=>j.kelas===getGuruKelasAktif()&&String(j.tapel||tapel)===String(tapel)&&(!isGuruMapel()||getGuruMapelNames().includes(j.mapel)));
-            body.innerHTML=list.length?list.map(j=>`<tr><td class="p-3">${chatEsc(j.tanggal)}</td><td class="p-3 font-semibold">${chatEsc(j.mapel)}</td><td class="p-3">${chatEsc(j.materi)}</td><td class="p-3">${chatEsc(j.kegiatan)}</td><td class="p-3">${chatEsc(j.keterangan||'-')}</td><td class="p-3">${chatEsc(j.inputBy||'-')}</td><td class="p-3 text-right whitespace-nowrap"><button onclick="editJurnalGuru(${j.id})" class="text-amber-600 mr-3" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteJurnalGuru(${j.id})" class="text-rose-500" title="Hapus"><i class="fa-solid fa-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada jurnal.</td></tr>';
+            body.innerHTML=list.length?list.map(j=>`<tr><td class="p-3">${chatEsc(j.tanggal)}</td><td class="p-3 font-semibold">${chatEsc(j.mapel)}</td><td class="p-3">${chatEsc(j.materi)}</td><td class="p-3">${chatEsc(j.kegiatan)}</td><td class="p-3">${chatEsc(j.keterangan||'-')}</td><td class="p-3">${chatEsc(j.inputBy||'-')}</td><td class="p-3 text-right whitespace-nowrap"><button type="button" onclick="editJurnalGuru(${j.id})" class="text-amber-600 mr-3" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button><button type="button" onclick="deleteJurnalGuru(${j.id})" class="text-rose-500" title="Hapus"><i class="fa-solid fa-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada jurnal.</td></tr>';
         }
         function editJurnalGuru(id){ const j=(JSON.parse(localStorage.getItem('jurnal'))||[]).find(x=>String(x.id)===String(id)); if(!j)return; if(isGuruMapel()&&j.inputBy!==currentUser.username)return alert('Guru Mata Pelajaran hanya dapat mengedit jurnal sendiri.'); editJurnalGuruId=j.id; populateJurnalKktpMapel(); fillJurnalGuruForm(j); document.querySelector('#tabJurnal .bg-white')?.scrollIntoView({behavior:'smooth',block:'start'}); }
-        function deleteJurnalGuru(id){ const target=(JSON.parse(localStorage.getItem('jurnal'))||[]).find(x=>String(x.id)===String(id)); if(!target)return; if(isGuruMapel()&&target.inputBy!==currentUser.username)return alert('Guru Mata Pelajaran hanya dapat menghapus jurnal yang dibuat oleh akun sendiri.'); if(!confirm('Hapus jurnal ini?'))return; saveAppData('jurnal',JSON.stringify((JSON.parse(localStorage.getItem('jurnal'))||[]).filter(x=>String(x.id)!==String(id)))); renderJurnalGuru(); }
+        function deleteJurnalGuru(id){ const target=(JSON.parse(localStorage.getItem('jurnal'))||[]).find(x=>String(x.id)===String(id)); if(!target)return; if(isGuruMapel()&&target.inputBy!==currentUser.username)return alert('Guru Mata Pelajaran hanya dapat menghapus jurnal yang dibuat oleh akun sendiri.'); if(!confirm('Hapus jurnal ini?'))return; saveGuruFeatureData('jurnal',(JSON.parse(localStorage.getItem('jurnal'))||[]).filter(x=>String(x.id)!==String(id))); renderJurnalGuru(); }
 
         function submitJadwalGuru(){
             if(!currentUser||currentUser.role!=='Guru') return;
@@ -2503,16 +2537,16 @@ function getSiswaSekelas() {
             const data=JSON.parse(localStorage.getItem('jadwal'))||[];
             if(editJadwalGuruId){ const idx=data.findIndex(x=>String(x.id)===String(editJadwalGuruId)); if(idx<0)return alert('Jadwal tidak ditemukan.'); data[idx]={...data[idx],hari,jam,mapel,guru,kelas,tapel}; showSaveToast('Jadwal berhasil diperbarui'); }
             else { data.push({id:Date.now(),hari,jam,mapel,guru,kelas,tapel,inputBy:currentUser.username}); showSaveToast('Jadwal tersimpan'); }
-            saveAppData('jadwal',JSON.stringify(data)); editJadwalGuruId=null; document.getElementById('jadwalJam').value=''; document.getElementById('jadwalGuru').value=''; renderJadwalGuru();
+            saveGuruFeatureData('jadwal', data); editJadwalGuruId=null; document.getElementById('jadwalJam').value=''; document.getElementById('jadwalGuru').value=''; renderJadwalGuru();
         }
         function renderJadwalGuru(){
             populateJadwalMapel(); const body=document.getElementById('bodyJadwalGuru'); if(!body)return; const kelas=getGuruKelasAktif(),tapel=currentUser?.tapel||getActiveTapel();
             const list=(JSON.parse(localStorage.getItem('jadwal'))||[]).filter(x=>String(x.kelas)===String(kelas)&&String(x.tapel||tapel)===String(tapel));
             const order={Senin:1,Selasa:2,Rabu:3,Kamis:4,Jumat:5,Sabtu:6}; list.sort((a,b)=>(order[a.hari]||9)-(order[b.hari]||9)||String(a.jam).localeCompare(String(b.jam)));
-            body.innerHTML=list.length?list.map(x=>`<tr><td class="p-3 font-semibold">${chatEsc(x.hari)}</td><td class="p-3">${chatEsc(x.jam)}</td><td class="p-3">${chatEsc(x.mapel)}</td><td class="p-3">${chatEsc(x.guru||'-')}</td><td class="p-3">${chatEsc(x.kelas)}</td><td class="p-3 text-right whitespace-nowrap"><button onclick="editJadwalGuru(${x.id})" class="text-amber-600 mr-3"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteJadwalGuru(${x.id})" class="text-rose-600"><i class="fa-solid fa-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada jadwal.</td></tr>';
+            body.innerHTML=list.length?list.map(x=>`<tr><td class="p-3 font-semibold">${chatEsc(x.hari)}</td><td class="p-3">${chatEsc(x.jam)}</td><td class="p-3">${chatEsc(x.mapel)}</td><td class="p-3">${chatEsc(x.guru||'-')}</td><td class="p-3">${chatEsc(x.kelas)}</td><td class="p-3 text-right whitespace-nowrap"><button type="button" onclick="editJadwalGuru(${x.id})" class="text-amber-600 mr-3"><i class="fa-solid fa-pen-to-square"></i></button><button type="button" onclick="deleteJadwalGuru(${x.id})" class="text-rose-600"><i class="fa-solid fa-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada jadwal.</td></tr>';
         }
         function editJadwalGuru(id){ const x=(JSON.parse(localStorage.getItem('jadwal'))||[]).find(y=>String(y.id)===String(id)); if(!x)return; editJadwalGuruId=x.id; populateJadwalMapel(); document.getElementById('jadwalHari').value=x.hari||'Senin'; document.getElementById('jadwalJam').value=x.jam||''; document.getElementById('jadwalMapel').value=x.mapel||''; document.getElementById('jadwalGuru').value=x.guru||''; document.getElementById('btnSimpanJadwal').textContent='✏️ Perbarui Jadwal'; }
-        function deleteJadwalGuru(id){ if(!confirm('Hapus jadwal ini?'))return; saveAppData('jadwal',JSON.stringify((JSON.parse(localStorage.getItem('jadwal'))||[]).filter(x=>String(x.id)!==String(id)))); renderJadwalGuru(); }
+        function deleteJadwalGuru(id){ if(!confirm('Hapus jadwal ini?'))return; saveGuruFeatureData('jadwal',(JSON.parse(localStorage.getItem('jadwal'))||[]).filter(x=>String(x.id)!==String(id))); renderJadwalGuru(); }
         function populateJadwalMapel(){ const all=JSON.parse(localStorage.getItem('mapel'))||[]; const list=isGuruMapel()?all.filter(m=>getGuruMapelNames().includes(m.nama)):all; const el=document.getElementById('jadwalMapel'); if(el)el.innerHTML=list.map(m=>`<option value="${chatEsc(m.nama)}">${chatEsc(m.nama)}</option>`).join('')||'<option value="">Tidak ada mapel</option>'; }
 
         function submitKKTPGuru(){
@@ -2525,15 +2559,15 @@ function getSiswaSekelas() {
             const row={bab,mapel,perlu,cukup,baik,sangat,keterangan,kelas:kelasKKTP,tapel,inputBy:currentUser.username,inputByType:currentUser.jenisGuru||'Guru Kelas',guruKelasUsername:guruKelasKKTP?.username||'',guruKelasNama:guruKelasKKTP?.nama||''};
             if(editKKTPGuruId){ const idx=data.findIndex(x=>String(x.id)===String(editKKTPGuruId)); if(idx<0)return alert('KKTP tidak ditemukan.'); if(isGuruMapel()&&data[idx].inputBy!==currentUser.username)return alert('Guru Mata Pelajaran hanya dapat mengedit KKTP sendiri.'); data[idx]={...data[idx],...row,id:data[idx].id}; showSaveToast('KKTP berhasil diperbarui'); }
             else { data.push({id:Date.now(),...row}); showSaveToast('KKTP tersimpan'); }
-            saveAppData('kktp',JSON.stringify(data)); editKKTPGuruId=null; ['kktpBab','kktpPerlu','kktpCukup','kktpBaik','kktpSangat','kktpKeterangan'].forEach(id=>document.getElementById(id).value=''); renderKKTPGuru();
+            saveGuruFeatureData('kktp', data); editKKTPGuruId=null; ['kktpBab','kktpPerlu','kktpCukup','kktpBaik','kktpSangat','kktpKeterangan'].forEach(id=>document.getElementById(id).value=''); renderKKTPGuru();
         }
         function renderKKTPGuru(){
             populateJurnalKktpMapel(); const body=document.getElementById('bodyKKTP'); if(!body)return; const tapel=currentUser?.tapel||getActiveTapel();
             const list=(JSON.parse(localStorage.getItem('kktp'))||[]).filter(k=>k.kelas===getGuruKelasAktif()&&String(k.tapel||tapel)===String(tapel)&&(!isGuruMapel()||getGuruMapelNames().includes(k.mapel)));
-            body.innerHTML=list.length?list.map(k=>`<tr><td class="p-3 font-semibold">${chatEsc(k.bab)}</td><td class="p-3">${chatEsc(k.mapel)}</td><td class="p-3">${chatEsc(k.perlu)}</td><td class="p-3">${chatEsc(k.cukup)}</td><td class="p-3">${chatEsc(k.baik)}</td><td class="p-3">${chatEsc(k.sangat)}</td><td class="p-3">${chatEsc(k.keterangan||'-')}</td><td class="p-3">${chatEsc(k.inputBy||'-')}</td><td class="p-3 text-right whitespace-nowrap"><button onclick="editKKTPGuru(${k.id})" class="text-amber-600 mr-3"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteKKTPGuru(${k.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="9" class="p-4 text-center text-slate-400">Belum ada KKTP untuk kelas dan tahun pelajaran ini.</td></tr>';
+            body.innerHTML=list.length?list.map(k=>`<tr><td class="p-3 font-semibold">${chatEsc(k.bab)}</td><td class="p-3">${chatEsc(k.mapel)}</td><td class="p-3">${chatEsc(k.perlu)}</td><td class="p-3">${chatEsc(k.cukup)}</td><td class="p-3">${chatEsc(k.baik)}</td><td class="p-3">${chatEsc(k.sangat)}</td><td class="p-3">${chatEsc(k.keterangan||'-')}</td><td class="p-3">${chatEsc(k.inputBy||'-')}</td><td class="p-3 text-right whitespace-nowrap"><button type="button" onclick="editKKTPGuru(${k.id})" class="text-amber-600 mr-3"><i class="fa-solid fa-pen-to-square"></i></button><button type="button" onclick="deleteKKTPGuru(${k.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`).join(''):'<tr><td colspan="9" class="p-4 text-center text-slate-400">Belum ada KKTP untuk kelas dan tahun pelajaran ini.</td></tr>';
         }
         function editKKTPGuru(id){ const k=(JSON.parse(localStorage.getItem('kktp'))||[]).find(x=>String(x.id)===String(id)); if(!k)return; if(isGuruMapel()&&k.inputBy!==currentUser.username)return alert('Guru Mata Pelajaran hanya dapat mengedit KKTP sendiri.'); editKKTPGuruId=k.id; populateJurnalKktpMapel(); ['kktpBab','kktpPerlu','kktpCukup','kktpBaik','kktpSangat','kktpKeterangan'].forEach((id,i)=>document.getElementById(id).value=[k.bab,k.perlu,k.cukup,k.baik,k.sangat,k.keterangan||''][i]); document.getElementById('kktpMapel').value=k.mapel||''; }
-        function deleteKKTPGuru(id){ const target=(JSON.parse(localStorage.getItem('kktp'))||[]).find(x=>String(x.id)===String(id)); if(!target)return; if(isGuruMapel()&&target.inputBy!==currentUser.username)return alert('Guru Mata Pelajaran hanya dapat menghapus KKTP yang dibuat oleh akun sendiri.'); if(!confirm('Hapus KKTP ini?'))return; saveAppData('kktp',JSON.stringify((JSON.parse(localStorage.getItem('kktp'))||[]).filter(x=>String(x.id)!==String(id)))); renderKKTPGuru(); }
+        function deleteKKTPGuru(id){ const target=(JSON.parse(localStorage.getItem('kktp'))||[]).find(x=>String(x.id)===String(id)); if(!target)return; if(isGuruMapel()&&target.inputBy!==currentUser.username)return alert('Guru Mata Pelajaran hanya dapat menghapus KKTP yang dibuat oleh akun sendiri.'); if(!confirm('Hapus KKTP ini?'))return; saveGuruFeatureData('kktp', (JSON.parse(localStorage.getItem('kktp'))||[]).filter(x=>String(x.id)!==String(id))); renderKKTPGuru(); }
         function uploadKKTPGuru(event){
             const file=event.target.files?.[0]; if(!file)return; if(!requireGuruAccess('kktp')){event.target.value='';return;}
             const reader=new FileReader(); reader.onload=e=>{ try{
@@ -2541,7 +2575,7 @@ function getSiswaSekelas() {
                 const kelas=getGuruKelasAktif(), tapel=currentUser.tapel||getActiveTapel(), guruKelas=requireGuruKelasTerhubung(kelas); if(isGuruMapel()&&!guruKelas)return;
                 const data=JSON.parse(localStorage.getItem('kktp'))||[]; let added=0;
                 rows.forEach(r=>{ const bab=String(r.BAB||r.Bab||r.bab||'').trim(), mapel=String(r.Mapel||r.MataPelajaran||r['Mata Pelajaran']||'').trim(); if(!bab||!mapel)return; if(isGuruMapel()&&!getGuruMapelNames().includes(mapel))return; const row={id:Date.now()+added,bab,mapel,perlu:String(r['Perlu Bimbingan']||r.Perlu||r.perlu||''),cukup:String(r.Cukup||r.cukup||''),baik:String(r.Baik||r.baik||''),sangat:String(r['Sangat Baik']||r.Sangat||r.sangat||''),keterangan:String(r.Keterangan||r.keterangan||''),kelas,tapel,inputBy:currentUser.username,inputByType:currentUser.jenisGuru||'Guru Kelas',guruKelasUsername:guruKelas?.username||'',guruKelasNama:guruKelas?.nama||''}; if(!row.perlu||!row.cukup||!row.baik||!row.sangat)return; data.push(row); added++; });
-                saveAppData('kktp',JSON.stringify(data)); renderKKTPGuru(); alert(`Upload KKTP selesai. ${added} data ditambahkan.`);
+                saveGuruFeatureData('kktp', data); renderKKTPGuru(); alert(`Upload KKTP selesai. ${added} data ditambahkan.`);
             }catch(err){console.error(err);alert('File KKTP tidak dapat dibaca. Gunakan Excel/CSV dengan kolom BAB, Mapel, Perlu Bimbingan, Cukup, Baik, Sangat Baik, Keterangan.');} event.target.value=''; }; reader.readAsArrayBuffer(file);
         }
 
@@ -2549,11 +2583,11 @@ function getSiswaSekelas() {
             if(isGuruMapel()) return alert('Guru Mata Pelajaran tidak memiliki akses menghapus seluruh data kelas.');
             if (confirm("Hapus semua inputan kelas Anda?")) {
                 const kelasGuru = currentUser.kelas;
-                saveAppData('absensi', JSON.stringify((JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.kelas !== kelasGuru)));
-                saveAppData('nilai', JSON.stringify((JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.kelas !== kelasGuru)));
-                saveAppData('nilai_ekskul', JSON.stringify((JSON.parse(localStorage.getItem('nilai_ekskul')) || []).filter(ne => ne.kelas !== kelasGuru)));
-                saveAppData('bintang', JSON.stringify((JSON.parse(localStorage.getItem('bintang')) || []).filter(b => b.kelas !== kelasGuru)));
-                saveAppData('tabungan', JSON.stringify((JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.kelas !== kelasGuru)));
+                saveGuruFeatureData('absensi', (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.kelas !== kelasGuru));
+                saveGuruFeatureData('nilai', (JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.kelas !== kelasGuru));
+                saveGuruFeatureData('nilai_ekskul', (JSON.parse(localStorage.getItem('nilai_ekskul')) || []).filter(ne => ne.kelas !== kelasGuru));
+                saveGuruFeatureData('bintang', (JSON.parse(localStorage.getItem('bintang')) || []).filter(b => b.kelas !== kelasGuru));
+                saveGuruFeatureData('tabungan', (JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.kelas !== kelasGuru));
                 alert("Data dibersihkan!");
                 initGuruViews();
             }
@@ -2570,7 +2604,8 @@ function getAbsensiSemesterAktif() {
     return String(document.getElementById('absensiSemester')?.value || '1');
 }
 
-function submitAbsensi() {
+function submitAbsensi(event) {
+            guardGuruButton(event);
     if(!requireGuruAccess('absensi')) return;
     const semester = getAbsensiSemesterAktif();
     const date = document.getElementById('absensiDate').value;
@@ -2586,7 +2621,7 @@ function submitAbsensi() {
     const idx = absensi.findIndex(a => a.username === userSiswa && a.date === date && a.kelas === currentUser.kelas && getAbsensiSemester(a) === semester);
     const dataBaru = { id: idx >= 0 ? absensi[idx].id : Date.now(), date, username: userSiswa, nama: sObj ? sObj.nama : userSiswa, kelas: currentUser.kelas, status, semester, tapel: profile.tapel || "-" };
     if (idx >= 0) absensi[idx] = dataBaru; else absensi.push(dataBaru);
-    saveAppData('absensi', JSON.stringify(absensi));
+    saveGuruFeatureData('absensi', absensi);
 
     renderAbsensiGuru();
     renderRekapAbsenSiswa();
@@ -2596,7 +2631,7 @@ function submitAbsensi() {
 
         function deleteAbsen(id) {
             if(confirm("Hapus data kehadiran ini?")) {
-                saveAppData('absensi', JSON.stringify((JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.id !== id)));
+                saveGuruFeatureData('absensi', (JSON.parse(localStorage.getItem('absensi')) || []).filter(a => a.id !== id));
                 renderAbsensiGuru();
                 renderRekapAbsenSiswa();
                 showSaveToast("Data kehadiran dihapus");
@@ -2609,7 +2644,7 @@ function submitAbsensi() {
             const jumlah = data.filter(a => a.kelas === kelasGuru).length;
             if (!jumlah) return alert("Belum ada data kehadiran untuk kelas Anda.");
             if (!confirm(`Hapus semua ${jumlah} data kehadiran kelas ${kelasGuru}?\n\nData yang dihapus tidak dapat dikembalikan.`)) return;
-            saveAppData('absensi', JSON.stringify(data.filter(a => a.kelas !== kelasGuru)));
+            saveGuruFeatureData('absensi', data.filter(a => a.kelas !== kelasGuru));
             renderAbsensiGuru();
             renderRekapAbsenSiswa();
             showSaveToast("Semua data kehadiran kelas dihapus");
@@ -2625,7 +2660,7 @@ function submitAbsensi() {
 
             absensi.forEach(a => {
                 chartData[a.status] = (chartData[a.status] || 0) + 1;
-                tbody.innerHTML += `<tr><td class="p-3">${a.date}</td><td class="p-3">Sem ${getAbsensiSemester(a)}</td><td class="p-3 font-semibold">${a.nama}</td><td><span class="px-2 py-0.5 rounded text-xs">${a.status}</span></td><td class="text-right"><button onclick="deleteAbsen(${a.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                tbody.innerHTML += `<tr><td class="p-3">${a.date}</td><td class="p-3">Sem ${getAbsensiSemester(a)}</td><td class="p-3 font-semibold">${a.nama}</td><td><span class="px-2 py-0.5 rounded text-xs">${a.status}</span></td><td class="text-right"><button type="button" onclick="deleteAbsen(${a.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
 
             if (chartInstanceAbsen) chartInstanceAbsen.destroy();
@@ -2643,7 +2678,8 @@ function submitAbsensi() {
             });
         }
 
-        function submitNilai() {
+        function submitNilai(event) {
+            guardGuruButton(event);
             if(!requireGuruAccess('nilai')) return;
             const username = document.getElementById('nilaiSiswa').value;
             const mapel = document.getElementById('nilaiMapel').value;
@@ -2669,7 +2705,7 @@ function submitAbsensi() {
             const guruKelasNama = guruKelasAktif?.nama || '';
 
             nilai.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: kelasAktif, mapel, semester, jenis, date, angka, tapel, inputBy: currentUser.username, inputByType: currentUser.jenisGuru || "Guru Kelas", guruKelasUsername, guruKelasNama });
-            saveAppData('nilai', JSON.stringify(nilai));
+            saveGuruFeatureData('nilai', nilai);
             renderNilaiGuru();
             renderLegger();
             showSaveToast("Penilaian tersimpan");
@@ -2679,7 +2715,7 @@ function submitAbsensi() {
             const target=(JSON.parse(localStorage.getItem('nilai'))||[]).find(n=>n.id===id);
             if(isGuruMapel() && target && target.inputBy !== currentUser.username) return alert('Guru Mata Pelajaran hanya dapat menghapus nilai yang diinput oleh akun sendiri.');
             if(confirm("Hapus?")) {
-                saveAppData('nilai', JSON.stringify((JSON.parse(localStorage.getItem('nilai'))).filter(n => n.id !== id)));
+                saveGuruFeatureData('nilai', (JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.id !== id));
                 renderNilaiGuru();
                 renderLegger();
             }
@@ -2694,7 +2730,7 @@ function submitAbsensi() {
 
             nilai.forEach(n => {
                 if (categories[n.jenis]) { categories[n.jenis].total += n.angka; categories[n.jenis].count += 1; }
-                tbody.innerHTML += `<tr><td class="p-3 font-semibold">${n.nama}</td><td>${n.mapel}</td><td>${n.jenis}</td><td>Sem ${n.semester}</td><td class="font-bold text-indigo-600">${n.angka}</td><td class="text-right"><button onclick="deleteNilai(${n.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                tbody.innerHTML += `<tr><td class="p-3 font-semibold">${n.nama}</td><td>${n.mapel}</td><td>${n.jenis}</td><td>Sem ${n.semester}</td><td class="font-bold text-indigo-600">${n.angka}</td><td class="text-right"><button type="button" onclick="deleteNilai(${n.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
 
             if (chartInstanceNilai) chartInstanceNilai.destroy();
@@ -2781,7 +2817,8 @@ function submitAbsensi() {
             });
         }
 
-        function submitNilaiEkskul() {
+        function submitNilaiEkskul(event) {
+            guardGuruButton(event);
             const username = document.getElementById('ekskulSiswa').value;
             const ekskul = document.getElementById('ekskulPilihan').value;
             const semester = document.getElementById('ekskulSemester').value;
@@ -2794,14 +2831,14 @@ function submitAbsensi() {
             const profile = JSON.parse(localStorage.getItem('schoolProfile'));
 
             nilaiEkskul.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: currentUser.kelas, ekskul, semester, predikat, desc, tapel: profile.tapel || "-" });
-            saveAppData('nilai_ekskul', JSON.stringify(nilaiEkskul));
+            saveGuruFeatureData('nilai_ekskul', nilaiEkskul);
             renderNilaiEkskulGuru();
             showSaveToast("Nilai ekskul tersimpan");
         }
 
         function deleteNilaiEkskul(id) {
             if(confirm("Hapus?")) {
-                saveAppData('nilai_ekskul', JSON.stringify((JSON.parse(localStorage.getItem('nilai_ekskul'))).filter(ne => ne.id !== id)));
+                saveGuruFeatureData('nilai_ekskul', (JSON.parse(localStorage.getItem('nilai_ekskul')) || []).filter(ne => ne.id !== id));
                 renderNilaiEkskulGuru();
             }
         }
@@ -2812,11 +2849,12 @@ function submitAbsensi() {
             if(!tbody) return;
             tbody.innerHTML = '';
             dataEkskul.forEach(ne => {
-                tbody.innerHTML += `<tr><td class="p-3 font-semibold">${ne.nama}</td><td>${ne.ekskul}</td><td>Sem ${ne.semester}</td><td>${ne.predikat}</td><td>${ne.desc}</td><td class="text-right"><button onclick="deleteNilaiEkskul(${ne.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                tbody.innerHTML += `<tr><td class="p-3 font-semibold">${ne.nama}</td><td>${ne.ekskul}</td><td>Sem ${ne.semester}</td><td>${ne.predikat}</td><td>${ne.desc}</td><td class="text-right"><button type="button" onclick="deleteNilaiEkskul(${ne.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
         }
 
-        function submitBintangGuru() {
+        function submitBintangGuru(event) {
+            guardGuruButton(event);
             if(!requireGuruAccess('bintang')) return;
             const username = document.getElementById('bintangSiswa').value;
             const jumlah = parseInt(document.getElementById('bintangJumlah').value);
@@ -2832,7 +2870,7 @@ function submitAbsensi() {
             const guruKelasBintang=requireGuruKelasTerhubung(kelasBintang);
             if(isGuruMapel() && !guruKelasBintang) return;
             bintangList.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: kelasBintang, jumlah, desc, date, tapel: currentUser.tapel || getActiveTapel(), inputBy: currentUser.username, inputByType: currentUser.jenisGuru || "Guru Kelas", guruKelasUsername: guruKelasBintang?.username || getGuruKelasUsername(kelasBintang), guruKelasNama: guruKelasBintang?.nama || '' });
-            saveAppData('bintang', JSON.stringify(bintangList));
+            saveGuruFeatureData('bintang', bintangList);
             document.getElementById('bintangDesc').value = '';
             renderBintangGuru();
             showSaveToast("Catatan bintang tersimpan");
@@ -2842,7 +2880,7 @@ function submitAbsensi() {
             if(confirm("Hapus catatan bintang ini?")) {
                 let bintangList = JSON.parse(localStorage.getItem('bintang')) || [];
                 bintangList = bintangList.filter(b => b.id !== id);
-                saveAppData('bintang', JSON.stringify(bintangList));
+                saveGuruFeatureData('bintang', bintangList);
                 renderBintangGuru();
             }
         }
@@ -2854,7 +2892,7 @@ function submitAbsensi() {
             tbody.innerHTML = '';
             bintangList.forEach(b => {
                 const badgeColor = b.jumlah < 0 ? 'text-rose-600 font-bold' : 'text-emerald-600 font-bold';
-                tbody.innerHTML += `<tr><td class="p-3">${b.date}</td><td class="p-3 font-semibold">${b.nama}</td><td class="${badgeColor}">${b.jumlah > 0 ? '+' + b.jumlah : b.jumlah} Bintang</td><td>${b.desc}</td><td class="text-right"><button onclick="deleteBintang(${b.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                tbody.innerHTML += `<tr><td class="p-3">${b.date}</td><td class="p-3 font-semibold">${b.nama}</td><td class="${badgeColor}">${b.jumlah > 0 ? '+' + b.jumlah : b.jumlah} Bintang</td><td>${b.desc}</td><td class="text-right"><button type="button" onclick="deleteBintang(${b.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
         }
 
@@ -3085,7 +3123,7 @@ function submitAbsensi() {
                                     <td class="p-3.5 text-rose-600 font-semibold">Rp ${t.potongan.toLocaleString('id-ID')}</td>
                                     <td class="p-3.5 text-emerald-600 font-bold">Rp ${t.nominalBersih.toLocaleString('id-ID')}</td>
                                     <td class="p-3.5 text-right">
-                                        <button onclick="deleteTabungan(${t.id}, event)" class="text-rose-500 hover:text-rose-700">
+                                        <button type="button" onclick="deleteTabungan(${t.id}, event)" class="text-rose-500 hover:text-rose-700">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </td>
