@@ -2989,6 +2989,21 @@ function submitAbsensi() {
                     let totalMasukGlobal = 0;
                     let totalKeluarGlobal = 0;
 
+                    // Deteksi transaksi yang benar-benar duplikat pada tanggal yang sama.
+                    // Duplikat ditentukan dari siswa + tanggal + jenis + nominal transaksi.
+                    const duplicateKeys = {};
+                    tabunganList.forEach(t => {
+                        const duplicateKey = [
+                            t.date || '',
+                            t.username || '',
+                            t.jenis || '',
+                            Number(t.nominalAsli || 0),
+                            Number(t.nominalBersih || 0),
+                            Number(t.potongan || 0)
+                        ].join('|');
+                        duplicateKeys[duplicateKey] = (duplicateKeys[duplicateKey] || 0) + 1;
+                    });
+
                     sortedDates.forEach(date => {
                         const items = groupedByDate[date];
                         let totalMasukHari = 0;
@@ -3004,11 +3019,26 @@ function submitAbsensi() {
                             }
 
                             const badgeColor = t.jenis === 'Masuk' ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
+                            const duplicateKey = [
+                                t.date || '',
+                                t.username || '',
+                                t.jenis || '',
+                                Number(t.nominalAsli || 0),
+                                Number(t.nominalBersih || 0),
+                                Number(t.potongan || 0)
+                            ].join('|');
+                            const isDuplicate = duplicateKeys[duplicateKey] > 1;
+                            const rowClass = isDuplicate
+                                ? 'bg-red-100 hover:bg-red-200 border-l-4 border-red-600 text-red-900'
+                                : 'hover:bg-slate-50';
+                            const duplicateBadge = isDuplicate
+                                ? '<span class="ml-2 inline-flex items-center gap-1 rounded-full bg-red-600 text-white px-2 py-0.5 text-[10px] font-extrabold uppercase"><i class="fa-solid fa-triangle-exclamation"></i> Data Double</span>'
+                                : '';
                             tbodyMutasi.innerHTML += `
-                                <tr class="hover:bg-slate-50">
-                                    <td class="p-3.5 text-slate-500 font-medium">${t.date}</td>
-                                    <td class="p-3.5 font-semibold text-slate-800">${t.nama}</td>
-                                    <td class="p-3.5"><span class="${badgeColor}">${t.jenis}</span></td>
+                                <tr class="${rowClass}" title="${isDuplicate ? 'Transaksi ini terdeteksi sama/duplikat pada tanggal yang sama.' : ''}">
+                                    <td class="p-3.5 ${isDuplicate ? 'text-red-800 font-bold' : 'text-slate-500 font-medium'}">${t.date}</td>
+                                    <td class="p-3.5 font-semibold ${isDuplicate ? 'text-red-900' : 'text-slate-800'}">${t.nama}${duplicateBadge}</td>
+                                    <td class="p-3.5"><span class="${isDuplicate ? 'text-red-700 font-extrabold' : badgeColor}">${t.jenis}</span></td>
                                     <td class="p-3.5">Rp ${t.nominalAsli.toLocaleString('id-ID')}</td>
                                     <td class="p-3.5 text-rose-600 font-semibold">Rp ${t.potongan.toLocaleString('id-ID')}</td>
                                     <td class="p-3.5 text-emerald-600 font-bold">Rp ${t.nominalBersih.toLocaleString('id-ID')}</td>
