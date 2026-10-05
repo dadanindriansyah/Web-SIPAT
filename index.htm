@@ -1152,12 +1152,14 @@
                             <div class="flex flex-wrap items-center gap-2.5">
                                 <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5">
                                     <label for="filterMutasiTanggal" class="text-xs font-bold text-slate-500 uppercase">Filter Tanggal:</label>
-                                    <input type="date" id="filterMutasiTanggal" onchange="renderTabunganGuru()" class="text-xs bg-transparent focus:outline-none font-semibold text-slate-700 cursor-pointer">
-                                    <button onclick="document.getElementById('filterMutasiTanggal').value=''; renderTabunganGuru();" class="text-xs text-rose-500 hover:text-rose-700 ml-1 font-bold" title="Reset Filter">
+                                    <input type="date" id="filterMutasiTanggal" onchange="tampilkanSemuaRiwayatMutasi=false; renderTabunganGuru()" class="text-xs bg-transparent focus:outline-none font-semibold text-slate-700 cursor-pointer">
+                                    <button onclick="tampilkanSemuaRiwayatMutasi=false; document.getElementById('filterMutasiTanggal').value=''; renderTabunganGuru();" class="text-xs text-rose-500 hover:text-rose-700 ml-1 font-bold" title="Reset Filter">
                                         <i class="fa-solid fa-xmark"></i>
                                     </button>
                                 </div>
-<button id="btnShowAllMutasi" onclick="document.getElementById('allMutasiContainer').style.display='block'" class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-xs">Tampilkan Semua Riwayat</button>
+<button id="btnShowAllMutasi" onclick="toggleSemuaRiwayatMutasi()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm">
+    <i class="fa-solid fa-list"></i> Tampilkan Semua Riwayat
+</button>
 
                             </div>
                             <button id="btnDownloadMutasi" onclick="exportTableToExcel('tblLogTabungan', 'Rekap_Keuangan_Tabungan')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm shadow-indigo-200 flex items-center gap-2">
@@ -2711,6 +2713,17 @@ function submitAbsensi() {
             const semSelect = document.getElementById('leggerSemester');
             if(!semSelect) return;
             const semAktif = semSelect.value;
+            const btnAllMutasi = document.getElementById('btnShowAllMutasi');
+            if (btnAllMutasi) {
+                btnAllMutasi.innerHTML = tampilkanSemuaRiwayatMutasi
+                    ? '<i class="fa-solid fa-eye-slash"></i> Sembunyikan Semua Riwayat'
+                    : '<i class="fa-solid fa-list"></i> Tampilkan Semua Riwayat';
+                btnAllMutasi.classList.toggle('bg-indigo-600', !tampilkanSemuaRiwayatMutasi);
+                btnAllMutasi.classList.toggle('hover:bg-indigo-700', !tampilkanSemuaRiwayatMutasi);
+                btnAllMutasi.classList.toggle('bg-slate-600', tampilkanSemuaRiwayatMutasi);
+                btnAllMutasi.classList.toggle('hover:bg-slate-700', tampilkanSemuaRiwayatMutasi);
+            }
+
             const siswaList = getSiswaSekelas();
             const mapelList = JSON.parse(localStorage.getItem('mapel')) || [];
             const semuaNilai = (JSON.parse(localStorage.getItem('nilai')) || []).filter(n => n.kelas === currentUser.kelas && String(n.tapel || currentUser.tapel || getActiveTapel()) === String(currentUser.tapel || getActiveTapel()) && n.semester === semAktif);
@@ -2891,22 +2904,69 @@ function submitAbsensi() {
             }
         }
 
+        let tampilkanSemuaRiwayatMutasi = false;
+
+        function toggleSemuaRiwayatMutasi() {
+            tampilkanSemuaRiwayatMutasi = !tampilkanSemuaRiwayatMutasi;
+
+            const btn = document.getElementById('btnShowAllMutasi');
+            const filterTanggalEl = document.getElementById('filterMutasiTanggal');
+
+            // Saat "Semua Riwayat" aktif, filter tanggal dikosongkan agar seluruh transaksi kelas tampil.
+            if (tampilkanSemuaRiwayatMutasi && filterTanggalEl) {
+                filterTanggalEl.value = '';
+            }
+
+            if (btn) {
+                btn.innerHTML = tampilkanSemuaRiwayatMutasi
+                    ? '<i class="fa-solid fa-eye-slash"></i> Sembunyikan Semua Riwayat'
+                    : '<i class="fa-solid fa-list"></i> Tampilkan Semua Riwayat';
+                btn.classList.toggle('bg-indigo-600', !tampilkanSemuaRiwayatMutasi);
+                btn.classList.toggle('hover:bg-indigo-700', !tampilkanSemuaRiwayatMutasi);
+                btn.classList.toggle('bg-slate-600', tampilkanSemuaRiwayatMutasi);
+                btn.classList.toggle('hover:bg-slate-700', tampilkanSemuaRiwayatMutasi);
+            }
+
+            renderTabunganGuru();
+        }
+
         function renderTabunganGuru() {
             const filterTanggalEl = document.getElementById('filterMutasiTanggal');
             const filterTanggal = filterTanggalEl ? filterTanggalEl.value : '';
 
+            // Jika pengguna memilih tanggal, mode "semua riwayat" otomatis dimatikan.
+            if (filterTanggal && tampilkanSemuaRiwayatMutasi) {
+                tampilkanSemuaRiwayatMutasi = false;
+                const btn = document.getElementById('btnShowAllMutasi');
+                if (btn) {
+                    btn.innerHTML = '<i class="fa-solid fa-list"></i> Tampilkan Semua Riwayat';
+                    btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+                    btn.classList.remove('bg-slate-600', 'hover:bg-slate-700');
+                }
+            }
+
             const mutasiWrap = document.getElementById('mutasiTableWrap');
             const btnDownloadMutasi = document.getElementById('btnDownloadMutasi');
-            if (!filterTanggal) {
+            const tampilkanMutasi = !!filterTanggal || tampilkanSemuaRiwayatMutasi;
+
+            if (!tampilkanMutasi) {
                 if (mutasiWrap) mutasiWrap.classList.add('mutasi-hidden');
                 if (btnDownloadMutasi) btnDownloadMutasi.classList.add('mutasi-hidden');
             } else {
                 if (mutasiWrap) mutasiWrap.classList.remove('mutasi-hidden');
                 if (btnDownloadMutasi) btnDownloadMutasi.classList.remove('mutasi-hidden');
             }
-            let tabunganList = (JSON.parse(localStorage.getItem('tabungan')) || []).filter(t => t.kelas === currentUser.kelas);
-            if (filterTanggal) tabunganList = tabunganList.filter(t => t.date === filterTanggal);
-            else tabunganList = [];
+
+            let tabunganList = (JSON.parse(localStorage.getItem('tabungan')) || [])
+                .filter(t => t.kelas === currentUser.kelas);
+
+            // Mode normal: hanya tanggal yang dipilih.
+            // Mode "Tampilkan Semua Riwayat": seluruh transaksi kelas.
+            if (filterTanggal && !tampilkanSemuaRiwayatMutasi) {
+                tabunganList = tabunganList.filter(t => t.date === filterTanggal);
+            } else if (!tampilkanSemuaRiwayatMutasi) {
+                tabunganList = [];
+            }
 
             const siswaList = getSiswaSekelas();
             
