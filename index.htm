@@ -3246,17 +3246,14 @@ function submitAbsensi(event) {
                     let totalMasukGlobal = 0;
                     let totalKeluarGlobal = 0;
 
-                    // Deteksi transaksi yang benar-benar duplikat pada tanggal yang sama.
-                    // Duplikat ditentukan dari siswa + tanggal + jenis + nominal transaksi.
+                    // Deteksi data ganda pada tanggal yang sama.
+                    // Jika siswa yang sama memiliki lebih dari satu transaksi pada tanggal
+                    // yang sama, seluruh baris transaksinya diberi tanda merah.
                     const duplicateKeys = {};
                     tabunganList.forEach(t => {
                         const duplicateKey = [
                             t.date || '',
-                            t.username || '',
-                            t.jenis || '',
-                            Number(t.nominalAsli || 0),
-                            Number(t.nominalBersih || 0),
-                            Number(t.potongan || 0)
+                            t.username || t.nama || ''
                         ].join('|');
                         duplicateKeys[duplicateKey] = (duplicateKeys[duplicateKey] || 0) + 1;
                     });
@@ -3289,7 +3286,7 @@ function submitAbsensi(event) {
                                 ? 'bg-red-100 hover:bg-red-200 border-l-4 border-red-600 text-red-900'
                                 : 'hover:bg-slate-50';
                             const duplicateBadge = isDuplicate
-                                ? '<span class="ml-2 inline-flex items-center gap-1 rounded-full bg-red-600 text-white px-2 py-0.5 text-[10px] font-extrabold uppercase"><i class="fa-solid fa-triangle-exclamation"></i> Data Double</span>'
+                                ? '<span class="ml-2 inline-flex items-center gap-1 rounded-full bg-red-600 text-white px-2 py-0.5 text-[10px] font-extrabold uppercase"><i class="fa-solid fa-triangle-exclamation"></i> Data Double / Ganda</span>'
                                 : '';
                             tbodyMutasi.innerHTML += `
                                 <tr class="${rowClass}" title="${isDuplicate ? 'Transaksi ini terdeteksi sama/duplikat pada tanggal yang sama.' : ''}">
