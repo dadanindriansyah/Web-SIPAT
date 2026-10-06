@@ -658,6 +658,7 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase">Pilih Tanggal Absen</label>
                             <input type="date" id="absensiDate" class="mt-1 w-full border rounded-lg p-2.5 text-sm">
+                            <p class="text-[10px] text-rose-500 mt-1">Tanggal yang sama untuk siswa/semester yang sama akan ditolak.</p>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase">Cari Nama Siswa</label>
@@ -779,6 +780,7 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase">Tanggal</label>
                             <input type="date" id="nilaiDate" class="mt-1 w-full border rounded-lg p-1.5 text-sm">
+                            <p class="text-[10px] text-rose-500 mt-1">Tanggal + siswa + mapel + kategori yang sama tidak boleh diinput dua kali.</p>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase">Nilai (0-100)</label>
@@ -823,6 +825,7 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
             <input type="date" id="jurnalTanggal" class="border p-2.5 rounded-lg text-sm">
+            <p class="text-[10px] text-rose-500 mt-1">Tanggal + mapel yang sama hanya boleh satu jurnal.</p>
             <select id="jurnalMapel" class="border p-2.5 rounded-lg text-sm bg-white"></select>
             <input type="text" id="jurnalMateri" placeholder="Materi / Topik Pembelajaran" class="border p-2.5 rounded-lg text-sm">
             <input type="text" id="jurnalKegiatan" placeholder="Kegiatan Pembelajaran" class="border p-2.5 rounded-lg text-sm">
@@ -957,6 +960,10 @@
                             <select id="ekskulPilihan" class="mt-1 w-full border rounded-lg p-2 text-sm"></select>
                         </div>
                         <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Tanggal Penilaian</label>
+                            <input type="date" id="ekskulDate" class="mt-1 w-full border rounded-lg p-2 text-sm">
+                        </div>
+                        <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase">Semester</label>
                             <select id="ekskulSemester" class="mt-1 w-full border rounded-lg p-2 text-sm">
                                 <option value="1">Semester 1</option>
@@ -993,6 +1000,7 @@
                         <table id="tblLogEkskul" class="w-full text-left text-xs">
                             <thead class="bg-slate-50">
                                 <tr>
+                                    <th class="p-3">Tanggal</th>
                                     <th class="p-3">Nama Siswa</th>
                                     <th class="p-3">Ekskul</th>
                                     <th class="p-3">Semester</th>
@@ -1083,6 +1091,7 @@
                         <div>
                             <label class="block text-xs font-bold text-slate-500 uppercase">Tanggal Transaksi</label>
                             <input type="date" id="tabunganDate" class="mt-1 w-full border rounded-lg p-2 text-sm">
+                            <p class="text-[10px] text-rose-500 mt-1">Satu siswa hanya boleh satu transaksi per tanggal.</p>
                         </div>
                     </div>
                     <div id="warnPotongan" class="hidden text-rose-600 bg-rose-50 border border-rose-200 text-xs font-semibold p-3 rounded-lg mb-4 flex items-center gap-2">
@@ -2203,7 +2212,8 @@ function editGuruManagedSiswa(username){
 }
 
 // ===== PENYIMPANAN TERPISAH PER FITUR GURU =====
-// Setiap fitur hanya boleh menulis ke storage key miliknya sendiri.
+// Setiap fitur Guru memiliki storage key dan bentuk data sendiri.
+// Jangan pernah memakai key "absensi" sebagai tempat penyimpanan umum.
 const GURU_FEATURE_KEYS = Object.freeze({
     users: 'users',
     absensi: 'absensi',
@@ -2216,14 +2226,104 @@ const GURU_FEATURE_KEYS = Object.freeze({
     tabungan: 'tabungan'
 });
 
+const GURU_FEATURE_VALIDATORS = Object.freeze({
+    absensi: x => x && typeof x === 'object' && !!x.username && !!x.date && ['Hadir','Sakit','Izin','Alfa'].includes(String(x.status)),
+    nilai: x => x && typeof x === 'object' && !!x.username && !!x.mapel && ['Tugas','STS','SAS'].includes(String(x.jenis)) && x.angka !== undefined && x.angka !== null,
+    nilai_ekskul: x => x && typeof x === 'object' && !!x.username && !!x.ekskul && !!x.predikat,
+    bintang: x => x && typeof x === 'object' && !!x.username && x.jumlah !== undefined && x.jumlah !== null && !!x.desc,
+    tabungan: x => x && typeof x === 'object' && !!x.username && !!x.jenis && !!x.date && (x.nominalAsli !== undefined || x.nominalBersih !== undefined),
+    jurnal: x => x && typeof x === 'object' && !!x.tanggal && !!x.mapel && (!!x.materi || !!x.kegiatan),
+    jadwal: x => x && typeof x === 'object' && !!x.hari && !!x.jam && !!x.mapel && !!x.kelas,
+    kktp: x => x && typeof x === 'object' && !!x.bab && !!x.mapel
+});
+
+function parseStoredArray(key) {
+    try {
+        const raw = localStorage.getItem(key);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+        console.warn('Data storage rusak, dikosongkan:', key, err);
+        return [];
+    }
+}
+
 function saveGuruFeatureData(featureKey, data) {
     const allowedKey = GURU_FEATURE_KEYS[featureKey];
     if (!allowedKey || allowedKey !== featureKey) {
         console.error('Penyimpanan fitur Guru ditolak:', featureKey);
         return false;
     }
-    const safeData = Array.isArray(data) ? data : data;
-    saveAppData(allowedKey, JSON.stringify(safeData));
+
+    if (!Array.isArray(data)) {
+        console.error('Penyimpanan fitur Guru ditolak karena data bukan array:', featureKey);
+        return false;
+    }
+
+    // Filter hanya record yang memang milik fitur tersebut.
+    // Ini adalah pengaman utama agar data Nilai/Jurnal/Tabungan tidak pernah masuk ke Absensi.
+    const validator = GURU_FEATURE_VALIDATORS[featureKey];
+    const safeData = validator ? data.filter(validator) : data.slice();
+
+    // Jangan menimpa data valid dengan array yang seluruhnya tidak cocok.
+    // Ini mencegah satu kesalahan input menghapus seluruh data fitur.
+    if (data.length > 0 && safeData.length === 0) {
+        console.error('Penyimpanan dibatalkan: tidak ada record yang cocok dengan fitur', featureKey, data);
+        return false;
+    }
+
+    const serialized = JSON.stringify(safeData);
+    localStorage.setItem(allowedKey, serialized);
+    showCloudStatus('online');
+
+    // Tulis hanya satu cabang Firebase yang sesuai dengan fitur ini.
+    // Tidak menggunakan update seluruh database dan tidak menyentuh cabang absensi.
+    if (firebaseReady && !applyingFirebaseData && CLOUD_KEYS.includes(allowedKey)) {
+        dbRef.child(allowedKey).set(toFirebaseValue(allowedKey, serialized))
+            .then(() => showCloudStatus('online'))
+            .catch(err => {
+                console.error('Gagal menyimpan fitur Guru ke Firebase:', allowedKey, err);
+                showCloudStatus('offline', 'Data tersimpan lokal, Firebase belum tersambung.');
+            });
+    }
+    return true;
+}
+
+// Membersihkan data lama yang salah masuk ke storage fitur lain.
+// Dipanggil saat aplikasi mulai, tanpa mengubah data yang bentuknya sudah benar.
+function repairGuruFeatureStores() {
+    const stores = Object.keys(GURU_FEATURE_VALIDATORS);
+    const recovered = Object.fromEntries(stores.map(k => [k, []]));
+    let changed = false;
+
+    stores.forEach(sourceKey => {
+        const source = parseStoredArray(sourceKey);
+        source.forEach(record => {
+            const matches = stores.filter(k => GURU_FEATURE_VALIDATORS[k](record));
+            if (matches.length === 1) {
+                const target = matches[0];
+                recovered[target].push(record);
+                if (target !== sourceKey) changed = true;
+            } else if (matches.length > 1) {
+                // Prioritaskan bentuk data yang paling spesifik.
+                const priority = ['absensi','nilai','nilai_ekskul','tabungan','bintang','jurnal','jadwal','kktp'];
+                const target = priority.find(k => matches.includes(k)) || sourceKey;
+                recovered[target].push(record);
+                if (target !== sourceKey) changed = true;
+            }
+        });
+    });
+
+    if (!changed) return false;
+    stores.forEach(key => {
+        const unique = [];
+        const seen = new Set();
+        recovered[key].forEach(x => {
+            const sig = String(x.id ?? '') + '|' + JSON.stringify(x);
+            if (!seen.has(sig)) { seen.add(sig); unique.push(x); }
+        });
+        localStorage.setItem(key, JSON.stringify(unique));
+    });
     return true;
 }
 
@@ -2499,6 +2599,67 @@ function getSiswaSekelas() {
             document.getElementById('jurnalKegiatan').value=j.kegiatan||'';
             document.getElementById('jurnalKeterangan').value=j.keterangan||'';
         }
+        // ===== PENGAMAN ANTI DATA TANGGAL GANDA =====
+        // Duplikasi ditentukan per data yang memang boleh memiliki tanggal berbeda:
+        // - Absensi   : siswa + tanggal + kelas + semester + tahun pelajaran
+        // - Nilai     : siswa + tanggal + mapel + jenis + semester + kelas + tahun pelajaran
+        // - Jurnal    : tanggal + mapel + kelas + tahun pelajaran
+        // - Ekskul    : siswa + tanggal + ekskul + semester + kelas + tahun pelajaran
+        // - Bintang   : siswa + tanggal + kelas + tahun pelajaran
+        // - Tabungan  : siswa + tanggal + kelas + tahun pelajaran
+        // Jika kombinasi tersebut sudah ada, input BARU DITOLAK. Data lama tidak ditimpa.
+        function normDateKey(v){ return String(v || '').trim(); }
+        function normKey(v){ return String(v ?? '').trim().toLowerCase(); }
+        function getFeatureTapel(row){ return String(row?.tapel || currentUser?.tapel || getActiveTapel() || '-'); }
+        function getGuruDateDuplicateSignature(feature, row){
+            if(!row) return '';
+            const date = normDateKey(row.date || row.tanggal);
+            if(!date) return '';
+            const kelas = normKey(row.kelas || getGuruKelasAktif());
+            const tapel = normKey(getFeatureTapel(row));
+            switch(feature){
+                case 'absensi':
+                    return [normKey(row.username),date,kelas,tapel,normKey(row.semester)].join('|');
+                case 'nilai':
+                    return [normKey(row.username),date,kelas,tapel,normKey(row.mapel),normKey(row.jenis),normKey(row.semester)].join('|');
+                case 'jurnal':
+                    return [date,kelas,tapel,normKey(row.mapel)].join('|');
+                case 'nilai_ekskul':
+                    return [normKey(row.username),date,kelas,tapel,normKey(row.ekskul),normKey(row.semester)].join('|');
+                case 'bintang':
+                    return [normKey(row.username),date,kelas,tapel].join('|');
+                case 'tabungan':
+                    return [normKey(row.username),date,kelas,tapel].join('|');
+                default: return '';
+            }
+        }
+        function rejectDuplicateGuruDate(feature, existing, candidate, ignoreId){
+            const sig = getGuruDateDuplicateSignature(feature, candidate);
+            if(!sig) return false;
+            const duplicate = (Array.isArray(existing) ? existing : []).some(row => {
+                if(ignoreId !== undefined && ignoreId !== null && String(row.id) === String(ignoreId)) return false;
+                return getGuruDateDuplicateSignature(feature, row) === sig;
+            });
+            if(duplicate){
+                const tanggal = candidate.date || candidate.tanggal;
+                const siapa = candidate.nama || candidate.username || '';
+                alert(`INPUT DITOLAK!\n\nData untuk tanggal ${tanggal} sudah pernah dimasukkan${siapa ? ` untuk ${siapa}` : ''}.\n\nSistem tidak membuat atau menimpa data ganda.`);
+                return true;
+            }
+            return false;
+        }
+        // Pengaman kedua: mencegah satu proses menyimpan array baru yang berisi duplikat.
+        function hasDuplicateGuruDates(feature, data){
+            const seen = new Set();
+            for(const row of (Array.isArray(data) ? data : [])){
+                const sig = getGuruDateDuplicateSignature(feature,row);
+                if(!sig) continue;
+                if(seen.has(sig)) return true;
+                seen.add(sig);
+            }
+            return false;
+        }
+
         function submitJurnalGuru(){
             if(!requireGuruAccess('jurnal')) return;
             const tanggal=document.getElementById('jurnalTanggal').value, mapel=document.getElementById('jurnalMapel').value, materi=document.getElementById('jurnalMateri').value.trim(), kegiatan=document.getElementById('jurnalKegiatan').value.trim(), keterangan=document.getElementById('jurnalKeterangan').value.trim();
@@ -2507,14 +2668,17 @@ function getSiswaSekelas() {
             const kelasJurnal=getGuruKelasAktif(); const guruKelasJurnal=requireGuruKelasTerhubung(kelasJurnal);
             if(isGuruMapel() && !guruKelasJurnal) return;
             const data=JSON.parse(localStorage.getItem('jurnal'))||[]; const tapel=currentUser.tapel||getActiveTapel();
+            const candidate={tanggal,mapel,materi,kegiatan,keterangan,kelas:kelasJurnal,tapel};
+            if(!editJurnalGuruId && rejectDuplicateGuruDate('jurnal',data,candidate)) return;
             if(editJurnalGuruId){
                 const idx=data.findIndex(x=>String(x.id)===String(editJurnalGuruId));
                 if(idx<0) return alert('Jurnal tidak ditemukan.');
                 if(isGuruMapel() && data[idx].inputBy!==currentUser.username) return alert('Guru Mata Pelajaran hanya dapat mengedit jurnal sendiri.');
-                data[idx]={...data[idx],tanggal,mapel,materi,kegiatan,keterangan,kelas:kelasJurnal,tapel};
+                if(rejectDuplicateGuruDate('jurnal',data,candidate,data[idx].id)) return;
+                data[idx]={...data[idx],...candidate};
                 showSaveToast('Jurnal berhasil diperbarui');
             }else{
-                data.push({id:Date.now(),tanggal,mapel,materi,kegiatan,keterangan,kelas:kelasJurnal,tapel,inputBy:currentUser.username,inputByType:currentUser.jenisGuru||'Guru Kelas',guruKelasUsername:guruKelasJurnal?.username||'',guruKelasNama:guruKelasJurnal?.nama||''});
+                data.push({id:Date.now(),...candidate,inputBy:currentUser.username,inputByType:currentUser.jenisGuru||'Guru Kelas',guruKelasUsername:guruKelasJurnal?.username||'',guruKelasNama:guruKelasJurnal?.nama||''});
                 showSaveToast('Jurnal harian tersimpan');
             }
             saveGuruFeatureData('jurnal', data); editJurnalGuruId=null;
@@ -2616,11 +2780,12 @@ function submitAbsensi(event) {
     let absensi = JSON.parse(localStorage.getItem('absensi')) || [];
     const sObj = getSiswaSekelas().find(s => s.username === userSiswa);
     const profile = JSON.parse(localStorage.getItem('schoolProfile')) || {};
+    const tapel = profile.tapel || currentUser.tapel || "-";
+    const candidate = { date, username:userSiswa, nama:sObj ? sObj.nama : userSiswa, kelas:currentUser.kelas, status, semester, tapel };
 
-    // Satu siswa pada tanggal yang sama dan semester yang sama diperbarui, bukan dibuat ganda.
-    const idx = absensi.findIndex(a => a.username === userSiswa && a.date === date && a.kelas === currentUser.kelas && getAbsensiSemester(a) === semester);
-    const dataBaru = { id: idx >= 0 ? absensi[idx].id : Date.now(), date, username: userSiswa, nama: sObj ? sObj.nama : userSiswa, kelas: currentUser.kelas, status, semester, tapel: profile.tapel || "-" };
-    if (idx >= 0) absensi[idx] = dataBaru; else absensi.push(dataBaru);
+    // Tanggal yang sama untuk siswa/kelas/semester/TP ditolak, bukan diperbarui.
+    if(rejectDuplicateGuruDate('absensi', absensi, candidate)) return;
+    absensi.push({ id: Date.now(), ...candidate });
     saveGuruFeatureData('absensi', absensi);
 
     renderAbsensiGuru();
@@ -2699,12 +2864,13 @@ function submitAbsensi(event) {
             }
             let nilai = JSON.parse(localStorage.getItem('nilai')) || [];
             const sObj = getSiswaSekelas().find(s => s.username === username);
-            const profile = JSON.parse(localStorage.getItem('schoolProfile'));
+            const profile = JSON.parse(localStorage.getItem('schoolProfile')) || {};
             const tapel = currentUser.tapel || profile.tapel || "-";
             const guruKelasUsername = guruKelasAktif?.username || getGuruKelasUsername(kelasAktif);
             const guruKelasNama = guruKelasAktif?.nama || '';
-
-            nilai.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: kelasAktif, mapel, semester, jenis, date, angka, tapel, inputBy: currentUser.username, inputByType: currentUser.jenisGuru || "Guru Kelas", guruKelasUsername, guruKelasNama });
+            const candidate = { username, nama:sObj ? sObj.nama : username, kelas:kelasAktif, mapel, semester, jenis, date, angka, tapel, inputBy: currentUser.username, inputByType: currentUser.jenisGuru || "Guru Kelas", guruKelasUsername, guruKelasNama };
+            if(rejectDuplicateGuruDate('nilai', nilai, candidate)) return;
+            nilai.push({ id: Date.now(), ...candidate });
             saveGuruFeatureData('nilai', nilai);
             renderNilaiGuru();
             renderLegger();
@@ -2821,16 +2987,19 @@ function submitAbsensi(event) {
             guardGuruButton(event);
             const username = document.getElementById('ekskulSiswa').value;
             const ekskul = document.getElementById('ekskulPilihan').value;
+            const date = document.getElementById('ekskulDate').value;
             const semester = document.getElementById('ekskulSemester').value;
             const predikat = document.getElementById('ekskulPredikat').value;
             const desc = document.getElementById('ekskulDesc').value.trim();
 
-            if(!username || !ekskul || !desc) return alert("Isi lengkap!");
+            if(!username || !ekskul || !date || !desc) return alert("Isi lengkap, termasuk tanggal penilaian!");
             let nilaiEkskul = JSON.parse(localStorage.getItem('nilai_ekskul')) || [];
             const sObj = getSiswaSekelas().find(s => s.username === username);
-            const profile = JSON.parse(localStorage.getItem('schoolProfile'));
-
-            nilaiEkskul.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: currentUser.kelas, ekskul, semester, predikat, desc, tapel: profile.tapel || "-" });
+            const profile = JSON.parse(localStorage.getItem('schoolProfile')) || {};
+            const tapel = profile.tapel || currentUser.tapel || "-";
+            const candidate = { username, nama:sObj ? sObj.nama : username, kelas:currentUser.kelas, ekskul, date, semester, predikat, desc, tapel };
+            if(rejectDuplicateGuruDate('nilai_ekskul', nilaiEkskul, candidate)) return;
+            nilaiEkskul.push({ id: Date.now(), ...candidate });
             saveGuruFeatureData('nilai_ekskul', nilaiEkskul);
             renderNilaiEkskulGuru();
             showSaveToast("Nilai ekskul tersimpan");
@@ -2849,7 +3018,7 @@ function submitAbsensi(event) {
             if(!tbody) return;
             tbody.innerHTML = '';
             dataEkskul.forEach(ne => {
-                tbody.innerHTML += `<tr><td class="p-3 font-semibold">${ne.nama}</td><td>${ne.ekskul}</td><td>Sem ${ne.semester}</td><td>${ne.predikat}</td><td>${ne.desc}</td><td class="text-right"><button type="button" onclick="deleteNilaiEkskul(${ne.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+                tbody.innerHTML += `<tr><td class="p-3">${ne.date || '-'}</td><td class="p-3 font-semibold">${ne.nama}</td><td>${ne.ekskul}</td><td>Sem ${ne.semester}</td><td>${ne.predikat}</td><td>${ne.desc}</td><td class="text-right"><button type="button" onclick="deleteNilaiEkskul(${ne.id})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
             });
         }
 
@@ -2864,12 +3033,14 @@ function submitAbsensi(event) {
 
             let bintangList = JSON.parse(localStorage.getItem('bintang')) || [];
             const sObj = getSiswaSekelas().find(s => s.username === username);
-            const date = new Date().toISOString().split('T')[0];
+            const now = new Date(); const date = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
 
             const kelasBintang=getGuruKelasAktif();
             const guruKelasBintang=requireGuruKelasTerhubung(kelasBintang);
             if(isGuruMapel() && !guruKelasBintang) return;
-            bintangList.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: kelasBintang, jumlah, desc, date, tapel: currentUser.tapel || getActiveTapel(), inputBy: currentUser.username, inputByType: currentUser.jenisGuru || "Guru Kelas", guruKelasUsername: guruKelasBintang?.username || getGuruKelasUsername(kelasBintang), guruKelasNama: guruKelasBintang?.nama || '' });
+            const candidate = { username, nama:sObj ? sObj.nama : username, kelas:kelasBintang, jumlah, desc, date, tapel:currentUser.tapel || getActiveTapel(), inputBy: currentUser.username, inputByType: currentUser.jenisGuru || "Guru Kelas", guruKelasUsername: guruKelasBintang?.username || getGuruKelasUsername(kelasBintang), guruKelasNama: guruKelasBintang?.nama || '' };
+            if(rejectDuplicateGuruDate('bintang', bintangList, candidate)) return;
+            bintangList.push({ id: Date.now(), ...candidate });
             saveGuruFeatureData('bintang', bintangList);
             document.getElementById('bintangDesc').value = '';
             renderBintangGuru();
@@ -2967,7 +3138,13 @@ function submitAbsensi(event) {
                     return alert("Saldo tidak mencukupi!");
                 }
             }
-            tabungan.push({ id: Date.now(), username, nama: sObj ? sObj.nama : username, kelas: currentUser.kelas, jenis, nominalAsli: nominalKotor, nominalBersih, potongan, date, tapel: profile.tapel || "-" });
+            const tapel = profile.tapel || currentUser.tapel || "-";
+            const candidate = { username, nama: sObj ? sObj.nama : username, kelas: currentUser.kelas, jenis, nominalAsli: nominalKotor, nominalBersih, potongan, date, tapel };
+            if(rejectDuplicateGuruDate('tabungan', tabungan, candidate)) {
+                window.__savingTabungan = false;
+                return;
+            }
+            tabungan.push({ id: Date.now(), ...candidate });
             saveTabunganData(tabungan);
             renderTabunganGuru();
             showSaveToast("Transaksi Tabungan tersimpan");
@@ -3683,6 +3860,9 @@ const CLOUD_KEYS = ['schoolProfile','adminPassword','users','mapel','ekskul','ab
 let firebaseReady = false;
 let applyingFirebaseData = false;
 
+// Rapikan cache lokal lama sebelum sinkronisasi Firebase.
+repairGuruFeatureStores();
+
 function toFirebaseValue(key, value) {
     if (key === 'adminPassword') return value;
     try { return JSON.parse(value); } catch(e) { return value; }
@@ -3749,6 +3929,17 @@ dbRef.on('value', snapshot => {
             }
         });
     } finally { applyingFirebaseData = false; }
+
+    // Jika ditemukan data lama yang salah tempat, kembalikan ke cabang fiturnya
+    // lalu simpan hanya cabang yang berubah. Tidak pernah menulis semuanya ke /absensi.
+    if (repairGuruFeatureStores() && firebaseReady) {
+        const repairKeys = Object.keys(GURU_FEATURE_VALIDATORS);
+        Promise.all(repairKeys.map(key => {
+            const raw = localStorage.getItem(key);
+            return dbRef.child(key).set(toFirebaseValue(key, raw || '[]'));
+        })).catch(err => console.warn('Perbaikan struktur data Firebase belum selesai:', err));
+    }
+
     showCloudStatus('online');
     loadNavSchool();
     populateLoginTapel();
