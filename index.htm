@@ -1097,7 +1097,7 @@
                     <div id="warnPotongan" class="hidden text-rose-600 bg-rose-50 border border-rose-200 text-xs font-semibold p-3 rounded-lg mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-circle-exclamation text-base"></i> Transaksi pengeluaran otomatis dipotong pajak/administrasi sebesar 10% dari nominal penarikan!
                     </div>
-                    <button type="button" onclick="submitTabungan(event)" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-emerald-700">
+                    <button type="button" onclick="submitTabungan(event); return false;" class="bg-emerald-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:bg-emerald-700">
                         <i class="fa-solid fa-receipt"></i> Jalankan Transaksi
                     </button>
                 </div>
@@ -1619,6 +1619,7 @@
         }
 
         function logout() {
+            sessionStorage.removeItem('sipatGuruActiveTab');
             currentUser = null;
             toggleChat(false);
             const chatWidget = document.getElementById('chatWidget');
@@ -1654,12 +1655,24 @@
                 initAdminDashboard();
             } else if (role === "Guru") {
                 document.getElementById('secGuru').classList.remove('hidden');
+
+                // Login Guru dibuat langsung tampil. Sinkronisasi Firebase dan render
+                // data berat dikerjakan di belakang layar agar tidak terasa lemot.
                 populateGuruKelasAktif();
                 document.getElementById('guruTitle').innerText = `Panel Kerja ${currentUser.jenisGuru || 'Guru'} - Kelas ${getGuruKelasAktif() || currentUser.kelas}`;
                 document.getElementById('txtGuruTapel').innerText = `TP: ${currentUser.tapel || currentTapel}`;
-                applyGuruAccess();
-                initGuruViews();
-                refreshChatPartners();
+
+                // Pertahankan tab Guru yang terakhir dipilih; login baru default ke Absensi.
+                const savedGuruTab = sessionStorage.getItem('sipatGuruActiveTab');
+                const allowedGuruTab = savedGuruTab && document.getElementById(savedGuruTab) ? savedGuruTab : 'tabAbsensi';
+                applyGuruAccess(allowedGuruTab);
+                switchGuruTab(allowedGuruTab);
+
+                // Render tambahan dijalankan setelah dashboard sudah tampil.
+                setTimeout(() => {
+                    try { initGuruViews(allowedGuruTab); } catch (e) { console.warn('Init Guru:', e); }
+                    try { refreshChatPartners(); } catch (e) {}
+                }, 0);
             } else if (role === "Siswa") {
                 document.getElementById('secSiswa').classList.remove('hidden');
                 document.getElementById('siswaTitle').innerText = `Hallo My Little Bolu Ketan, Selamat Datang ${currentUser.nama}! (Kelas ${currentUser.kelas})`;
@@ -2542,44 +2555,66 @@ function getSiswaSekelas() {
             populateJurnalKktpMapel();
         }
 
-        function applyGuruAccess(){
+        function applyGuruAccess(preferredTabId) {
             const restricted = isGuruMapel();
             const allowed = restricted
                 ? ['tabNilai','tabBintang','tabDaftarSiswa','tabJurnal','tabJadwal','tabKKTP']
                 : ['tabAbsensi','tabNilai','tabLegger','tabEkskul','tabBintang','tabTabungan','tabCetakDoc','tabDaftarSiswa','tabJurnal','tabJadwal','tabKKTP'];
-            document.querySelectorAll('.guru-tab-btn').forEach(btn=>{
-                const onclick=btn.getAttribute('onclick')||'';
-                const m=onclick.match(/switchGuruTab\('([^']+)'\)/);
-                const id=m?m[1]:'';
+
+            document.querySelectorAll('.guru-tab-btn').forEach(btn => {
+                const onclick = btn.getAttribute('onclick') || '';
+                const m = onclick.match(/switchGuruTab\('([^']+)'\)/);
+                const id = m ? m[1] : '';
                 btn.classList.toggle('hidden', !allowed.includes(id));
             });
-            document.querySelectorAll('.guru-content').forEach(c=>{
+
+            document.querySelectorAll('.guru-content').forEach(c => {
                 if (!allowed.includes(c.id)) c.classList.add('hidden');
             });
-            if(restricted){
-                document.querySelectorAll('.guru-content').forEach(c=>c.classList.add('hidden'));
-                document.getElementById('tabNilai')?.classList.remove('hidden');
-                document.getElementById('tabAbsensi')?.classList.add('hidden');
-                document.getElementById('tabLegger')?.classList.add('hidden');
-                document.getElementById('tabEkskul')?.classList.add('hidden');
-                document.getElementById('tabTabungan')?.classList.add('hidden');
-                document.getElementById('tabCetakDoc')?.classList.add('hidden');
-                
-            } else {
-                document.getElementById('tabAbsensi')?.classList.remove('hidden');
-            }
-            const clearBtn=document.querySelector('button[onclick="clearAllGuruData()"]');
-            if(clearBtn) clearBtn.classList.toggle('hidden',restricted);
+
+            // Jangan lagi selalu membuka Absensi. Ini yang sebelumnya membuat
+            // Tabungan kembali ke Absensi setelah transaksi tersimpan/Firebase refresh.
+            let active = preferredTabId || sessionStorage.getItem('sipatGuruActiveTab') || '';
+            if (!allowed.includes(active)) active = restricted ? 'tabNilai' : 'tabAbsensi';
+
+            document.querySelectorAll('.guru-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById(active)?.classList.remove('hidden');
+
+            sessionStorage.setItem('sipatGuruActiveTab', active);
+
+            const clearBtn = document.querySelector('button[onclick="clearAllGuruData()"]');
+            if (clearBtn) clearBtn.classList.toggle('hidden', restricted);
+            return active;
         }
 
         function switchGuruTab(tabId) {
-            const featureMap={tabAbsensi:'absensi',tabNilai:'nilai',tabBintang:'bintang',tabJurnal:'jurnal',tabKKTP:'kktp'};
+            const featureMap = {tabAbsensi:'absensi',tabNilai:'nilai',tabBintang:'bintang',tabJurnal:'jurnal',tabKKTP:'kktp'};
             if(!requireGuruAccess(featureMap[tabId] || 'other')) return;
             if(isGuruMapel() && ['tabAbsensi','tabLegger','tabEkskul','tabTabungan','tabCetakDoc'].includes(tabId)) return;
-            document.querySelectorAll('.guru-tab-btn').forEach(btn=>{btn.classList.remove('bg-white','text-emerald-800');btn.classList.add('text-emerald-100','hover:bg-emerald-800/50');});
-            if(window.event){window.event.target.classList.add('bg-white','text-emerald-800');window.event.target.classList.remove('text-emerald-100','hover:bg-emerald-800/50');}
-            document.querySelectorAll('.guru-content').forEach(c=>c.classList.add('hidden')); document.getElementById(tabId)?.classList.remove('hidden');
-            if(tabId==='tabLegger')renderLegger(); if(tabId==='tabBintang')renderBintangGuru(); if(tabId==='tabTabungan')renderTabunganGuru(); if(tabId==='tabJurnal')renderJurnalGuru(); if(tabId==='tabJadwal')renderJadwalGuru(); if(tabId==='tabKKTP')renderKKTPGuru();
+
+            const target = document.getElementById(tabId);
+            if(!target) return;
+
+            sessionStorage.setItem('sipatGuruActiveTab', tabId);
+
+            document.querySelectorAll('.guru-tab-btn').forEach(btn => {
+                const onclick = btn.getAttribute('onclick') || '';
+                const isActive = onclick.includes(`switchGuruTab('${tabId}')`);
+                btn.classList.toggle('bg-white', isActive);
+                btn.classList.toggle('text-emerald-800', isActive);
+                btn.classList.toggle('text-emerald-100', !isActive);
+                btn.classList.toggle('hover:bg-emerald-800/50', !isActive);
+            });
+
+            document.querySelectorAll('.guru-content').forEach(c => c.classList.add('hidden'));
+            target.classList.remove('hidden');
+
+            if(tabId==='tabLegger') renderLegger();
+            if(tabId==='tabBintang') renderBintangGuru();
+            if(tabId==='tabTabungan') renderTabunganGuru();
+            if(tabId==='tabJurnal') renderJurnalGuru();
+            if(tabId==='tabJadwal') renderJadwalGuru();
+            if(tabId==='tabKKTP') renderKKTPGuru();
         }
 
         function populateJurnalKktpMapel(){
@@ -3145,8 +3180,12 @@ function submitAbsensi(event) {
                 return;
             }
             tabungan.push({ id: Date.now(), ...candidate });
+
+            // Simpan hanya ke cabang Tabungan. UI langsung selesai tanpa menunggu Firebase.
+            sessionStorage.setItem('sipatGuruActiveTab', 'tabTabungan');
             saveTabunganData(tabungan);
             renderTabunganGuru();
+            switchGuruTab('tabTabungan');
             showSaveToast("Transaksi Tabungan tersimpan");
             window.__savingTabungan = false;
         }
@@ -3704,7 +3743,10 @@ function refreshCurrentView() {
     if (!currentUser) return;
     try {
         if (currentUser.role === 'Admin' && typeof initAdminDashboard === 'function') initAdminDashboard();
-        if (currentUser.role === 'Guru' && typeof initGuruViews === 'function') initGuruViews();
+        if (currentUser.role === 'Guru' && typeof initGuruViews === 'function') {
+            const activeGuruTab = sessionStorage.getItem('sipatGuruActiveTab') || 'tabAbsensi';
+            initGuruViews(activeGuruTab);
+        }
         if (currentUser.role === 'Siswa' && typeof loadSiswaDashboard === 'function') loadSiswaDashboard();
     } catch (e) { console.warn('Refresh realtime:', e); }
 }
@@ -4037,10 +4079,17 @@ function renderRekapAbsenSiswa() {
         `;
     });
 }
-function initGuruViews() {
+function initGuruViews(preferredTabId) {
+    const activeBeforeRefresh = preferredTabId || sessionStorage.getItem('sipatGuruActiveTab') || 'tabAbsensi';
+
     populateGuruKelasAktif();
     populateGuruDropdowns();
-    if(currentUser && currentUser.role==='Guru') syncGuruStudentsFromFirebase();
+
+    // Sinkronisasi siswa tetap berjalan, tetapi tidak menghalangi UI.
+    if(currentUser && currentUser.role==='Guru'){
+        Promise.resolve(syncGuruStudentsFromFirebase()).catch(()=>{});
+    }
+
     if(!isGuruMapel()){ renderAbsensiGuru(); renderRekapAbsenSiswa(); }
     renderNilaiGuru();
     renderLegger();
@@ -4049,7 +4098,9 @@ function initGuruViews() {
     renderTabunganGuru();
     renderJurnalGuru();
     renderKKTPGuru();
-    applyGuruAccess();
+
+    const active = applyGuruAccess(activeBeforeRefresh);
+    switchGuruTab(active);
 }
     </script>
 </body>
